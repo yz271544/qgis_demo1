@@ -1,0 +1,24 @@
+# curl --location 'http://localhost:8089/api/system/template/import'
+#--header 'Authorization: ••••••'
+#--form 'files=@"/D:/iProject/javapath/jingwei-xserver-plus/doc/http/template/住地采集表.xlsx"'
+#--form 'files=@"/D:/iProject/javapath/jingwei-xserver-plus/doc/http/template/测试模板.xlsx"'
+#--form 'type="watchkeeper"'
+POST http://127.0.0.1:8089/api/system/template/import
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJzeXNfdXNlcjoxNSIsInJuU3RyIjoiM2RoWFpUMzZiTFVSMktha3VSdERJUWRnUGw2QVlGZDciLCJ1c2VySWQiOjE1fQ.Olzw1GtwI_p9IWmbYBaxpLbMsG8cUuLsXMvmIAQVqmE
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="files"; filename="住地采集表.xlsx""
+
+< 住地采集表.xlsx
+--WebAppBoundary
+Content-Disposition: form-data; name="files"; filename="测试模板.xlsx""
+
+< 测试模板.xlsx
+--WebAppBoundary
+Content-Disposition: form-data; name="type"
+
+watchkeeper
+--WebAppBoundary--
+
+###
