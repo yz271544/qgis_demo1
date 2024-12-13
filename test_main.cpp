@@ -2,7 +2,7 @@
 // Created by Lyndon on 2024/12/12.
 //
 
-#include "QgsApplication.h"
+#include "qgsapplication.h"
 
 int main(int argc, char *argv[])
 {
