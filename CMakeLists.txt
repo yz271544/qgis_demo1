@@ -111,9 +111,11 @@ link_directories(${QGIS_PREFIX_PATH}/lib /usr/lib/x86_64-linux-gnu)
 #        test_main.cpp
 #        test_main.h)
 add_executable(qgis_demo1 main.cpp)
+add_executable(qgis_demo2 main2.cpp)
 #add_executable(qgis_demo1 test_main.cpp)
 
 # 链接QGIS相关库到可执行文件
 #target_link_libraries(qgis_demo1 PRIVATE QGIS_core QGIS_gui Qt5_Core Qt5_Gui Qt5_Qml Qt5_Quick Qt5_Widgets)
 #target_link_libraries(qgis_demo1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY})
 target_link_libraries(qgis_demo1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
+target_link_libraries(qgis_demo2 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)

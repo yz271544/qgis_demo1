@@ -12,10 +12,14 @@
 #include <QFile>
 #include <QTextStream>
 
+#define HAVE_STATIC_PROVIDERS
+
 int main(int argc, char *argv[])
 {
     // Set the QT_QPA_PLATFORM environment variable to wayland
     // setenv("QT_QPA_PLATFORM", "wayland", 1);
+
+    setenv("QGIS_PROVIDER_FILE", "wfs;wcs;arcgisvectortileservice;cesiumtiles;copc;ept;gdal;mbtilesvectortiles;memory;mesh_memory;ogr;quantizedmesh;sensorthings;tiledscene;vectortile;vpc;vtpkvectortiles;xyzvectortiles;wms", 1);
 
     QString qgis_source;
     char* qgissource = std::getenv("QGISSOURCE");
@@ -28,9 +32,22 @@ int main(int argc, char *argv[])
     qDebug() << "qgis_source:" << qgis_source;
 
 
+    QString qgis_provider_file;
+    char* providerfile = std::getenv("QGIS_PROVIDER_FILE");
+    if (providerfile!= nullptr) {
+        qgis_provider_file = QString::fromStdString(providerfile);
+    } else {
+        qgis_provider_file = "";
+    }
+
+    qDebug() << "qgis_provider_file:" << qgis_provider_file;
+
+
+
+
     // 初始化QGIS应用，这里设置为不使用图形界面（第二个参数为false）
     QgsApplication app(argc, argv, false);
-    QgsApplication::initQgis();
+    // QgsApplication::initQgis();
     // 设置QGIS的相关路径（根据你实际的安装情况调整），比如插件路径等，示例中简单设置为空
     // app.setPrefixPath("D:/iProject/cpath/OSGeo4W/apps/qgis", true);
     app.setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
@@ -38,14 +55,15 @@ int main(int argc, char *argv[])
     // Set QGIS plugin path
     app.setPluginPath("/lyndon/iProject/cpath/QGIS/output/lib/qgis/plugins");
     // app.``setPluginPath("/usr/lib/qgis/plugins");
-
+    app.initQgis();
     // 初始化相关的设置等
     app.init();
 
     QgsPluginLayerRegistry* plugin_layer_registry = app.pluginLayerRegistry();
     QStringList plugin_layer_types = plugin_layer_registry->pluginLayerTypes();
     qDebug() << "plugin type:" << plugin_layer_types;
-
+    QgsPluginLayerType* wms_plugin_layer = plugin_layer_registry->pluginLayerType("wms");
+    qDebug() << "wms plugin type:" << wms_plugin_layer;
 
     // 创建一个QGIS项目实例
     QgsProject *project = QgsProject::instance();
@@ -53,7 +71,8 @@ int main(int argc, char *argv[])
     // 设置项目标题等基础信息
     project->setTitle("My QGIS Project");
     qInfo() << "set title: " << project->title();
-    project->setCrs(QgsCoordinateReferenceSystem::fromEpsgId(3857));  // 这里设置坐标参考系为EPSG:3857，可按需改
+    QgsCoordinateReferenceSystem crs = QgsCoordinateReferenceSystem::fromEpsgId(3857);
+    project->setCrs(crs);  // 这里设置坐标参考系为EPSG:3857，可按需改
     qInfo() << "set crs: " << project->crs().authid();
 
     std::string MAP_BASE_URL;
@@ -61,15 +80,13 @@ int main(int argc, char *argv[])
     if (env_url!= nullptr) {
         MAP_BASE_URL = env_url;
     } else {
-        MAP_BASE_URL = "http://47.94.145.6:80";
+        MAP_BASE_URL = "http://47.94.145.6";
     }
 
     // Define WMS layer URL and name
     std::string BASE_TILE_URL = MAP_BASE_URL + "/map/lx/{z}/{x}/{y}.png";
     QString baseTileUrl = QString::fromStdString(BASE_TILE_URL);
     QString baseTileName = "BaseTile";  // Replace with actual name
-
-
 
     qInfo() << "baseTileUrl: " << baseTileUrl;
     qInfo() << "baseTileName: " << baseTileName;
@@ -80,8 +97,11 @@ int main(int argc, char *argv[])
     uri.setParam("type", "xyz");
 
     // Create WMS raster layer
-    QgsRasterLayer *baseTileLayer = new QgsRasterLayer(uri.uri(), baseTileName, "wms");
-    baseTileLayer->setDataProvider(QString::fromStdString("wms"));
+    QgsRasterLayer* baseTileLayer = new QgsRasterLayer(uri.uri(), baseTileName, "wms");
+    baseTileLayer->setCrs(crs);
+
+
+    // baseTileLayer->setDataProvider(QString::fromStdString("wms"));
 
     // 创建RasterLayer并添加到项目中
     if (baseTileLayer->isValid()) {
@@ -91,12 +111,11 @@ int main(int argc, char *argv[])
         qCritical() << "qCritical:" << baseTileLayer->error().summary();
         qDebug() << "Error adding XYZ layer";
     }
-
-
     // 指定要保存的QGZ文件路径
     QString projectFilePath = "/lyndon/iProject/cpath/qgis_demo1/common/project/project.qgz";
     // 先将项目保存为临时的QGS文件（QGIS项目文件格式）
     QString tempQgsFilePath = QFileInfo(projectFilePath).absolutePath() + "/temp_project.qgs";
+    qDebug() << "save qgs file:" << tempQgsFilePath;
     project->write(tempQgsFilePath);
 
     // 以下是将QGS文件打包成QGZ文件的过程（QGZ实际就是压缩的QGS）
@@ -121,6 +140,7 @@ int main(int argc, char *argv[])
 
     // 保存为QGZ文件（实际是压缩成ZIP格式并改名）
     QFile file(projectFilePath);
+    qDebug() << "save qgz file:" << projectFilePath;
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream stream(&file);
         stream << doc.toString();
