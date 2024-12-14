@@ -3,6 +3,7 @@
 #include "qgsapplication.h"
 #include "qgsrasterlayer.h"
 #include "qgsdatasourceuri.h"
+#include "qgspluginlayerregistry.h"
 #include <QString>
 #include <QFileInfo>
 
@@ -16,18 +17,34 @@ int main(int argc, char *argv[])
     // Set the QT_QPA_PLATFORM environment variable to wayland
     // setenv("QT_QPA_PLATFORM", "wayland", 1);
 
+    QString qgis_source;
+    char* qgissource = std::getenv("QGISSOURCE");
+    if (qgissource!= nullptr) {
+        qgis_source = QString::fromStdString(qgissource);
+    } else {
+        qgis_source = "";
+    }
+
+    qDebug() << "qgis_source:" << qgis_source;
+
+
     // 初始化QGIS应用，这里设置为不使用图形界面（第二个参数为false）
     QgsApplication app(argc, argv, false);
     QgsApplication::initQgis();
     // 设置QGIS的相关路径（根据你实际的安装情况调整），比如插件路径等，示例中简单设置为空
     // app.setPrefixPath("D:/iProject/cpath/OSGeo4W/apps/qgis", true);
     app.setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
-
+    // app.setPrefixPath("/usr", false);
     // Set QGIS plugin path
     app.setPluginPath("/lyndon/iProject/cpath/QGIS/output/lib/qgis/plugins");
+    // app.``setPluginPath("/usr/lib/qgis/plugins");
 
     // 初始化相关的设置等
     app.init();
+
+    QgsPluginLayerRegistry* plugin_layer_registry = app.pluginLayerRegistry();
+    QStringList plugin_layer_types = plugin_layer_registry->pluginLayerTypes();
+    qDebug() << "plugin type:" << plugin_layer_types;
 
 
     // 创建一个QGIS项目实例
