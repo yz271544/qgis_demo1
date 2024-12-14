@@ -42,26 +42,34 @@ int main(int argc, char *argv[])
 
     qDebug() << "qgis_provider_file:" << qgis_provider_file;
 
-
-
-
     // 初始化QGIS应用，这里设置为不使用图形界面（第二个参数为false）
     QgsApplication app(argc, argv, false);
     // QgsApplication::initQgis();
     // 设置QGIS的相关路径（根据你实际的安装情况调整），比如插件路径等，示例中简单设置为空
     // app.setPrefixPath("D:/iProject/cpath/OSGeo4W/apps/qgis", true);
-    app.setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
+    QgsApplication::setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
     // app.setPrefixPath("/usr", false);
     // Set QGIS plugin path
-    app.setPluginPath("/lyndon/iProject/cpath/QGIS/output/lib/qgis/plugins");
+    QgsApplication::setPluginPath("/lyndon/iProject/cpath/QGIS/output/lib/qgis/plugins");
     // app.``setPluginPath("/usr/lib/qgis/plugins");
-    app.initQgis();
+    QgsApplication::initQgis();
     // 初始化相关的设置等
-    app.init();
+    QgsApplication::init();
 
     QgsPluginLayerRegistry* plugin_layer_registry = app.pluginLayerRegistry();
-    QStringList plugin_layer_types = plugin_layer_registry->pluginLayerTypes();
-    qDebug() << "plugin type:" << plugin_layer_types;
+    if (plugin_layer_registry) {
+        QStringList plugin_layer_types = plugin_layer_registry->pluginLayerTypes();
+        qDebug() << "plugin type:" << plugin_layer_types.join(", ");
+        QgsPluginLayerType* wms_plugin_layer = plugin_layer_registry->pluginLayerType("wms");
+        if (wms_plugin_layer) {
+            qDebug() << "WMS plugin type loaded successfully";
+        } else {
+            qDebug() << "Failed to load WMS plugin type";
+        }
+    } else {
+        qDebug() << "Failed to load plugin registry";
+    }
+
     QgsPluginLayerType* wms_plugin_layer = plugin_layer_registry->pluginLayerType("wms");
     qDebug() << "wms plugin type:" << wms_plugin_layer;
 
@@ -99,7 +107,6 @@ int main(int argc, char *argv[])
     // Create WMS raster layer
     QgsRasterLayer* baseTileLayer = new QgsRasterLayer(uri.uri(), baseTileName, "wms");
     baseTileLayer->setCrs(crs);
-
 
     // baseTileLayer->setDataProvider(QString::fromStdString("wms"));
 
