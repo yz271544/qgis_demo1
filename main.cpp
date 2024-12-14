@@ -2,18 +2,18 @@
 #include "qgsproject.h"
 #include "qgsapplication.h"
 #include "qgsrasterlayer.h"
-#include "qgscoordinatereferencesystem.h"
+#include "qgsdatasourceuri.h"
 #include <QString>
 #include <QFileInfo>
-#include <QDebug>
+#include <QDomDocument>
 #include <QFile>
 #include <QTextStream>
+#include <QDebug>  // For logging
+#include <qgspluginlayerregistry.h>
 #include <QProcess>
 
-// 确保已包含必要的头文件
-// ... [其他必要的包含]
+// #define HAVE_STATIC_PROVIDERS
 
-// 初始化QGIS应用，设置为不使用图形界面
 int main(int argc, char *argv[])
 {
     QString qgis_source;
@@ -26,17 +26,35 @@ int main(int argc, char *argv[])
 
     qDebug() << "qgis_source:" << qgis_source;
 
+    // Initialize QGIS application without graphical interface
     QgsApplication app(argc, argv, false);
     QgsApplication::setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
     QgsApplication::setPluginPath("/lyndon/iProject/cpath/QGIS/output/lib/qgis/plugins");
     QgsApplication::initQgis();
+
+
+    QgsPluginLayerRegistry* plugin_layer_registry = QgsApplication::pluginLayerRegistry();
+    if (plugin_layer_registry) {
+        plugin_layer_registry->addPluginLayerType(new QgsPluginLayerType(QString::fromStdString("xyzvectortiles")));
+        QStringList plugin_layer_types = plugin_layer_registry->pluginLayerTypes();
+        qDebug() << "plugin type:" << plugin_layer_types.join(", ");
+
+        QgsPluginLayerType* plugin_layer_type = plugin_layer_registry->pluginLayerType("xyzvectortiles");
+        if (plugin_layer_type) {
+            qDebug() << "XYZ plugin type loaded successfully";
+        } else {
+            qDebug() << "Failed to load XYZ plugin type";
+        }
+    } else {
+        qDebug() << "Failed to load plugin registry";
+    }
 
     QgsProject *project = QgsProject::instance();
     qInfo() << "project instance: " << project;
     project->setTitle("My QGIS Project");
     qInfo() << "set title: " << project->title();
     QgsCoordinateReferenceSystem crs = QgsCoordinateReferenceSystem::fromEpsgId(3857);
-    project->setCrs(crs);  // 设置坐标参考系为EPSG:3857
+    project->setCrs(crs);  // Set CRS to EPSG:3857
     qInfo() << "set crs: " << project->crs().authid();
 
     std::string MAP_BASE_URL;
@@ -47,27 +65,33 @@ int main(int argc, char *argv[])
         MAP_BASE_URL = "http://47.94.145.6";
     }
 
-    // Define XYZ layer URL and name
+    // Define WMS layer URL and name
     std::string BASE_TILE_URL = MAP_BASE_URL + "/map/lx/{z}/{x}/{y}.png";
     QString baseTileUrl = QString::fromStdString(BASE_TILE_URL);
-    QString baseTileName = "BaseTile";  // Replace with actual name
+    QString baseTileName = "BaseTile";
 
     qInfo() << "baseTileUrl: " << baseTileUrl;
     qInfo() << "baseTileName: " << baseTileName;
 
+    // Configure XYZ data source parameters
+    // QgsDataSourceUri uri;
+    // uri.setParam("url", baseTileUrl);
+    // uri.setParam("type", "xyz");
+
     // 构建完整的数据源URI字符串
     QString dataSource = QString("type=xyz&url=%1").arg(baseTileUrl);
-
+    qDebug() << "dataSource:" << dataSource;
     // 创建XYZ Raster图层
     auto* baseTileLayer = new QgsRasterLayer(dataSource, baseTileName, "xyz");
     baseTileLayer->setCrs(crs);
 
+    // Check if the layer is valid
     if (baseTileLayer->isValid()) {
         project->addMapLayer(baseTileLayer);
-        qInfo() << "XYZ layer added successfully.";
     } else {
-        qCritical() << "Error adding XYZ layer";
+        qCritical() << "Error adding XYZ layer: " << baseTileLayer->error().message();
     }
+
 
     // 指定保存的QGS文件路径
     QString projectFilePath = "/lyndon/iProject/cpath/qgis_demo1/common/project/project.qgz";
@@ -93,6 +117,46 @@ int main(int argc, char *argv[])
 
     QgsApplication::exitQgis();
     app.exit();
+
+    return 0;
+
+    // // Define the path to save the QGZ file
+    // QString projectFilePath = "/lyndon/iProject/cpath/qgis_demo1/common/project/project.qgz";
+    // QString tempQgsFilePath = QFileInfo(projectFilePath).absolutePath() + "/temp_project.qgs";
+    // qDebug() << "save qgs file:" << tempQgsFilePath;
+    // project->write(tempQgsFilePath);
+    //
+    // // Compress the QGS to QGZ
+    // QFileInfo qgsFileInfo(tempQgsFilePath);
+    // QString baseName = qgsFileInfo.baseName();
+    // QString dirPath = qgsFileInfo.absoluteDir().absolutePath();
+    //
+    // QDomDocument doc("qgis");
+    // QDomElement qgisElem = doc.createElement("qgis");
+    // doc.appendChild(qgisElem);
+    //
+    // QDomElement projectElem = doc.createElement("project");
+    // projectElem.setAttribute("version", "3");
+    // qgisElem.appendChild(projectElem);
+    //
+    // QDomElement titleElem = doc.createElement("title");
+    // QDomText titleText = doc.createTextNode(baseName);
+    // titleElem.appendChild(titleText);
+    // projectElem.appendChild(titleElem);
+    //
+    // QFile file(projectFilePath);
+    // qDebug() << "save qgz file:" << projectFilePath;
+    // if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    //     QTextStream stream(&file);
+    //     stream << doc.toString();
+    //     file.close();
+    //     QFile::remove(tempQgsFilePath);
+    // } else {
+    //     qDebug() << "Error saving QGZ file";
+    // }
+    //
+    // QgsApplication::exitQgis();
+    // app.exit();
 
     return 0;
 }
