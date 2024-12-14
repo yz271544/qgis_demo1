@@ -27,17 +27,24 @@ if (WIN32)
 
 
 elseif(UNIX)
-    message("NIX QGIS SOURCE DIR: $ENV{QGISSOURCE}")
-    message("NIX Searching for QGIS in $ENV{QGISPROGRAMFILES}/cmake")
-    # 设置QGIS库的路径
-    set(QGIS_INSTALL_DIR "$ENV{QGISSOURCE}/apps")
-    set(QGIS_DIR_CMAKE "$ENV{QGISSOURCE}/cmake")
-    set(QGIS_BUILD_PATH "$ENV{QGISSOURCE}")
-    set(QGIS_PREFIX_PATH "$ENV{QGISSOURCE}/output")
-    message("QGIS_INSTALL_DIR: ${QGIS_INSTALL_DIR}")
-    message("QGIS_DIR_CMAKE: ${QGIS_DIR_CMAKE}")
-    set(CMAKE_MODULE_PATH ${QGIS_INSTALL_DIR} ${QGIS_DIR_CMAKE} ${QT5_CMAKE_DIR} ${CMAKE_MODULE_PATH})
-    message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+    if($ENV{QGISSOURCE})
+        message("debug env")
+        message("NIX QGIS SOURCE DIR: $ENV{QGISSOURCE}")
+        message("NIX Searching for QGIS in $ENV{QGISPROGRAMFILES}/cmake")
+        # 设置QGIS库的路径
+        set(QGIS_INSTALL_DIR "$ENV{QGISSOURCE}/apps")
+        set(QGIS_DIR_CMAKE "$ENV{QGISSOURCE}/cmake")
+        set(QGIS_BUILD_PATH "$ENV{QGISSOURCE}")
+        set(QGIS_PREFIX_PATH "$ENV{QGISSOURCE}/output")
+        message("QGIS_INSTALL_DIR: ${QGIS_INSTALL_DIR}")
+        message("QGIS_DIR_CMAKE: ${QGIS_DIR_CMAKE}")
+        set(CMAKE_MODULE_PATH ${QGIS_INSTALL_DIR} ${QGIS_DIR_CMAKE} ${QT5_CMAKE_DIR} ${CMAKE_MODULE_PATH})
+        message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+    else()
+        message("release env")
+        set(CMAKE_MODULE_PATH /usr/share/qgis)
+        message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+    endif()
 
     find_package(Qt5 REQUIRED COMPONENTS
             Core
