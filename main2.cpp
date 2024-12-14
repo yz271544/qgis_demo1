@@ -1,4 +1,6 @@
 // #include <QApplication>
+#include <qgspluginlayerregistry.h>
+
 #include "qgsproject.h"
 #include "qgsapplication.h"
 #include <QMainWindow>
@@ -13,7 +15,14 @@ int main(int argc, char *argv[])
     QgsApplication app(argc, argv, true);
     app.setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
     app.setPluginPath("/lyndon/iProject/cpath/QGIS/output/lib/qgis/plugins");
+    app.init();
     app.initQgis();
+    QgsPluginLayerRegistry* plugin_layer_registry = app.pluginLayerRegistry();
+    QStringList plugin_layer_types = plugin_layer_registry->pluginLayerTypes();
+    qDebug() << "plugin type:" << plugin_layer_types;
+    QgsPluginLayerType* wms_plugin_layer = plugin_layer_registry->pluginLayerType("wms");
+    qDebug() << "wms plugin type:" << wms_plugin_layer;
+
     // 创建主窗口
     QMainWindow mainWindow;
     mainWindow.setWindowTitle("QGIS-with-Amap");
