@@ -19,7 +19,12 @@ int main(int argc, char *argv[])
     // Set the QT_QPA_PLATFORM environment variable to wayland
     // setenv("QT_QPA_PLATFORM", "wayland", 1);
 
-    setenv("QGIS_PROVIDER_FILE", "wfs;wcs;arcgisvectortileservice;cesiumtiles;copc;ept;gdal;mbtilesvectortiles;memory;mesh_memory;ogr;quantizedmesh;sensorthings;tiledscene;vectortile;vpc;vtpkvectortiles;xyzvectortiles;wms", 1);
+    setenv("QGIS_PROVIDER_FILE", "arcgisvectortileservice;cesiumtiles;copc;ept;gdal;"
+                                 "mbtilesvectortiles;memory;mesh_memory;ogr;quantizedmesh;sensorthings;tiledscene;"
+                                 "arcgisfeatureserver;arcgismapserver;delimitedtext;gpx;grass7;grassraster7;mdal;mssql;"
+                                 "vectortile;vpc;vtpkvectortiles;xyzvectortiles;pdal;"
+                                 "postgresraster;postgres;spatialite;virtuallayer;virtualraster;wcs;wfs;wms;", 1);
+
 
     QString qgis_source;
     char* qgissource = std::getenv("QGISSOURCE");
@@ -56,8 +61,11 @@ int main(int argc, char *argv[])
     // 初始化相关的设置等
     QgsApplication::init();
 
-    QgsPluginLayerRegistry* plugin_layer_registry = app.pluginLayerRegistry();
+    QgsPluginLayerRegistry* plugin_layer_registry = QgsApplication::pluginLayerRegistry();
     if (plugin_layer_registry) {
+        for (const QString& plugin_name : qgis_provider_file.split(";")) {
+            plugin_layer_registry->addPluginLayerType(new QgsPluginLayerType(plugin_name));
+        }
         QStringList plugin_layer_types = plugin_layer_registry->pluginLayerTypes();
         qDebug() << "plugin type:" << plugin_layer_types.join(", ");
         QgsPluginLayerType* wms_plugin_layer = plugin_layer_registry->pluginLayerType("wms");
