@@ -13,11 +13,11 @@ int main(int argc, char *argv[])
 {
     // 初始化QGIS
     QgsApplication app(argc, argv, true);
-    app.setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
-    app.setPluginPath("/lyndon/iProject/cpath/QGIS/output/lib/qgis/plugins");
-    app.init();
-    app.initQgis();
-    QgsPluginLayerRegistry* plugin_layer_registry = app.pluginLayerRegistry();
+    QgsApplication::setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
+    QgsApplication::setPluginPath("/lyndon/iProject/cpath/QGIS/output/lib/qgis/plugins");
+    QgsApplication::init();
+    QgsApplication::initQgis();
+    QgsPluginLayerRegistry* plugin_layer_registry = QgsApplication::pluginLayerRegistry();
     QStringList plugin_layer_types = plugin_layer_registry->pluginLayerTypes();
     qDebug() << "plugin type:" << plugin_layer_types;
     QgsPluginLayerType* wms_plugin_layer = plugin_layer_registry->pluginLayerType("wms");
