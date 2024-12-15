@@ -73,11 +73,6 @@ int main(int argc, char *argv[])
     qInfo() << "baseTileUrl: " << baseTileUrl;
     qInfo() << "baseTileName: " << baseTileName;
 
-    // Configure XYZ data source parameters
-    // QgsDataSourceUri uri;
-    // uri.setParam("url", baseTileUrl);
-    // uri.setParam("type", "xyz");
-
     // 构建完整的数据源URI字符串
     QString dataSource = QString("type=xyz&url=%1").arg(baseTileUrl);
     qDebug() << "dataSource:" << dataSource;
@@ -120,43 +115,4 @@ int main(int argc, char *argv[])
 
     return 0;
 
-    // // Define the path to save the QGZ file
-    // QString projectFilePath = "/lyndon/iProject/cpath/qgis_demo1/common/project/project.qgz";
-    // QString tempQgsFilePath = QFileInfo(projectFilePath).absolutePath() + "/temp_project.qgs";
-    // qDebug() << "save qgs file:" << tempQgsFilePath;
-    // project->write(tempQgsFilePath);
-    //
-    // // Compress the QGS to QGZ
-    // QFileInfo qgsFileInfo(tempQgsFilePath);
-    // QString baseName = qgsFileInfo.baseName();
-    // QString dirPath = qgsFileInfo.absoluteDir().absolutePath();
-    //
-    // QDomDocument doc("qgis");
-    // QDomElement qgisElem = doc.createElement("qgis");
-    // doc.appendChild(qgisElem);
-    //
-    // QDomElement projectElem = doc.createElement("project");
-    // projectElem.setAttribute("version", "3");
-    // qgisElem.appendChild(projectElem);
-    //
-    // QDomElement titleElem = doc.createElement("title");
-    // QDomText titleText = doc.createTextNode(baseName);
-    // titleElem.appendChild(titleText);
-    // projectElem.appendChild(titleElem);
-    //
-    // QFile file(projectFilePath);
-    // qDebug() << "save qgz file:" << projectFilePath;
-    // if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    //     QTextStream stream(&file);
-    //     stream << doc.toString();
-    //     file.close();
-    //     QFile::remove(tempQgsFilePath);
-    // } else {
-    //     qDebug() << "Error saving QGZ file";
-    // }
-    //
-    // QgsApplication::exitQgis();
-    // app.exit();
-
-    return 0;
 }
