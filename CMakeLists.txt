@@ -4,12 +4,21 @@ project(qgis_demo1)
 set(CMAKE_CXX_STANDARD 20)
 
 message("CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
+add_compile_options(/wd4819)
 
 if (WIN32)
+    add_definitions(-D_USE_MATH_DEFINES)
     message("Win32 Searching for QGIS in $ENV{QGISPROGRAMFILES}/qgis")
     # 设置QGIS库的路径
     set(QGIS_DIR $ENV{QGISPROGRAMFILES}/qgis)
-    set(CMAKE_MODULE_PATH ${QGIS_DIR} ${QT5_CMAKE_DIR} ${CMAKE_MODULE_PATH})
+    set(QT5_CMAKE_DIR D:/iProject/cpath/OSGeo4W/apps/Qt5/lib/cmake/Qt5)
+    message("QT5_CMAKE_DIR: ${QT5_CMAKE_DIR}")
+    set(QT5_DIR D:/iProject/cpath/OSGeo4W/apps/Qt5/lib)
+#    set(QT5_GUI_CMAKE_DIR D:/iProject/cpath/OSGeo4W/apps/Qt5/lib/cmake/Qt5Gui)
+#    set(QT5_QML_CMAKE_DIR D:/iProject/cpath/OSGeo4W/apps/Qt5/lib/cmake/Qt5Qml)
+#    set(QT5_XML_CMAKE_DIR D:/iProject/cpath/OSGeo4W/apps/Qt5/lib/cmake/Qt5Xml)
+#    set(CMAKE_MODULE_PATH ${QGIS_DIR} ${QT5_DIR} ${QT5_GUI_CMAKE_DIR} ${QT5_CMAKE_DIR} ${QT5_QML_CMAKE_DIR} ${QT5_XML_CMAKE_DIR} ${CMAKE_MODULE_PATH})
+    set(CMAKE_MODULE_PATH ${QGIS_DIR} ${QT5_DIR} ${QT5_CMAKE_DIR} ${CMAKE_MODULE_PATH})
 
     # 使用QGIS安装目录下的FindQGIS.cmake来查找QGIS库（前提是这个文件符合CMake查找模块规范）
     message("CMAKE_PREFIX_PATH:${CMAKE_PREFIX_PATH}")
@@ -22,7 +31,7 @@ if (WIN32)
     set(HAS_KDE_QT5_PDF_TRANSFORM_FIX FALSE CACHE BOOL "Using KDE's Qt 5.15 fork with the PDF brush transform fix")
     set(HAS_KDE_QT5_SMALL_CAPS_FIX FALSE CACHE BOOL "Using KDE's Qt 5.15 fork with the QFont::SmallCaps fix")
     set(HAS_KDE_QT5_FONT_STRETCH_FIX FALSE CACHE BOOL "Using KDE's Qt 5.15 fork with the QFont stretch fix")
-    #find_package(Qt5 COMPONENTS Core Gui Qml Quick Widgets REQUIRED)
+    find_package(Qt5 COMPONENTS Core Gui Qml Quick Widgets Xml Multimedia REQUIRED)
     find_package(Qt5Keychain CONFIG REQUIRED)
 
 
@@ -117,8 +126,19 @@ add_executable(qgis_demo4 main4.cpp)
 #add_executable(qgis_demo1 test_main.cpp)
 
 # 链接QGIS相关库到可执行文件
-#target_link_libraries(qgis_demo1 PRIVATE QGIS_core QGIS_gui Qt5_Core Qt5_Gui Qt5_Qml Qt5_Quick Qt5_Widgets)
-#target_link_libraries(qgis_demo1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY})
+#if (WIN32)
+#    target_link_libraries(qgis_demo1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5_Gui Qt5_Qml Qt5_Quick Qt5_Widgets Qt5_Xml)
+#    target_link_libraries(qgis_demo2 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5_Gui Qt5_Qml Qt5_Quick Qt5_Widgets Qt5_Xml)
+#    target_link_libraries(qgis_demo3 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5_Gui Qt5_Qml Qt5_Quick Qt5_Widgets Qt5_Xml)
+#    target_link_libraries(qgis_demo4 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5_Gui Qt5_Qml Qt5_Quick Qt5_Widgets Qt5_Xml)
+#elseif(UNIX)
+#    target_link_libraries(qgis_demo1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
+#    target_link_libraries(qgis_demo2 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
+#    target_link_libraries(qgis_demo3 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
+#    target_link_libraries(qgis_demo4 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
+#endif()
+
+
 target_link_libraries(qgis_demo1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
 target_link_libraries(qgis_demo2 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
 target_link_libraries(qgis_demo3 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
