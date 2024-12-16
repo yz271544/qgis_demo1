@@ -4,6 +4,7 @@
 #include <qgsproject.h>
 #include <qgsrasterlayer.h>
 #include <qgslayertree.h>
+#include "qgspluginlayerregistry.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,14 @@ int main(int argc, char *argv[])
     QgsApplication::initQgis();
 
     qDebug() << "Plugin path: " << QgsApplication::pluginPath();
+
+    /*QgsPluginLayerRegistry* plugin_layer_registry = QgsApplication::pluginLayerRegistry();
+    if (plugin_layer_registry) {
+        QStringList plugin_layer_types = plugin_layer_registry->pluginLayerTypes();
+        qDebug() << "plugin type:" << plugin_layer_types.join(", ");
+    } else {
+        qDebug() << "Failed to load plugin registry";
+    }*/
 
     // 创建一个新的 QGIS 工程
     QgsProject *project = QgsProject::instance();
@@ -31,12 +40,12 @@ int main(int argc, char *argv[])
     }
 
     // 将图层添加到项目中
-    QgsProject::instance()->addMapLayer(xyzLayer);
+    project->addMapLayer(xyzLayer);
 
     // 保存项目为 .qgz 文件
     // QString projectPath = "/lyndon/iProject/cpath/qgis_demo1/common/project/project4.qgz";
     QString projectPath = "D:/iProject/cpath/qgis_demo1/common/project/project4.qgz";
-    if (!QgsProject::instance()->write(projectPath)) {
+    if (!project->write(projectPath)) {
         qWarning() << "无法保存项目文件!";
         return -1;
     }

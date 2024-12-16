@@ -1,3 +1,5 @@
+#include <iomanip>
+#include <iostream>
 #include <cstdlib>
 #include "qgsproject.h"
 #include "qgsapplication.h"
@@ -12,18 +14,25 @@
 #include <QFile>
 #include <QTextStream>
 
+using namespace std;
 #define HAVE_STATIC_PROVIDERS
 
 int main(int argc, char *argv[])
 {
     // Set the QT_QPA_PLATFORM environment variable to wayland
     // setenv("QT_QPA_PLATFORM", "wayland", 1);
+    auto platform = std::getenv("QT_QPA_PLATFORM");
+    if (getenv == nullptr) {
+        _putenv_s("QT_QPA_PLATFORM", "wayland");
+    } else {
+        qDebug() << "QT_QPA_PLATFORM:" << platform;
+    }
 
-    setenv("QGIS_PROVIDER_FILE", "arcgisvectortileservice;cesiumtiles;copc;ept;gdal;"
+    _putenv_s("QGIS_PROVIDER_FILE", "arcgisvectortileservice;cesiumtiles;copc;ept;gdal;"
                                  "mbtilesvectortiles;memory;mesh_memory;ogr;quantizedmesh;sensorthings;tiledscene;"
                                  "arcgisfeatureserver;arcgismapserver;delimitedtext;gpx;grass7;grassraster7;mdal;mssql;"
                                  "vectortile;vpc;vtpkvectortiles;xyzvectortiles;pdal;"
-                                 "postgresraster;postgres;spatialite;virtuallayer;virtualraster;wcs;wfs;wms;", 1);
+                                 "postgresraster;postgres;spatialite;virtuallayer;virtualraster;wcs;wfs;wms;");
 
 
     QString qgis_source;
