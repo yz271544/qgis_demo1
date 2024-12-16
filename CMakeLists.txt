@@ -4,9 +4,9 @@ project(qgis_demo1)
 set(CMAKE_CXX_STANDARD 20)
 
 message("CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
-add_compile_options(/wd4819)
 
 if (WIN32)
+    add_compile_options(/wd4819)
     add_definitions(-D_USE_MATH_DEFINES)
     message("Win32 Searching for QGIS in $ENV{QGISPROGRAMFILES}/qgis")
     # 设置QGIS库的路径
@@ -36,25 +36,26 @@ if (WIN32)
 
 
 elseif(UNIX)
-    if($ENV{QGISSOURCE})
+    if($ENV{QGISSOURCE} STREQUAL "")
+        message("release env")
+        set(CMAKE_MODULE_PATH /usr/share/qgis)
+        message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+    else()
         message("debug env")
         message("NIX QGIS SOURCE DIR: $ENV{QGISSOURCE}")
         message("NIX Searching for QGIS in $ENV{QGISPROGRAMFILES}/cmake")
         # 设置QGIS库的路径
-        set(QGIS_INSTALL_DIR "$ENV{QGISSOURCE}/apps")
-        set(QGIS_DIR_CMAKE "$ENV{QGISSOURCE}/cmake")
-        set(QGIS_BUILD_PATH "$ENV{QGISSOURCE}")
-        set(QGIS_PREFIX_PATH "$ENV{QGISSOURCE}/output")
+        set(QGIS_INSTALL_DIR "$ENV{QGISSOURCE}/output" CACHE STRING "QGIS install directory")
+        set(QGIS_DIR_CMAKE "$ENV{QGISSOURCE}/output/share/qgis" CACHE STRING "QGIS cmake directory")
+        set(QGIS_BUILD_PATH "$ENV{QGISSOURCE}" CACHE STRING "QGIS build directory")
+        set(QGIS_PREFIX_PATH "$ENV{QGISSOURCE}/output" CACHE STRING "QGIS prefix path")
+        set(QGIS_LIB_PATH "$ENV{QGISSOURCE}/output/lib" CACHE STRING "QGIS lib path")
         message("QGIS_INSTALL_DIR: ${QGIS_INSTALL_DIR}")
         message("QGIS_DIR_CMAKE: ${QGIS_DIR_CMAKE}")
-        set(CMAKE_MODULE_PATH ${QGIS_INSTALL_DIR} ${QGIS_DIR_CMAKE} ${QT5_CMAKE_DIR} ${CMAKE_MODULE_PATH})
-        message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
-    else()
-        message("release env")
-        set(CMAKE_MODULE_PATH /usr/share/qgis)
+        set(CMAKE_MODULE_PATH ${QGIS_INSTALL_DIR} ${QGIS_DIR_CMAKE} ${QT5_CMAKE_DIR} ${QGIS_LIB_PATH} ${CMAKE_MODULE_PATH})
         message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
     endif()
-
+    message("start find Qt package")
     find_package(Qt5 REQUIRED COMPONENTS
             Core
             Gui
@@ -69,7 +70,7 @@ else()
     message("Unsupported platform")
 endif()
 
-
+message("start find qgis package")
 find_package(QGIS COMPONENTS core gui REQUIRED)
 
 #message("111 QGIS_DIR: ${QGIS_DIR}")

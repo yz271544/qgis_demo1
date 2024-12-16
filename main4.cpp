@@ -10,8 +10,8 @@ int main(int argc, char *argv[])
 {
     // 初始化 QGIS 应用程序
     QgsApplication app(argc, argv, true);
-    // QgsApplication::setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
-    QgsApplication::setPrefixPath("D:/iProject/cpath/OSGeo4W/apps/qgis", true);
+    QgsApplication::setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
+    // QgsApplication::setPrefixPath("D:/iProject/cpath/OSGeo4W/apps/qgis", true);
     QgsApplication::init();
     QgsApplication::initQgis();
 
@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
     project->addMapLayer(xyzLayer);
 
     // 保存项目为 .qgz 文件
-    // QString projectPath = "/lyndon/iProject/cpath/qgis_demo1/common/project/project4.qgz";
-    QString projectPath = "D:/iProject/cpath/qgis_demo1/common/project/project4.qgz";
+    QString projectPath = "/lyndon/iProject/cpath/qgis_demo1/common/project/project4.qgz";
+    //QString projectPath = "D:/iProject/cpath/qgis_demo1/common/project/project4.qgz";
     if (!project->write(projectPath)) {
         qWarning() << "无法保存项目文件!";
         return -1;
