@@ -14,6 +14,8 @@
 #include <QFile>
 #include <QTextStream>
 
+#include "config.h"
+
 using namespace std;
 #define HAVE_STATIC_PROVIDERS
 

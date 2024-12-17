@@ -120,7 +120,8 @@ link_directories(${QGIS_PREFIX_PATH}/lib /usr/lib/x86_64-linux-gnu)
 #add_executable(qgis_demo1 main.cpp
 #        test_main.cpp
 #        test_main.h)
-add_executable(qgis_demo1 main.cpp)
+add_executable(qgis_demo1 main.cpp
+        config.h)
 add_executable(qgis_demo2 main2.cpp)
 add_executable(qgis_demo3 main3.cpp)
 add_executable(qgis_demo4 main4.cpp)
