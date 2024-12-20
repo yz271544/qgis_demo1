@@ -8,7 +8,7 @@
 #if defined(_WIN32)
     // 定义Windows下相关变量
     const char* qgisPrefixPath = "D:/iProject/cpath/OSGeo4W/apps/qgis";
-    const char* qgisProjectPath = "D:/iProject/cpath/qgis_demo1/common/project/project4.qgz";
+    const char* qgisProjectPath = "D:/iProject/cpath/qgis_demo1/common/project/project3d1.qgz";
 #elif defined(__linux__)
     // 定义Linux下相关变量
     const char* qgisPrefixPath = "/lyndon/iProject/cpath/QGIS/output";

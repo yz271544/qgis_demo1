@@ -125,9 +125,16 @@ add_executable(qgis_demo1 main.cpp
 add_executable(qgis_demo2 main2.cpp)
 add_executable(qgis_demo3 main3.cpp)
 add_executable(qgis_demo4 main4.cpp)
+add_executable(qgis_demo3d1 main3d1.cpp)
+
+set_target_properties(qgis_demo3d1 PROPERTIES
+        POSITION_INDEPENDENT_CODE ON
+)
+
 #add_executable(qgis_demo1 test_main.cpp)
 
 target_link_libraries(qgis_demo1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
 target_link_libraries(qgis_demo2 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
 target_link_libraries(qgis_demo3 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
 target_link_libraries(qgis_demo4 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
+target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
