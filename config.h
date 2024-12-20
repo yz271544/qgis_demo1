@@ -12,7 +12,7 @@
 #elif defined(__linux__)
     // 定义Linux下相关变量
     const char* qgisPrefixPath = "/lyndon/iProject/cpath/QGIS/output";
-    const char* qgisProjectPath = "/lyndon/iProject/cpath/qgis_demo1/common/project/project4.qgz";
+    const char* qgisProjectPath = "/lyndon/iProject/cpath/qgis_demo1/common/project/project3d1.qgz";
 #endif
 
 #endif //CONFIG_H
