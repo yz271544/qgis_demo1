@@ -43,7 +43,6 @@ elseif(UNIX)
     else()
         message("debug env")
         message("NIX QGIS SOURCE DIR: $ENV{QGISSOURCE}")
-        message("NIX Searching for QGIS in $ENV{QGISPROGRAMFILES}/cmake")
         # 设置QGIS库的路径
         set(QGIS_INSTALL_DIR "$ENV{QGISSOURCE}/output" CACHE STRING "QGIS install directory")
         set(QGIS_DIR_CMAKE "$ENV{QGISSOURCE}/output/share/qgis" CACHE STRING "QGIS cmake directory")
