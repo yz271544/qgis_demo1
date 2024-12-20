@@ -53,6 +53,10 @@ elseif(UNIX)
         message("QGIS_DIR_CMAKE: ${QGIS_DIR_CMAKE}")
         set(CMAKE_MODULE_PATH ${QGIS_INSTALL_DIR} ${QGIS_DIR_CMAKE} ${QT5_CMAKE_DIR} ${QGIS_LIB_PATH} ${CMAKE_MODULE_PATH})
         message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+
+        find_path(QGIS_3D_INCLUDE_DIR NAMES qgis_3d.h HINTS ${QGIS_INSTALL_DIR}/include/qgis)
+        find_library(QGIS_3D_LIBRARY NAMES qgis_3d HINTS ${QGIS_LIB_PATH})
+
     endif()
     message("start find Qt package")
     find_package(Qt5 REQUIRED COMPONENTS
@@ -70,7 +74,8 @@ else()
 endif()
 
 message("start find qgis package")
-find_package(QGIS COMPONENTS core gui REQUIRED)
+#find_package(QGIS COMPONENTS core gui 3d REQUIRED)
+find_package(QGIS REQUIRED)
 
 #message("111 QGIS_DIR: ${QGIS_DIR}")
 #set(QGIS_INCLUDE_DIR ${QGIS_DIR}/include)
@@ -132,8 +137,8 @@ set_target_properties(qgis_demo3d1 PROPERTIES
 
 #add_executable(qgis_demo1 test_main.cpp)
 
-target_link_libraries(qgis_demo1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
-target_link_libraries(qgis_demo2 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
-target_link_libraries(qgis_demo3 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
-target_link_libraries(qgis_demo4 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
-target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
+target_link_libraries(qgis_demo1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
+target_link_libraries(qgis_demo2 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
+target_link_libraries(qgis_demo3 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
+target_link_libraries(qgis_demo4 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
+target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
