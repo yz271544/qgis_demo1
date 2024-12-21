@@ -5,6 +5,11 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+
+const char *BASE_TILE_NAME = "BaseTile";
+const char *MAIN_TILE_NAME = "MainTile";
+const char *REAL3D_TILE_NAME="Real3DTile";
+
 #if defined(_WIN32)
     // 定义Windows下相关变量
     const char* qgisPrefixPath = "D:/iProject/cpath/OSGeo4W/apps/qgis";

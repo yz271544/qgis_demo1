@@ -1,4 +1,5 @@
-﻿#include <execution>
+﻿#include <complex>
+#include <execution>
 #include <QCoreApplication>
 #include <QTextCodec>
 #include <QUrl>
@@ -10,6 +11,9 @@
 #include <qgsproject.h>
 #include <qgsrasterlayer.h>
 #include <qgslayertree.h>
+#include <qgscoordinatereferencesystem.h>
+#include <qgsmapcanvas.h>
+#include <qgsprojectviewsettings.h>
 
 #include "config.h"
 #include "qgspluginlayerregistry.h"
@@ -42,9 +46,7 @@ QString encodeUrl(QString originalUrl) {
 }
 
 
-
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     // 初始化 QGIS 应用程序
     QgsApplication app(argc, argv, true);
     // QgsApplication::setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
@@ -67,15 +69,25 @@ int main(int argc, char *argv[])
     // qDebug() << "encoded_test_url:" << encoded_test_url;
 
 
-
     // 创建一个新的 QGIS 工程
     QgsProject *project = QgsProject::instance();
+    project->removeAll();
+    QString crs = "EPSG:3857";
+    QgsCoordinateReferenceSystem qgscrs;
+    qgscrs.createFromString(crs);
+    project->setCrs(qgscrs);
+
+    QgsMapCanvas canvas;
+    canvas.setDestinationCrs(qgscrs);
+    QgsMapSettings map_settings;
+    map_settings.setDestinationCrs(qgscrs);
+
+
 
     // 创建 XYZ 图层 (使用公开的 OpenStreetMap URL)
     QString baseXyzUrl = "type=xyz&url=http://47.94.145.6/map/lx/{z}/{x}/{y}.png&zmax=19&zmin=0";
     //QString baseXyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
-    QString baseLayerName = "BaseMap";
-    QgsRasterLayer *baseXyzLayer = new QgsRasterLayer(baseXyzUrl, baseLayerName, "wms");
+    QgsRasterLayer *baseXyzLayer = new QgsRasterLayer(baseXyzUrl, BASE_TILE_NAME, "wms");
 
     if (!baseXyzLayer->isValid()) {
         qWarning() << "XYZ xyzLayer 图层无效!" << baseXyzLayer->error().message();
@@ -94,8 +106,7 @@ int main(int argc, char *argv[])
     QString encodedOrthogonalXyzUrl = "type=xyz&url=" + urlString + "/{z}/{x}/{y}.png";
     qDebug() << "encodedOrthogonalXyzUrl: " << encodedOrthogonalXyzUrl;
     //QString xyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
-    QString orthogonalLayerName = "OrthogonalMap";
-    QgsRasterLayer *orthogonalLayer = new QgsRasterLayer(encodedOrthogonalXyzUrl, orthogonalLayerName, "wms");
+    QgsRasterLayer *orthogonalLayer = new QgsRasterLayer(encodedOrthogonalXyzUrl, MAIN_TILE_NAME, "wms");
 
     if (!orthogonalLayer->isValid()) {
         qWarning() << "XYZ orthogonalLayer 图层无效!" << orthogonalLayer->error().message();
@@ -108,7 +119,8 @@ int main(int argc, char *argv[])
     // 3D Scene
     // QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
     QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json";
-    QgsTiledSceneLayer *tiled_scene_layer = new QgsTiledSceneLayer(realistic3d_tile_url, "Real3DTile", "cesiumtiles");
+    QgsTiledSceneLayer *tiled_scene_layer = new QgsTiledSceneLayer(realistic3d_tile_url, REAL3D_TILE_NAME,
+                                                                   "cesiumtiles");
     tiled_scene_layer->setRenderer3D(new QgsTiledSceneLayer3DRenderer());
     if (!tiled_scene_layer->isValid()) {
         qWarning() << "cesiumtiles 3D tiled_scene_layer 图层无效!" << tiled_scene_layer->error().message();
@@ -117,6 +129,41 @@ int main(int argc, char *argv[])
     // 将图层添加到项目中
     project->addMapLayer(tiled_scene_layer);
     qDebug() << "add 3d scene layer to project";
+
+    QgsRectangle extent;
+    auto qgs_map_layers = project->mapLayers().values();
+    for (auto qgs_map_layer: qgs_map_layers) {
+        QString layerName = qgs_map_layer->name();
+        if (layerName != BASE_TILE_NAME && layerName != MAIN_TILE_NAME && !layerName.startsWith(MAIN_TILE_NAME)) {
+            // 将当前图层的范围合并到总的范围中
+            QgsRectangle ext = qgs_map_layer->extent();
+            qDebug() << "layerName:" << layerName << " ext: " << ext << " width: " << ext.width() << " height: " << ext.height()
+            << " xMinimum:" << extent.xMinimum() << " yMinimum:" << extent.yMinimum() << " xMaximum:" << extent.xMaximum() << " yMaximum:" << extent.yMaximum()
+            << " area: " << ext.area() << " perimeter: " << ext.perimeter() << " center: " << ext.center()
+            << " isEmpty: " << ext.isEmpty() << " isNull: " << ext.isNull() << " isFinite: " << ext.isFinite();
+
+            extent.combineExtentWith(ext);
+        }
+    }
+
+    qDebug() << "extent: " << extent << " width: " << extent.width() << " height: " << extent.height()
+    << " xMinimum:" << extent.xMinimum() << " yMinimum:" << extent.yMinimum() << " xMaximum:" << extent.xMaximum() << " yMaximum:" << extent.yMaximum()
+    << " area: " << extent.area() << " perimeter: " << extent.perimeter() << " center: " << extent.center()
+    << " isEmpty: " << extent.isEmpty() << " isNull: " << extent.isNull() << " isFinite: " << extent.isFinite();
+
+
+
+    map_settings.setExtent(extent);
+    canvas.setExtent(extent);
+    canvas.refresh();
+
+
+    QgsReferencedRectangle qgs_extent(extent, qgscrs);
+    QgsProjectViewSettings* qgs_project_view_settings = project->viewSettings();
+    qgs_project_view_settings->setDefaultViewExtent(qgs_extent);
+
+
+
 
     qDebug() << "qgisProjectPath:" << qgisProjectPath;
     // 保存项目为 .qgz 文件
@@ -133,4 +180,3 @@ int main(int argc, char *argv[])
     QgsApplication::exitQgis();
     return 0;
 }
-
