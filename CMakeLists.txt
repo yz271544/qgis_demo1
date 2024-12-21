@@ -136,7 +136,9 @@ add_executable(qgis_demo1 main.cpp
 add_executable(qgis_demo2 main2.cpp)
 add_executable(qgis_demo3 main3.cpp)
 add_executable(qgis_demo4 main4.cpp)
-add_executable(qgis_demo3d1 main3d1.cpp)
+add_executable(qgis_demo3d1 main3d1.cpp
+        JwGeometry.cpp
+        JwGeometry.h)
 
 set_target_properties(qgis_demo3d1 PROPERTIES
         POSITION_INDEPENDENT_CODE ON

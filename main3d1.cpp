@@ -46,6 +46,9 @@ QString encodeUrl(QString originalUrl) {
 }
 
 
+
+
+
 int main(int argc, char *argv[]) {
     // 初始化 QGIS 应用程序
     QgsApplication app(argc, argv, true);
@@ -77,17 +80,17 @@ int main(int argc, char *argv[]) {
     qgscrs.createFromString(crs);
     project->setCrs(qgscrs);
 
-    QgsMapCanvas canvas;
-    canvas.setDestinationCrs(qgscrs);
-    QgsMapSettings map_settings;
-    map_settings.setDestinationCrs(qgscrs);
+    auto canvas = new QgsMapCanvas();
+    canvas->setDestinationCrs(qgscrs);
+    auto map_settings = new QgsMapSettings();
+    map_settings->setDestinationCrs(qgscrs);
 
 
 
     // 创建 XYZ 图层 (使用公开的 OpenStreetMap URL)
     QString baseXyzUrl = "type=xyz&url=http://47.94.145.6/map/lx/{z}/{x}/{y}.png&zmax=19&zmin=0";
     //QString baseXyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
-    QgsRasterLayer *baseXyzLayer = new QgsRasterLayer(baseXyzUrl, BASE_TILE_NAME, "wms");
+    auto *baseXyzLayer = new QgsRasterLayer(baseXyzUrl, BASE_TILE_NAME, "wms");
 
     if (!baseXyzLayer->isValid()) {
         qWarning() << "XYZ xyzLayer 图层无效!" << baseXyzLayer->error().message();
@@ -106,7 +109,7 @@ int main(int argc, char *argv[]) {
     QString encodedOrthogonalXyzUrl = "type=xyz&url=" + urlString + "/{z}/{x}/{y}.png";
     qDebug() << "encodedOrthogonalXyzUrl: " << encodedOrthogonalXyzUrl;
     //QString xyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
-    QgsRasterLayer *orthogonalLayer = new QgsRasterLayer(encodedOrthogonalXyzUrl, MAIN_TILE_NAME, "wms");
+    auto *orthogonalLayer = new QgsRasterLayer(encodedOrthogonalXyzUrl, MAIN_TILE_NAME, "wms");
 
     if (!orthogonalLayer->isValid()) {
         qWarning() << "XYZ orthogonalLayer 图层无效!" << orthogonalLayer->error().message();
@@ -119,7 +122,7 @@ int main(int argc, char *argv[]) {
     // 3D Scene
     // QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
     QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json";
-    QgsTiledSceneLayer *tiled_scene_layer = new QgsTiledSceneLayer(realistic3d_tile_url, REAL3D_TILE_NAME,
+    auto *tiled_scene_layer = new QgsTiledSceneLayer(realistic3d_tile_url, REAL3D_TILE_NAME,
                                                                    "cesiumtiles");
     tiled_scene_layer->setRenderer3D(new QgsTiledSceneLayer3DRenderer());
     if (!tiled_scene_layer->isValid()) {
@@ -153,14 +156,16 @@ int main(int argc, char *argv[]) {
 
 
 
-    map_settings.setExtent(extent);
-    canvas.setExtent(extent);
-    canvas.refresh();
+    map_settings->setExtent(extent);
+    canvas->setExtent(extent);
+    canvas->refresh();
 
 
     QgsReferencedRectangle qgs_extent(extent, qgscrs);
     QgsProjectViewSettings* qgs_project_view_settings = project->viewSettings();
     qgs_project_view_settings->setDefaultViewExtent(qgs_extent);
+    qgs_project_view_settings->setPresetFullExtent(qgs_extent);
+
 
 
 
