@@ -36,22 +36,22 @@ int main(int argc, char *argv[]) {
     qgscrs.createFromString(crs);
     project->setCrs(qgscrs);
 
-    auto canvas = new QgsMapCanvas();
-    canvas->setDestinationCrs(qgscrs);
-    auto map_settings = new QgsMapSettings();
-    map_settings->setDestinationCrs(qgscrs);
+    QgsMapCanvas canvas;
+    canvas.setDestinationCrs(qgscrs);
+    QgsMapSettings map_settings;
+    map_settings.setDestinationCrs(qgscrs);
 
     // create XYZ base layer
     QString baseXyzUrl = "type=xyz&url=http://47.94.145.6/map/lx/{z}/{x}/{y}.png&zmax=19&zmin=0";
     //QString baseXyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
-    auto *baseXyzLayer = new QgsRasterLayer(baseXyzUrl, BASE_TILE_NAME, "wms");
+    QgsRasterLayer baseXyzLayer(baseXyzUrl, BASE_TILE_NAME, "wms");
 
-    if (!baseXyzLayer->isValid()) {
-        qWarning() << "XYZ xyzLayer layer invalid!" << baseXyzLayer->error().message();
+    if (!baseXyzLayer.isValid()) {
+        qWarning() << "XYZ xyzLayer layer invalid!" << baseXyzLayer.error().message();
         return -1;
     }
     // add base layer to project
-    project->addMapLayer(baseXyzLayer);
+    project->addMapLayer(&baseXyzLayer);
     qDebug() << "add base layer to project";
 
     QTextStream out(stdout);
@@ -70,28 +70,29 @@ int main(int argc, char *argv[]) {
     // QTextStream(stdout) << "encodedOrthogonalXyzUrl: " << encodedOrthogonalXyzUrl << Qt::endl;
     qDebug().noquote() << "encodedOrthogonalXyzUrl: " << encodedOrthogonalXyzUrl;
     //QString xyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
-    auto *orthogonalLayer = new QgsRasterLayer(encodedOrthogonalXyzUrl, MAIN_TILE_NAME, "wms");
+    QgsRasterLayer orthogonalLayer(encodedOrthogonalXyzUrl, MAIN_TILE_NAME, "wms");
 
-    if (!orthogonalLayer->isValid()) {
-        qWarning() << "XYZ orthogonalLayer layer invalid!" << orthogonalLayer->error().message();
+    if (!orthogonalLayer.isValid()) {
+        qWarning() << "XYZ orthogonalLayer layer invalid!" << orthogonalLayer.error().message();
         return -1;
     }
     // add orthogonal layer to project
-    project->addMapLayer(orthogonalLayer);
+    project->addMapLayer(&orthogonalLayer);
     qDebug() << "add orthogonal layer to project";
 
     // 3D Scene
     // QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
     QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json";
-    auto *tiled_scene_layer = new QgsTiledSceneLayer(realistic3d_tile_url, REAL3D_TILE_NAME,
+    QgsTiledSceneLayer tiled_scene_layer(realistic3d_tile_url, REAL3D_TILE_NAME,
                                                                    "cesiumtiles");
-    tiled_scene_layer->setRenderer3D(new QgsTiledSceneLayer3DRenderer());
-    if (!tiled_scene_layer->isValid()) {
-        qWarning() << "cesiumtiles 3D tiled_scene_layer layer invalid!" << tiled_scene_layer->error().message();
+    QgsTiledSceneLayer3DRenderer qgs_tiled_scene_layer_3d_renderer;
+    tiled_scene_layer.setRenderer3D(&qgs_tiled_scene_layer_3d_renderer);
+    if (!tiled_scene_layer.isValid()) {
+        qWarning() << "cesiumtiles 3D tiled_scene_layer layer invalid!" << tiled_scene_layer.error().message();
         return -1;
     }
     // add layer to project
-    project->addMapLayer(tiled_scene_layer);
+    project->addMapLayer(&tiled_scene_layer);
     qDebug() << "add 3d scene layer to project";
 
     QgsRectangle extent;
@@ -114,19 +115,15 @@ int main(int argc, char *argv[]) {
     << " area: " << extent.area() << " perimeter: " << extent.perimeter() << " center: " << extent.center()
     << " isEmpty: " << extent.isEmpty() << " isNull: " << extent.isNull() << " isFinite: " << extent.isFinite();
 
-    map_settings->setExtent(extent);
-    canvas->setExtent(extent);
-    canvas->refresh();
+    map_settings.setExtent(extent);
+    canvas.setExtent(extent);
+    canvas.refresh();
 
 
     QgsReferencedRectangle qgs_extent(extent, qgscrs);
     QgsProjectViewSettings* qgs_project_view_settings = project->viewSettings();
     qgs_project_view_settings->setDefaultViewExtent(qgs_extent);
     qgs_project_view_settings->setPresetFullExtent(qgs_extent);
-
-
-
-
 
     qDebug() << "qgisProjectPath:" << qgisProjectPath;
     // save to .qgz file
