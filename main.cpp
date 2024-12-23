@@ -1,4 +1,4 @@
-#include <cstdlib>
+﻿#include <cstdlib>
 #include "qgsproject.h"
 #include "qgsapplication.h"
 #include "qgsrasterlayer.h"

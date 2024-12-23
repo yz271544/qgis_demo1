@@ -18,39 +18,8 @@
 #include "config.h"
 #include "qgspluginlayerregistry.h"
 
-
-QString encodeUrl(QString originalUrl) {
-    // QString originalUrl = "https://example.com/路径/文件.html?参数1=值1&参数2=值2";
-    qDebug() << "originalUrl: " << originalUrl;
-    QUrl url(originalUrl);
-    QString path = url.path();
-    qDebug() << "path: " << path;
-    // for (QString chars : path.split("/")) {
-    //     qDebug() << "chars: " << chars;
-    //     QString encodedChars = QUrl::toPercentEncoding(chars);
-    //     qDebug() << "encodedChars: " << encodedChars;
-    //     QString part = path.replace(chars, encodedChars);
-    //     qDebug() << "part: " << part;
-    //     url.setPath(part);
-    // }
-    url.setPath(path);
-
-    // QString encodedPath = QUrl::toPercentEncoding(path);
-    // qDebug() << "encodedPath: " << encodedPath;
-    // url.setPath(encodedPath);
-    qDebug() << "url: " << url.toString();
-    QString finalEncodedUrl = url.toString();
-    // qDebug() << "TEST originalUrl：" << originalUrl;
-    // qDebug() << "TEST Encoded URL: " << finalEncodedUrl;
-    return finalEncodedUrl;
-}
-
-
-
-
-
 int main(int argc, char *argv[]) {
-    // 初始化 QGIS 应用程序
+    // init QGIS app
     QgsApplication app(argc, argv, true);
     // QgsApplication::setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
     QgsApplication::setPrefixPath(qgisPrefixPath, true);
@@ -59,20 +28,7 @@ int main(int argc, char *argv[]) {
 
     qDebug() << "Plugin path: " << QgsApplication::pluginPath();
 
-    /*QgsPluginLayerRegistry* plugin_layer_registry = QgsApplication::pluginLayerRegistry();
-    if (plugin_layer_registry) {
-        QStringList plugin_layer_types = plugin_layer_registry->pluginLayerTypes();
-        qDebug() << "plugin type:" << plugin_layer_types.join(", ");
-    } else {
-        qDebug() << "Failed to load plugin registry";
-    }*/
-
-    // QString originalUrl = "https://example.com/路径/文件.html?参数1=值1&参数2=值2";
-    // QString encoded_test_url= encodeUrl(originalUrl);
-    // qDebug() << "encoded_test_url:" << encoded_test_url;
-
-
-    // 创建一个新的 QGIS 工程
+    // create QGIS project
     QgsProject *project = QgsProject::instance();
     project->removeAll();
     QString crs = "EPSG:3857";
@@ -85,37 +41,42 @@ int main(int argc, char *argv[]) {
     auto map_settings = new QgsMapSettings();
     map_settings->setDestinationCrs(qgscrs);
 
-
-
-    // 创建 XYZ 图层 (使用公开的 OpenStreetMap URL)
+    // create XYZ base layer
     QString baseXyzUrl = "type=xyz&url=http://47.94.145.6/map/lx/{z}/{x}/{y}.png&zmax=19&zmin=0";
     //QString baseXyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
     auto *baseXyzLayer = new QgsRasterLayer(baseXyzUrl, BASE_TILE_NAME, "wms");
 
     if (!baseXyzLayer->isValid()) {
-        qWarning() << "XYZ xyzLayer 图层无效!" << baseXyzLayer->error().message();
+        qWarning() << "XYZ xyzLayer layer invalid!" << baseXyzLayer->error().message();
         return -1;
     }
-    // 将图层添加到项目中
+    // add base layer to project
     project->addMapLayer(baseXyzLayer);
     qDebug() << "add base layer to project";
 
-    // 创建 XYZ 图层 (使用公开的 OpenStreetMap URL)
-    QString urlString = "http://47.94.145.6/map/orthogonal/1847168269595754497-健康谷正射";
+    QTextStream out(stdout);
+    out.setCodec("UTF-8");
+    QString ch = QString::fromUtf8("健康谷正射");
+    qDebug() << "ch:" << ch;
 
-    // QString encoded_url_string = encodeUrl(urlString);
-    // qDebug() << "encoded_url_string: " << encoded_url_string;
-    // QString encodedOrthogonalXyzUrl = "type=xyz&url=http://47.94.145.6" + prefix +  partStr + "/{z}/{x}/{y}.png";
-    QString encodedOrthogonalXyzUrl = "type=xyz&url=" + urlString + "/{z}/{x}/{y}.png";
-    qDebug() << "encodedOrthogonalXyzUrl: " << encodedOrthogonalXyzUrl;
+    // create XYZ layer
+    QString urlString = QString::fromUtf8("http://47.94.145.6/map/orthogonal/1847168269595754497-健康谷正射");
+    qDebug() << "urlString:" << urlString;
+    // QTextStream(stdout) << "urlString:" << urlString << endl;
+    QString encodedOrthogonalXyzUrl = "type=xyz&url=";
+    encodedOrthogonalXyzUrl.append(urlString);
+    encodedOrthogonalXyzUrl.append("/{z}/{x}/{y}");
+    encodedOrthogonalXyzUrl.append(".png");
+    // QTextStream(stdout) << "encodedOrthogonalXyzUrl: " << encodedOrthogonalXyzUrl << Qt::endl;
+    qDebug().noquote() << "encodedOrthogonalXyzUrl: " << encodedOrthogonalXyzUrl;
     //QString xyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
     auto *orthogonalLayer = new QgsRasterLayer(encodedOrthogonalXyzUrl, MAIN_TILE_NAME, "wms");
 
     if (!orthogonalLayer->isValid()) {
-        qWarning() << "XYZ orthogonalLayer 图层无效!" << orthogonalLayer->error().message();
+        qWarning() << "XYZ orthogonalLayer layer invalid!" << orthogonalLayer->error().message();
         return -1;
     }
-    // 将图层添加到项目中
+    // add orthogonal layer to project
     project->addMapLayer(orthogonalLayer);
     qDebug() << "add orthogonal layer to project";
 
@@ -126,10 +87,10 @@ int main(int argc, char *argv[]) {
                                                                    "cesiumtiles");
     tiled_scene_layer->setRenderer3D(new QgsTiledSceneLayer3DRenderer());
     if (!tiled_scene_layer->isValid()) {
-        qWarning() << "cesiumtiles 3D tiled_scene_layer 图层无效!" << tiled_scene_layer->error().message();
+        qWarning() << "cesiumtiles 3D tiled_scene_layer layer invalid!" << tiled_scene_layer->error().message();
         return -1;
     }
-    // 将图层添加到项目中
+    // add layer to project
     project->addMapLayer(tiled_scene_layer);
     qDebug() << "add 3d scene layer to project";
 
@@ -138,7 +99,6 @@ int main(int argc, char *argv[]) {
     for (auto qgs_map_layer: qgs_map_layers) {
         QString layerName = qgs_map_layer->name();
         if (layerName != BASE_TILE_NAME && layerName != MAIN_TILE_NAME && !layerName.startsWith(MAIN_TILE_NAME)) {
-            // 将当前图层的范围合并到总的范围中
             QgsRectangle ext = qgs_map_layer->extent();
             qDebug() << "layerName:" << layerName << " ext: " << ext << " width: " << ext.width() << " height: " << ext.height()
             << " xMinimum:" << extent.xMinimum() << " yMinimum:" << extent.yMinimum() << " xMaximum:" << extent.xMaximum() << " yMaximum:" << extent.yMaximum()
@@ -153,8 +113,6 @@ int main(int argc, char *argv[]) {
     << " xMinimum:" << extent.xMinimum() << " yMinimum:" << extent.yMinimum() << " xMaximum:" << extent.xMaximum() << " yMaximum:" << extent.yMaximum()
     << " area: " << extent.area() << " perimeter: " << extent.perimeter() << " center: " << extent.center()
     << " isEmpty: " << extent.isEmpty() << " isNull: " << extent.isNull() << " isFinite: " << extent.isFinite();
-
-
 
     map_settings->setExtent(extent);
     canvas->setExtent(extent);
@@ -171,17 +129,17 @@ int main(int argc, char *argv[]) {
 
 
     qDebug() << "qgisProjectPath:" << qgisProjectPath;
-    // 保存项目为 .qgz 文件
+    // save to .qgz file
     QString projectPath = qgisProjectPath;
     qDebug() << "projectPath:" << projectPath;
     if (!project->write(projectPath)) {
-        qWarning() << "无法保存项目文件!";
+        qWarning() << "save projectPath to file " << projectPath << " failed!";
         return -1;
     }
 
-    qDebug() << "项目已成功保存到" << projectPath;
+    qDebug() << "projectPath:" << projectPath;
 
-    // 释放 QGIS 资源
+    // release qgis resource
     QgsApplication::exitQgis();
     return 0;
 }

@@ -1,4 +1,4 @@
-// #include <QApplication>
+﻿// #include <QApplication>
 #include <qgspluginlayerregistry.h>
 
 #include "qgsproject.h"

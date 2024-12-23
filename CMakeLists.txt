@@ -11,6 +11,7 @@ if (WIN32)
     message("Win32 Searching for QGIS in $ENV{QGISPROGRAMFILES}/qgis")
     # 设置QGIS库的路径
     set(QGIS_DIR $ENV{QGISPROGRAMFILES}/qgis)
+    set(QGIS_LIB_PATH D:/iProject/cpath/OSGeo4W/apps/qgis/lib)
     set(QT5_CMAKE_DIR D:/iProject/cpath/OSGeo4W/apps/Qt5/lib/cmake/Qt5)
     message("QT5_CMAKE_DIR: ${QT5_CMAKE_DIR}")
     set(QT5_DIR D:/iProject/cpath/OSGeo4W/apps/Qt5/lib)

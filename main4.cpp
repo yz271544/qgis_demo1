@@ -1,4 +1,4 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QFileInfo>
 #include <qgsapplication.h>
 #include <qgsproject.h>
