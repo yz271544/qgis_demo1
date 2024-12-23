@@ -38,8 +38,7 @@ if (WIN32)
 
 elseif(UNIX)
     message("NIX system - QGISSOURCE: ${QGISSOURCE}")
-#    if(NOT DEFINED $ENV{QGISSOURCE})
-    if (DEFINED $ENV{QGISSOURCE} AND $ENV{QGISSOURCE} STREQUAL "")
+    if (NOT DEFINED $ENV{QGISSOURCE} AND $ENV{QGISSOURCE} STREQUAL "")
         message("release env")
         set(CMAKE_MODULE_PATH /usr/share/qgis)
         message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
@@ -72,6 +71,9 @@ elseif(UNIX)
             Multimedia
     )
     find_package(Qt5Keychain CONFIG REQUIRED)
+
+    find_path(GDAL_INCLUDE_DIR NAMES gdal.h ogr_api.h gdalwarper.h cpl_conv.h cpl_string.h HINTS /usr/include/gdal)
+    find_library(GDAL_LIBRARY NAMES gdal HINTS /usr/lib /usr/lib/x86_64-linux-gnu)
 else()
     message("Unsupported platform")
 endif()
@@ -123,6 +125,10 @@ include_directories(${Qt5Multimedia_INCLUDE_DIRS})
 message("Qt5Xml_INCLUDE_DIRS: ${Qt5Xml_INCLUDE_DIRS}")
 include_directories(${Qt5Xml_INCLUDE_DIRS})
 
+message("GDAL_INCLUDE_DIR: ${GDAL_INCLUDE_DIR}")
+include_directories(${GDAL_INCLUDE_DIR})
+
+
 # Add the -fPIC flag
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
@@ -147,8 +153,8 @@ set_target_properties(qgis_demo3d1 PROPERTIES
 
 #add_executable(qgis_demo1 test_main.cpp)
 
-target_link_libraries(qgis_demo1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
-target_link_libraries(qgis_demo2 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
-target_link_libraries(qgis_demo3 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
-target_link_libraries(qgis_demo4 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
-target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml)
+target_link_libraries(qgis_demo1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml ${GDAL_LIBRARY})
+target_link_libraries(qgis_demo2 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml ${GDAL_LIBRARY})
+target_link_libraries(qgis_demo3 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml ${GDAL_LIBRARY})
+target_link_libraries(qgis_demo4 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml ${GDAL_LIBRARY})
+target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml ${GDAL_LIBRARY})
