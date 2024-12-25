@@ -1,0 +1,58 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "Qt-Debug",
+      "inherits": "Qt-Default",
+      "binaryDir": "${sourceDir}/out/build/debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-DQT_QML_DEBUG"
+      },
+      "environment": {
+        "QML_DEBUG_ARGS": "-qmljsdebugger=file:{f4751dc7-d82b-47ec-aad0-1846698c70ce},block"
+      }
+    },
+    {
+      "name": "Qt-Release",
+      "inherits": "Qt-Default",
+      "binaryDir": "${sourceDir}/out/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "hidden": true,
+      "name": "Qt-Default",
+      "inherits": "Qt5",
+      "vendor": {
+        "qt-project.org/Default": {
+          "checksum": "huwgutPSPG6bSeZS6KHPxWSQplk="
+        }
+      }
+    },
+    {
+      "hidden": true,
+      "name": "Qt5",
+      "inherits": "Qt",
+      "environment": {
+        "QTDIR": "D:/iProject/cpath/OSGeo4W/apps/Qt5"
+      },
+      "architecture": {
+        "strategy": "external",
+        "value": "x64"
+      },
+      "generator": "Ninja",
+      "vendor": {
+        "qt-project.org/Version": {
+          "checksum": "TIG+jWhPtLyVRxsUfyp8nd/3jpo="
+        }
+      }
+    }
+  ],
+  "vendor": {
+    "qt-project.org/Presets": {
+      "checksum": "V9x9uCU5FMZ1PmMPgSqQVlXjXv8="
+    }
+  }
+}

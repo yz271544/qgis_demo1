@@ -1,4 +1,7 @@
-cmake-build-debug/
+﻿cmake-build-debug/
 cmake-build-release/
 common/
 .idea/
+out/
+doc/
+.vs/
