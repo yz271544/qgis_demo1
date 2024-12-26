@@ -51,7 +51,8 @@ int main(int argc, char* argv[]) {
 
 	// init QGIS app
 	QgsApplication app(argc, argv, true);
-	QgsApplication::setPrefixPath(QGIS_PREFIX_PATH, true);
+	//QgsApplication::setPrefixPath(QGIS_PREFIX_PATH, true);
+	QgsApplication::setPrefixPath("/usr", true);
 	QgsApplication::init();
 	QgsApplication::initQgis();
 	Qgs3D::initialize();
@@ -163,7 +164,14 @@ int main(int argc, char* argv[]) {
 	else {
 		qCritical() << "critical：point layer commit changes 数据提交到图层失败:" << point_provider->error().message();
 	}
-
+	//point_layer->updateExtents();
+	// Print the updated extent
+	// QgsRectangle point_layer_extent = point_layer->extent();
+	// qDebug() << "Updated extent: " << point_layer_extent << " width: " << point_layer_extent.width() << " height: " << point_layer_extent.height()
+	// 	<< " xMinimum:" << point_layer_extent.xMinimum() << " yMinimum:" << point_layer_extent.yMinimum() << " xMaximum:" << point_layer_extent.
+	// 	xMaximum() << " yMaximum:" << point_layer_extent.yMaximum()
+	// 	<< " area: " << point_layer_extent.area() << " perimeter: " << point_layer_extent.perimeter() << " center: " << point_layer_extent.center()
+	// 	<< " isEmpty: " << point_layer_extent.isEmpty() << " isNull: " << point_layer_extent.isNull() << " isFinite: " << point_layer_extent.isFinite();
 
 	// # Save the vector layer to a GeoJSON file
 	QgsVectorFileWriter::SaveVectorOptions options{};
@@ -179,8 +187,18 @@ int main(int argc, char* argv[]) {
 	QgsVectorFileWriter* writer = QgsVectorFileWriter::create(geojson_path, fields, Qgis::WkbType::PointZ, project->crs(), QgsCoordinateTransformContext(), options);
 	writer->writeAsVectorFormatV3(point_layer, geojson_path, project->transformContext(), options);
 	delete writer;
+	// delete point_layer;
 	// # Load the GeoJSON file
 	QgsVectorLayer* p_point_layer = new QgsVectorLayer(geojson_path, layer_name, "ogr");
+	p_point_layer->setCrs(project->crs());
+	// p_point_layer->updateExtents();
+	// QgsRectangle p_point_layer_extent = p_point_layer->extent();
+	// qDebug() << "222 Updated extent: " << p_point_layer_extent << " width: " << p_point_layer_extent.width() << " height: " << p_point_layer_extent.height()
+	// 	<< " xMinimum:" << p_point_layer_extent.xMinimum() << " yMinimum:" << p_point_layer_extent.yMinimum() << " xMaximum:" << p_point_layer_extent.
+	// 	xMaximum() << " yMaximum:" << p_point_layer_extent.yMaximum()
+	// 	<< " area: " << p_point_layer_extent.area() << " perimeter: " << p_point_layer_extent.perimeter() << " center: " << p_point_layer_extent.center()
+	// 	<< " isEmpty: " << p_point_layer_extent.isEmpty() << " isNull: " << p_point_layer_extent.isNull() << " isFinite: " << p_point_layer_extent.isFinite();
+
 	if (!p_point_layer->isValid()) {
 		qCritical("Failed to load the layer!");
 		exit(1);
@@ -203,18 +221,35 @@ int main(int argc, char* argv[]) {
 	project->addMapLayer(p_point_layer);
 
 
+	QgsMapCanvas* canvas = new QgsMapCanvas();
+	QgsMapSettings qgs_map_settings = canvas->mapSettings();
+	qDebug() << "qgs_map_settings extent: " << qgs_map_settings.extent();
+	canvas->setDestinationCrs(qgscrs);
+
+	QgsPointXY* center;
 	QgsRectangle extent;
 	auto qgs_map_layers = project->mapLayers().values();
 	for (auto qgs_map_layer : qgs_map_layers) {
 		QString layerName = qgs_map_layer->name();
-		if (layerName != BASE_TILE_NAME && layerName != MAIN_TILE_NAME && !layerName.startsWith(MAIN_TILE_NAME)) {
+		if (layerName != BASE_TILE_NAME && layerName != MAIN_TILE_NAME
+			&& !layerName.startsWith(MAIN_TILE_NAME)
+			&& !layerName.startsWith(REAL3D_TILE_NAME)
+			) {
+		//if (qgsVariantEqual(layer_name, "Real3DTile")) {
+			canvas->layers().append(qgs_map_layer);
 			QgsRectangle ext = qgs_map_layer->extent();
-			qDebug() << "layerName:" << layerName << " ext: " << ext << " width: " << ext.width() << " height: " << ext.
-				height()
-				<< " xMinimum:" << extent.xMinimum() << " yMinimum:" << extent.yMinimum() << " xMaximum:" << extent.
-				xMaximum() << " yMaximum:" << extent.yMaximum()
-				<< " area: " << ext.area() << " perimeter: " << ext.perimeter() << " center: " << ext.center()
-				<< " isEmpty: " << ext.isEmpty() << " isNull: " << ext.isNull() << " isFinite: " << ext.isFinite();
+			// if (QgsTiledSceneLayer* qgs_vector_layer = dynamic_cast<QgsTiledSceneLayer*>(qgs_map_layer)) {
+			// 	qgs_vector_layer->recalculateExtents();
+			// 	ext = qgs_vector_layer->extent();
+			// }
+			center = new QgsPointXY((ext.xMaximum() + ext.xMinimum())/2, (ext.yMaximum() + ext.yMinimum())/2);
+			QString layer_crs_name = qgs_map_layer->crs().authid();
+			qDebug() << "layerName:" << layerName << "crs:" << layer_crs_name << " ext: " << ext
+			<< " width: " << ext.width() << " height: " << ext.height()
+			<< " xMinimum:" << ext.xMinimum() << " yMinimum:" << ext.yMinimum()
+			<< " xMaximum:" << ext.xMaximum() << " yMaximum:" << ext.yMaximum()
+			<< " area: " << ext.area() << " perimeter: " << ext.perimeter() << " center: " << ext.center()
+			<< " isEmpty: " << ext.isEmpty() << " isNull: " << ext.isNull() << " isFinite: " << ext.isFinite();
 
 			extent.combineExtentWith(ext);
 		}
@@ -225,17 +260,20 @@ int main(int argc, char* argv[]) {
 		xMaximum() << " yMaximum:" << extent.yMaximum()
 		<< " area: " << extent.area() << " perimeter: " << extent.perimeter() << " center: " << extent.center()
 		<< " isEmpty: " << extent.isEmpty() << " isNull: " << extent.isNull() << " isFinite: " << extent.isFinite();
+	qgs_map_settings.setDestinationCrs(qgscrs);
+	qgs_map_settings.setExtent(extent);
+	canvas->setExtent(extent);
+	canvas->setCenter(*center);
+	// canvas->setVisible(true);
+	canvas->refresh();
+	// canvas->show();
+	//Qgs3DMapCanvas* canvas3d = new Qgs3DMapCanvas;
+	QgsReferencedRectangle* referenced_rectangle = new QgsReferencedRectangle(extent, project->crs());
+	project->viewSettings()->setDefaultViewExtent(*referenced_rectangle);
+	// QgsMapSettings map_settings;
+	// map_settings.setDestinationCrs(qgscrs);
+	// map_settings.setExtent(extent);
 
-	/*QgsMapCanvas canvas = new QgsMapCanvas;
-	canvas.setDestinationCrs(qgscrs);
-
-	Qgs3DMapCanvas* canvas3d = new Qgs3DMapCanvas;
-
-	QgsMapSettings map_settings;
-	map_settings.setDestinationCrs(qgscrs);
-	map_settings.setExtent(extent);
-	canvas.setExtent(extent);
-	canvas.refresh();*/
 
 
 	/*QgsReferencedRectangle qgs_extent(extent, qgscrs);

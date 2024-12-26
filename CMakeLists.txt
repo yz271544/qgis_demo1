@@ -138,9 +138,18 @@ add_executable(qgis_demo4 main4.cpp)
 add_executable(qgis_demo3d0 main3d0.cpp
         JwGeometry.cpp)
 add_executable(qgis_demo3d1 main3d1.cpp
-        JwGeometry.cpp)
+        JwGeometry.cpp
+        core/qgis/style/StylePoint.cpp
+        core/qgis/style/StylePoint.h
+)
+
+add_executable(test_main test_main.cpp test_main.h)
 
 set_target_properties(qgis_demo3d1 PROPERTIES
+        POSITION_INDEPENDENT_CODE ON
+)
+
+set_target_properties(test_main PROPERTIES
         POSITION_INDEPENDENT_CODE ON
 )
 
@@ -152,3 +161,4 @@ target_link_libraries(qgis_demo3 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY
 target_link_libraries(qgis_demo4 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml ${GDAL_LIBRARY})
 target_link_libraries(qgis_demo3d0 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml ${GDAL_LIBRARY})
 target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml ${GDAL_LIBRARY})
+target_link_libraries(test_main PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml ${GDAL_LIBRARY})
