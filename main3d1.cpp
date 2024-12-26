@@ -181,7 +181,7 @@ int main(int argc, char* argv[]) {
 	options.overrideGeometryType = Qgis::WkbType::PointZ;
 
 	QString layer_persist_prefix = QString().append(save_qgis_project_path).append("/").append(layer_name);
-	QString geojson_path = layer_persist_prefix.append(".geojson");
+	QString geojson_path = QString(layer_persist_prefix).append(".geojson");
 	// QgsVectorFileWriter::writeAsVectorFormatV3(point_layer, geojson_path, QgsCoordinateTransformContext(), options);
 	// QgsVectorFileWriter* writer = new QgsVectorFileWriter(geojson_path, QGIS_LAYER_ENCODING, fields, Qgis::WkbType::PointZ, project->crs());
 	QgsVectorFileWriter* writer = QgsVectorFileWriter::create(geojson_path, fields, Qgis::WkbType::PointZ, project->crs(), QgsCoordinateTransformContext(), options);
@@ -204,7 +204,7 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 	// # icon_path = "D:/iProject/pypath/qgis-x/common/icon/民警.png"
-	QString icon_path = layer_persist_prefix.append(".png");
+	QString icon_path = QString(layer_persist_prefix).append(".png");
 
 	if (!icon_base64.isEmpty()) {
 		QByteArray decodedData = QByteArray::fromBase64(icon_base64.toUtf8());
@@ -264,12 +264,15 @@ int main(int argc, char* argv[]) {
 	qgs_map_settings.setExtent(extent);
 	canvas->setExtent(extent);
 	canvas->setCenter(*center);
+	canvas->scaleChanged(23930);
+	canvas->updateScale();
 	// canvas->setVisible(true);
 	canvas->refresh();
 	// canvas->show();
 	//Qgs3DMapCanvas* canvas3d = new Qgs3DMapCanvas;
 	QgsReferencedRectangle* referenced_rectangle = new QgsReferencedRectangle(extent, project->crs());
 	project->viewSettings()->setDefaultViewExtent(*referenced_rectangle);
+	// project->viewSettings()->setPresetFullExtent(*referenced_rectangle);
 	// QgsMapSettings map_settings;
 	// map_settings.setDestinationCrs(qgscrs);
 	// map_settings.setExtent(extent);
