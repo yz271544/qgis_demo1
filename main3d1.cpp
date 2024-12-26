@@ -131,37 +131,30 @@ int main(int argc, char* argv[]) {
 
 	point_layer->startEditing();
 
-	QgsVector3D point3d(111.482116, 40.724241, 1019.501738);
-	//QgsVector3D qgs_vector_3d = transformer.transform(point3d);
-
-
-	QgsPointXY* qgs_point_xy = new QgsPointXY(point3d.x(), point3d.y());
+	QgsPoint point(111.482116, 40.724241, 1019.501738);
+	QgsPointXY* qgs_point_xy = new QgsPointXY(point.x(), point.y());
 	QgsPointXY transformed_point = transformer->transform(*qgs_point_xy);
 
-	QgsFeature feature(point_layer->fields());
+    QgsPoint* qgs_point = new QgsPoint(transformed_point.x(), transformed_point.y(), point.z());
 
-	QgsPoint qgs_point(transformed_point.x(), transformed_point.y(), point3d.z());
+	qDebug() << "qgs_point x:" << qgs_point->x() << " y:" << qgs_point->y() << " z:" << qgs_point->z();
 
-	qDebug() << "qgs_point x:" << qgs_point.x() << " y:" << qgs_point.y() << " z:" << qgs_point.z();
+	QgsAttributes* attributes = new QgsAttributes{};
+	attributes->append("张三");
+	attributes->append("point");
+	attributes->append(qgs_point->x());
+	attributes->append(qgs_point->y());
+	attributes->append(qgs_point->z());
 
-	// std::unique_ptr<QgsPoint> up_qgs_point(&qgs_point);
-	// feature.setGeometry(QgsGeometry(up_qgs_point.get()));
-
-	//QgsGeometry geometry(&qgs_point);
-	QgsGeometry geometry = QgsGeometry::fromPoint(qgs_point);
-	feature.setGeometry(geometry);
-	// print(f"{point_name_prefix}{i + 1}", transformed_point.x(), transformed_point.y())
-	// feature.setAttributes([f"{point_name_prefix}{i + 1}", "point", qgs_vector_3d.x(), qgs_vector_3d.y()])
-	QgsAttributes attributes{};
-	attributes.append("张三");
-	attributes.append("point");
-	attributes.append(qgs_point.x());
-	attributes.append(qgs_point.y());
-	attributes.append(qgs_point.z());
-	feature.setAttributes(attributes);
-
-	QgsFeatureList qgs_feature_list{ feature };
-	point_provider->addFeatures(qgs_feature_list);
+	QgsFeature* feature = new QgsFeature(point_layer->fields());
+	feature->setAttributes(*attributes);
+	QgsGeometry geometry = QgsGeometry::fromPoint(*qgs_point);
+	QgsPoint vertexOfGeometry = geometry.vertexAt(0);
+	qDebug() << "geometry: " << vertexOfGeometry.x() << " " << vertexOfGeometry.y() << " " << vertexOfGeometry.z();
+	feature->setGeometry(geometry);
+	point_provider->addFeature(*feature);
+	// QgsFeatureList qgs_feature_list{ feature };
+	// point_provider->addFeatures(qgs_feature_list);
 
 	// # Commit changes to the vector layer
 	if (point_layer->commitChanges()) {
@@ -176,16 +169,19 @@ int main(int argc, char* argv[]) {
 	QgsVectorFileWriter::SaveVectorOptions options{};
 	options.driverName = "GeoJSON";
 	options.fileEncoding = "UTF-8";
+	options.includeZ = true;
+	options.overrideGeometryType = Qgis::WkbType::PointZ;
 
 	QString layer_persist_prefix = QString().append(save_qgis_project_path).append("/").append(layer_name);
 	QString geojson_path = layer_persist_prefix.append(".geojson");
-	QgsVectorFileWriter::writeAsVectorFormatV3(point_layer, geojson_path, QgsCoordinateTransformContext(), options);
-	/*QgsVectorFileWriter* writer = new QgsVectorFileWriter(geojson_path, QGIS_LAYER_ENCODING, fields, Qgis::WkbType::Point, project->crs());
+	// QgsVectorFileWriter::writeAsVectorFormatV3(point_layer, geojson_path, QgsCoordinateTransformContext(), options);
+	// QgsVectorFileWriter* writer = new QgsVectorFileWriter(geojson_path, QGIS_LAYER_ENCODING, fields, Qgis::WkbType::PointZ, project->crs());
+	QgsVectorFileWriter* writer = QgsVectorFileWriter::create(geojson_path, fields, Qgis::WkbType::PointZ, project->crs(), QgsCoordinateTransformContext(), options);
 	writer->writeAsVectorFormatV3(point_layer, geojson_path, project->transformContext(), options);
-	delete writer;*/
+	delete writer;
 	// # Load the GeoJSON file
-	QgsVectorLayer p_point_layer(geojson_path, layer_name, "ogr");
-	if (!p_point_layer.isValid()) {
+	QgsVectorLayer* p_point_layer = new QgsVectorLayer(geojson_path, layer_name, "ogr");
+	if (!p_point_layer->isValid()) {
 		qCritical("Failed to load the layer!");
 		exit(1);
 	}
@@ -204,7 +200,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	project->addMapLayer(&p_point_layer);
+	project->addMapLayer(p_point_layer);
 
 
 	QgsRectangle extent;
@@ -258,32 +254,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	qDebug() << "save projectPath:" << projectPath << "successes";
-	//project->clear();
-	//delete point_layer;
-	//delete qgs_tiled_scene_layer_3d_renderer;
-	// release qgis resource
-	//QgsApplication::exitQgis();
-	//qDebug() << "exitQgis";
-	/*QgsApplication::exit();
-	qDebug() << "exit q app";*/
 
-	QMap<QString, QgsMapLayer*> layers = project->mapLayers(true);
-	QList<QgsMapLayer*> layerList = layers.values();
-	for (int i = 0; i < layerList.size(); ++i) {
-		QgsMapLayer* currentLayer = layerList.at(i);
-		// 在这里添加对当前图层currentLayer的操作逻辑，比如输出图层名称等
-
-		QgsDataProvider* data_provider = currentLayer->dataProvider();
-		if (QgsVectorDataProvider* providerAsVectorDerived = dynamic_cast<QgsVectorDataProvider*>(data_provider)) {
-			qDebug() << "trucate layer:" << currentLayer->name();
-			bool truncated_status = providerAsVectorDerived->truncate();
-			qDebug() << "trucate layer:" << currentLayer->name() << " status:" << truncated_status;
-			/*bool disconn = providerAsVectorDerived->disconnect();
-			qDebug() << "disconnect layer:" << currentLayer->name() << " status:" << disconn;*/
-			/*bool cancel_reload = providerAsVectorDerived->cancelReload();
-			qDebug() << "cancelReload layer:" << currentLayer->name() << " status:" << cancel_reload;*/
-		}
-	}
 	QgsLayoutManager* layout_manager = project->layoutManager();
 	QList< QgsMasterLayoutInterface* > layouts = layout_manager->layouts();
 	for (int i = 0; i < layouts.size(); ++i) {
@@ -292,7 +263,7 @@ int main(int argc, char* argv[]) {
 		layout_manager->removeLayout(layout);
 	}
 	layout_manager->clear();
-	/*project->clear();*/
+	// project->clear();
 
 	//return app.exec();
 	return 0;
