@@ -266,6 +266,7 @@ int main(int argc, char* argv[]) {
 	canvas->setCenter(*center);
 	canvas->scaleChanged(23930);
 	canvas->updateScale();
+	canvas->zoomToFullExtent();
 	// canvas->setVisible(true);
 	canvas->refresh();
 	// canvas->show();
