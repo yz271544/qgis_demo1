@@ -136,25 +136,25 @@ int main(int argc, char *argv[]) {
 
     point_layer->startEditing();
     //QgsPoint point(111.482116, 40.724241, 1019.501738);
-    QList<InputPoint*> points;
-    points.append(new InputPoint(QString("等等") ,QgsPoint(111.482116, 40.724241, 1019.501738)));
-    points.append(new InputPoint(QString("张三"), QgsPoint(111.482624, 40.724823, 1020.262739)));
-    points.append(new InputPoint(QString("李四"), QgsPoint(111.483443, 40.724982, 1020.800378)));
-    points.append(new InputPoint(QString("王五"), QgsPoint(111.484411, 40.724352, 1022.498272)));
-    points.append(new InputPoint(QString("赵六"), QgsPoint(111.483948, 40.725397, 1021.921124)));
-    points.append(new InputPoint(QString("冯七"), QgsPoint(111.484871, 40.724699, 1024.298574)));
-    points.append(new InputPoint(QString("马八"), QgsPoint(111.484869,40.726562,1023.229612)));
+    QList<InputPoint> points;
+    points.append(InputPoint(QString("等等") ,QgsPoint(111.482116, 40.724241, 1019.501738)));
+    points.append(InputPoint(QString("张三"), QgsPoint(111.482624, 40.724823, 1020.262739)));
+    points.append(InputPoint(QString("李四"), QgsPoint(111.483443, 40.724982, 1020.800378)));
+    points.append(InputPoint(QString("王五"), QgsPoint(111.484411, 40.724352, 1022.498272)));
+    points.append(InputPoint(QString("赵六"), QgsPoint(111.483948, 40.725397, 1021.921124)));
+    points.append(InputPoint(QString("冯七"), QgsPoint(111.484871, 40.724699, 1024.298574)));
+    points.append(InputPoint(QString("马八"), QgsPoint(111.484869,40.726562,1023.229612)));
     qDebug() << "points size:" << points.size();
-    for (InputPoint* point : points) {
-        QgsPointXY *qgs_point_xy = new QgsPointXY(point->getPoint().x(), point->getPoint().y());
+    for (InputPoint point : points) {
+        QgsPointXY *qgs_point_xy = new QgsPointXY(point.getPoint().x(), point.getPoint().y());
         QgsPointXY transformed_point = transformer->transform(*qgs_point_xy);
 
-        QgsPoint *qgs_point = new QgsPoint(transformed_point.x(), transformed_point.y(), point->getPoint().z());
+        QgsPoint *qgs_point = new QgsPoint(transformed_point.x(), transformed_point.y(), point.getPoint().z());
 
         qDebug() << "qgs_point x:" << qgs_point->x() << " y:" << qgs_point->y() << " z:" << qgs_point->z();
 
         QgsAttributes *attributes = new QgsAttributes{};
-        attributes->append(point->getName());
+        attributes->append(point.getName());
         attributes->append("point");
         attributes->append(qgs_point->x());
         attributes->append(qgs_point->y());
