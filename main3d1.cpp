@@ -37,6 +37,8 @@
 
 #include "config.h"
 #include "core/qgis/payload/InputPoint.h"
+#include "core/utils/QgsUtil.h"
+#include "core/utils/ImageUtil.h"
 #include "qgspluginlayerregistry.h"
 #if defined(_WIN32)
 #include <windows.h>
@@ -176,21 +178,25 @@ int main(int argc, char *argv[]) {
         qCritical() << "critical：point layer commit changes 数据提交到图层失败:" << point_provider->error().message();
     }
     // # Save the vector layer to a GeoJSON file
-    QgsVectorFileWriter::SaveVectorOptions options{};
-    options.driverName = "GeoJSON";
-    options.fileEncoding = "UTF-8";
-    options.includeZ = true;
-    options.overrideGeometryType = Qgis::WkbType::PointZ;
-
-    QString layer_persist_prefix = QString().append(save_qgis_project_path).append("/").append(layer_name);
-    QString geojson_path = QString(layer_persist_prefix).append(".geojson");
-    QgsVectorFileWriter *writer = QgsVectorFileWriter::create(geojson_path, fields, Qgis::WkbType::PointZ,
-                                                              project->crs(), QgsCoordinateTransformContext(), options);
-    writer->writeAsVectorFormatV3(point_layer, geojson_path, project->transformContext(), options);
-    delete writer;
-    // delete point_layer;
-    // # Load the GeoJSON file
-    QgsVectorLayer *p_point_layer = new QgsVectorLayer(geojson_path, layer_name, "ogr");
+    // QgsVectorFileWriter::SaveVectorOptions options{};
+    // options.driverName = "GeoJSON";
+    // options.fileEncoding = "UTF-8";
+    // options.includeZ = true;
+    // options.overrideGeometryType = Qgis::WkbType::PointZ;
+    //
+    // QString layer_persist_prefix = QString().append(save_qgis_project_path).append("/").append(layer_name);
+    // QString geojson_path = QString(layer_persist_prefix).append(".geojson");
+    // QgsVectorFileWriter *writer = QgsVectorFileWriter::create(geojson_path, fields, Qgis::WkbType::PointZ,
+    //                                                           project->crs(), QgsCoordinateTransformContext(), options);
+    // writer->writeAsVectorFormatV3(point_layer, geojson_path, project->transformContext(), options);
+    // delete writer;
+    // // delete point_layer;
+    // // # Load the GeoJSON file
+    // QgsVectorLayer *p_point_layer = new QgsVectorLayer(geojson_path, layer_name, "ogr");
+    QgsVectorLayer *p_point_layer = QgsUtil::write_persisted_layer(layer_name, point_layer, save_qgis_project_path, fields,
+                                                                  Qgis::WkbType::PointZ,
+                                                                  project->transformContext(),
+                                                                  project->crs());
     p_point_layer->setCrs(project->crs());
 
     if (!p_point_layer->isValid()) {
@@ -198,9 +204,21 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     // # icon_path = "D:/iProject/pypath/qgis-x/common/icon/民警.png"
-    QString icon_path = QString(layer_persist_prefix).append(".png");
-
-    if (!icon_base64.isEmpty()) {
+    // QString icon_path = QString(layer_persist_prefix).append(".png");
+    QString icon_path = QString().append(save_qgis_project_path).append("/").append(layer_name).append(".png");
+    if (!icon_base64.isEmpty())
+    {
+        std::pair<QString, QByteArray> base64_image = ImageUtil::parse_base64_image(icon_base64);
+        QFile iconFile(icon_path);
+        if (iconFile.open(QIODevice::WriteOnly)) {
+            iconFile.write(base64_image.second);
+            iconFile.close();
+        }
+        else {
+            qWarning() << "Failed to open file for writing:" << icon_path;
+        }
+    }
+    /*if (!icon_base64.isEmpty()) {
         QByteArray decodedData = QByteArray::fromBase64(icon_base64.toUtf8());
         QFile iconFile(icon_path);
         if (iconFile.open(QIODevice::WriteOnly)) {
@@ -209,7 +227,7 @@ int main(int argc, char *argv[]) {
         } else {
             qWarning() << "Failed to open file for writing:" << icon_path;
         }
-    }
+    }*/
 
     project->addMapLayer(p_point_layer);
 

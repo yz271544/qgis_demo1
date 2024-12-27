@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.6)
 project(qgis_demo1)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 
 message("CMAKE_HOST_SYSTEM_NAME: ${CMAKE_HOST_SYSTEM_NAME}")
 
@@ -81,9 +84,6 @@ elseif(UNIX)
         message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
     endif()
 
-    # 生成 config.h 头文件
-    configure_file(config.h.in ${CMAKE_HOME_DIRECTORY}/config.h)
-
     message("start find Qt package")
     find_package(Qt5 REQUIRED COMPONENTS
             Core
@@ -102,6 +102,9 @@ elseif(UNIX)
 else()
     message("Unsupported platform")
 endif()
+
+# 生成 config.h 头文件
+configure_file(config.h.in ${CMAKE_HOME_DIRECTORY}/config.h)
 
 message("start find qgis package")
 find_package(QGIS REQUIRED)
@@ -148,12 +151,12 @@ link_directories(${QGIS_PREFIX_PATH}/lib /usr/lib/x86_64-linux-gnu)
 add_executable(qgis_demo1 main.cpp
         config.h
         tests/test_json.cpp
-)
-add_executable(qgis_demo2 main2.cpp)
-add_executable(qgis_demo3 main3.cpp)
-add_executable(qgis_demo4 main4.cpp)
+ "core/utils/ColorTransformUtil.cpp" "core/utils/ColorTransformUtil.h")
+add_executable(qgis_demo2 main2.cpp "core/utils/ColorTransformUtil.cpp" "core/utils/ColorTransformUtil.h")
+add_executable(qgis_demo3 main3.cpp "core/utils/ColorTransformUtil.cpp" "core/utils/ColorTransformUtil.h")
+add_executable(qgis_demo4 main4.cpp "core/utils/ColorTransformUtil.cpp" "core/utils/ColorTransformUtil.h")
 add_executable(qgis_demo3d0 main3d0.cpp
-        JwGeometry.cpp)
+        JwGeometry.cpp "core/utils/ColorTransformUtil.cpp" "core/utils/ColorTransformUtil.h")
 add_executable(qgis_demo3d1 main3d1.cpp
         config.h
         JwGeometry.cpp
@@ -161,9 +164,16 @@ add_executable(qgis_demo3d1 main3d1.cpp
         core/qgis/style/StylePoint.h
         core/qgis/payload/InputPoint.cpp
         core/qgis/payload/InputPoint.h
-)
+        core/utils/ColorTransformUtil.cpp
+        core/utils/ColorTransformUtil.h
+        core/utils/QgsUtil.cpp
+        core/utils/QgsUtil.h
+        core/utils/FileUtil.cpp
+        core/utils/FileUtil.h
+        core/utils/ImageUtil.cpp
+        core/utils/ImageUtil.h)
 
-add_executable(test_main test_main.cpp test_main.h)
+add_executable(test_main test_main.cpp test_main.h "core/utils/ColorTransformUtil.cpp" "core/utils/ColorTransformUtil.h")
 
 set_target_properties(qgis_demo3d1 PROPERTIES
         POSITION_INDEPENDENT_CODE ON
@@ -183,8 +193,14 @@ target_link_libraries(qgis_demo3d0 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRA
 target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Test ${GDAL_LIBRARY})
 target_link_libraries(test_main PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Test ${GDAL_LIBRARY})
 
-set(CMAKE_AUTOMOC ON)
-# 测试程序
+# 测试json程序
 add_executable(test_json tests/test_json.cpp)
 target_link_libraries(test_json Qt5::Core Qt5::Test)
 add_test(NAME JsonTest COMMAND test_json)
+
+# 测试utils程序
+add_executable(test_utils tests/test_utils.cpp core/utils/ColorTransformUtil.cpp core/utils/ColorTransformUtil.h
+        core/utils/QgsUtil.cpp
+        core/utils/QgsUtil.h)
+target_link_libraries(test_utils Qt5::Core Qt5::Test)
+add_test(NAME UtilsTest COMMAND test_utils)

@@ -22,4 +22,24 @@ inline const char* QGIS_PROJECT_PATH = "/lyndon/iProject/cpath/qgis_demo1/common
 inline const char* QGIS_PROJECT_FILE_NAME = "/project3d1.qgz";
 #endif
 
+// Function to get boolean value from environment variable
+inline bool getEnvBool(const char* envVarName, bool defaultValue = false) {
+    const char* envValue = std::getenv(envVarName);
+    if (envValue == nullptr) {
+        return defaultValue;
+    }
+    std::string value(envValue);
+    std::transform(value.begin(), value.end(), value.begin(), [](unsigned char c) { return std::tolower(c); });
+    if (value == "true" || value == "1") {
+        return true;
+    } else if (value == "false" || value == "0") {
+        return false;
+    }
+    return defaultValue;
+}
+
+
+// Get ENABLE_POINT_CLUSTER from environment variable, default to false
+inline bool ENABLE_POINT_CLUSTER = getEnvBool("ENABLE_POINT_CLUSTER", false);
+
 #endif //CONFIG_H
