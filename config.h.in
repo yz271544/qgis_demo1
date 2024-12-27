@@ -4,6 +4,12 @@
 
 #ifndef CONFIG_H
 #define CONFIG_H
+#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 inline const char* QGIS_LAYER_ENCODING = "UTF-8";
 inline const char* BASE_TILE_NAME = "BaseTile";

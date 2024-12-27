@@ -4,6 +4,12 @@
 
 #ifndef STYLEPOINT_H
 #define STYLEPOINT_H
+#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 #include <qgsrenderer.h>
 #include <qgis.h>
 #include "qgssymbol.h"

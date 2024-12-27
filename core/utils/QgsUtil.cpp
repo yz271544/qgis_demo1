@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by Lyndon on 2024/12/27.
 //
 
@@ -72,8 +72,8 @@ float QgsUtil::d300_pixel_to_mm(float pixel_size) {
 
 QgsCoordinateTransform QgsUtil::coordinate_transformer_4326_to_3857(QgsProject* project) {
     // Set coordinate transform
-    QgsCoordinateReferenceSystem crs_4326(4326);  // 假设 4326 是对应的EPSG代码
-    QgsCoordinateReferenceSystem crs_3857(3857);  // 假设 3857 是对应的EPSG代码
+    QgsCoordinateReferenceSystem crs_4326("EPSG:4326");  // 假设 4326 是对应的EPSG代码
+    QgsCoordinateReferenceSystem crs_3857("EPSG:3857");  // 假设 3857 是对应的EPSG代码
     return QgsCoordinateTransform(crs_4326, crs_3857, project);
 }
 
@@ -83,7 +83,8 @@ QgsVectorLayer* QgsUtil::write_persisted_layer(const QString& layer_name, QgsVec
                                          const QgsCoordinateTransformContext& cts,
                                          const QgsCoordinateReferenceSystem& crs) {
     // file path
-    QString file_path = project_dir + "/" + layer_name + ".geojson";
+    QString file_prefix = QString().append(project_dir).append("/").append(layer_name);
+    QString file_path = QString().append(file_prefix).append(".geojson");
 
     // options
     QgsVectorFileWriter::SaveVectorOptions options;
@@ -92,7 +93,7 @@ QgsVectorLayer* QgsUtil::write_persisted_layer(const QString& layer_name, QgsVec
     options.includeZ = true;
     options.overrideGeometryType = qgs_wkb_type;
     // options.layerName = layer_name;
-
+    qDebug() << "prepare writer file:" << file_path;
     // Create a new vector file writer
     std::unique_ptr<QgsVectorFileWriter> writer(QgsVectorFileWriter::create(
         file_path,
@@ -108,12 +109,16 @@ QgsVectorLayer* QgsUtil::write_persisted_layer(const QString& layer_name, QgsVec
         return nullptr;
     }
     // write
+    qDebug() << "writting: " << file_path <<" ...";
     writer->writeAsVectorFormatV3(layer, file_path, cts, options);
+    qDebug() << "writted the layer to geojson file";
     // flush disk
-    delete writer;
+    // delete writer;
     // delete gpkg
     // 假设 FileUtil 中的 delete_file 函数已经实现
-    FileUtil::delete_file(file_path + ".gpkg");
+    QString gpkg_file = QString().append(file_prefix).append(".gpkg");
+    qDebug() << "delete file:" << gpkg_file;
+    FileUtil::delete_file(gpkg_file);
     // return persistence layer
     return new QgsVectorLayer(file_path, layer_name, "ogr");
 }

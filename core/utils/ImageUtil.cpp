@@ -1,7 +1,6 @@
-//
+﻿//
 // Created by Lyndon on 2024/12/27.
 //
-
 #include "ImageUtil.h"
 
 std::pair<QString, QByteArray> ImageUtil::parse_base64_image(const QString& base64_str) {
@@ -13,7 +12,8 @@ std::pair<QString, QByteArray> ImageUtil::parse_base64_image(const QString& base
 
     // 获取数据类型及 Base64 编码部分
     QString data_type = parts[0];
-    QByteArray base64_data = parts[1].toUtf8();
+    qDebug() << "---- base64_str:" << base64_str;
+    QByteArray base64_data = base64_str.toUtf8();
 
     // 提取扩展名
     QStringView dataTypeView(data_type);

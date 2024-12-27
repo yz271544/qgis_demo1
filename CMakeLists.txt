@@ -199,7 +199,10 @@ target_link_libraries(test_json Qt5::Core Qt5::Test)
 add_test(NAME JsonTest COMMAND test_json)
 
 # 测试utils程序
-add_executable(test_utils tests/test_utils.cpp core/utils/ColorTransformUtil.cpp core/utils/ColorTransformUtil.h
+add_executable(test_utils
+        tests/test_utils.cpp
+        core/utils/ColorTransformUtil.cpp
+        core/utils/ColorTransformUtil.h
         core/utils/QgsUtil.cpp
         core/utils/QgsUtil.h)
 target_link_libraries(test_utils Qt5::Core Qt5::Test)

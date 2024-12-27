@@ -1,11 +1,16 @@
-//
+﻿//
 // Created by Lyndon on 2024/12/27.
 //
 
 #ifndef IMAGEUTIL_H
 #define IMAGEUTIL_H
 
-
+#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 #include <iostream>
 #include <string>
@@ -14,6 +19,7 @@
 #include <QString>
 #include <QStringList>
 #include <stdexcept>
+#include <QDebug>
 
 
 class ImageUtil {
