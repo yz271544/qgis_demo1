@@ -6,3 +6,5 @@ out/
 doc/
 .vs/
 config.h
+.cmake/
+Testing/
