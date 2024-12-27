@@ -3,3 +3,8 @@
 //
 
 #include "StylePoint.h"
+
+
+QgsFeatureRenderer* StylePoint::get2d_rule_based_renderer(QString font_style, QString icon_path, qreal point_size) {
+    return nullptr;
+}
