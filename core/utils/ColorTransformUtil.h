@@ -9,6 +9,9 @@
 #if defined(_WIN32)
 #include <windows.h>
 #endif
+#include <QString>
+#include <QVector>
+#include <QHash>
 #include <tuple>
 #include <string>
 #include <vector>
@@ -25,14 +28,14 @@ public:
 	* \param rgba rgba 字符串 rgb(47,153,243,1)
 	* \returns 整数元组 tuple[int, int, int]
 	*/
-	static std::tuple<int, int, int, float> str_rgba_to_tuple_int(const std::string& rgba);
+	static std::tuple<int, int, int, float> str_rgba_to_tuple_int(const QString& rgba);
 
 	/**
 	* 将 RGB 元组转换为十六进制字符串
 	* \param rgb RGB 元组 tuple(47,153,243)
 	* \returns 十六进制字符串 #2f99f3
 	*/
-	static std::string rgb_to_hex(const std::tuple<int, int, int>& rgb);
+	static QString rgb_to_hex(const std::tuple<int, int, int>& rgb);
 
 	/**
 	* 将 rgba 字符串转换为十六进制字符串
@@ -40,14 +43,14 @@ public:
 	* \returns pair 十六进制字符串和透明度
 	* std::cout << "Hex: " << result.first << ", Capacity: " << result.second << std::endl;
 	*/
-	static std::pair<std::string, float> str_rgba_to_hex(const std::string& rgba);
+	static std::pair<QString, float> str_rgba_to_hex(const QString& rgba);
 
 	/**
 	* 将十六进制字符串转换为 RGB 元组
 	* \param hex_str 十六进制字符串 #2f99f3
 	* \returns RGB 元组 tuple(47,153,243)
 	*/
-	static std::tuple<int, int, int> hex_to_rgb(const std::string& hex_str);
+	static std::tuple<int, int, int> hex_to_rgb(const QString& hex_str);
 
 	/**
 	* 比较两种颜色
@@ -55,21 +58,21 @@ public:
 	* \param color2 颜色2
 	* \returns 是否相等
 	*/
-	static bool compare_color(const std::vector<std::string>& color1, const std::vector<std::string>& color2);
+	static bool compare_color(const QVector<QString>& color1, const QVector<QString>& color2);
 
 	/**
 	* 合并颜色
 	* \param color 颜色 ['#ff4040', '#00cd52', '#2f99f3']
 	* \returns 合并后的颜色 '#ff4040-#00cd52-#2f99f3'
 	*/
-	static std::string merge_color(const std::vector<std::string>& color);
+	static QString merge_color(const QVector<QString>& color);
 
 	/**
 	* 拆分颜色
 	* \param merged_color 合并后的颜色 '#ff4040-#00cd52-#2f99f3'
 	* \returns 拆分后的颜色 ['#ff4040', '#00cd52', '#2f99f3']
 	*/
-	static std::vector<std::string> split_color(const std::string& merged_color);
+	static QVector<QString> split_color(const QString& merged_color);
 
 
 	/**
@@ -77,7 +80,7 @@ public:
 	* \param style_colors 颜色列表 [['#ff4040', '#00cd52', '#2f99f3'], ['#ff4040', '#00cd52', '#2f99f3'], ['#1c6ad6', '#00cd52', '#cbc829']]
 	* \returns 分组统计结果 { '#ff4040-#00cd52-#2f99f3': 2, '#1c6ad6-#00cd52-#cbc829': 1 }
 	*/
-	static std::unordered_map<std::string, int> multi_color_group(const std::vector<std::vector<std::string>>& style_colors);
+	static QHash<QString, int> multi_color_group(const QVector<QVector<QString>>& style_colors);
 };
 
 #endif // COLORTRANSFORMUTIL_H

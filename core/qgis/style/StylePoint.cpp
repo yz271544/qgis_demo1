@@ -2,19 +2,37 @@
 #include "StylePoint.h"
 
 
-QgsFeatureRenderer* StylePoint::get2d_rule_based_renderer(QString& font_style, QJsonDocument& layer_style, QString& icon_path, qreal point_size) {
-	std::string label_font_color = "#000000";
-	float label_font_opacity = 1.0;
-	std::pair<std::string, float> colorOpacity = ColorTransformUtil::str_rgba_to_hex(font_style.toStdString());
-	label_font_color = colorOpacity.first;
-	label_font_opacity = colorOpacity.second;
-	std::string label_style_font_family = "SimSun";
+QgsFeatureRenderer* StylePoint::get2d_rule_based_renderer(QJsonObject& font_style, QJsonObject& layer_style, QString& icon_path, qreal point_size=5.0) {
+	QMap<QString, QVariant> label_style;
+	if (font_style.contains("fontColor")) {
+		QString font_color = font_style["fontColor"].toString();
+		std::pair<QString, float> colorOpacity = ColorTransformUtil::str_rgba_to_hex(font_color);
+		label_style.insert("fontColor", colorOpacity.first);
+		label_style.insert("fontOpacity", colorOpacity.second);
+	} else {
+		label_style.insert("fontColor", "#000000");
+		label_style.insert("fontOpacity", 1.0);
+	}
+	if (font_style.contains("fontFamily")) {
+		label_style.insert("fontFamily", font_style["fontFamily"].toString());
+	} else {
+		label_style.insert("fontFamily", "SimSun");
+	}
+	if (font_style.contains("fontSize")) {
+		label_style.insert("fontSize", font_style["fontSize"].toInt());
+	} else {
+		label_style.insert("fontSize", 12);
+	}
+	label_style.insert("is_bold", true);
+	label_style.insert("is_italic", false);
+	label_style.insert("spacing", 0.0);
+
 	double label_style_font_size = 12;
 	QgsSymbol* rule_symbol = QgsSymbol::defaultSymbol(Qgis::GeometryType::Point);
-	QgsFontMarkerSymbolLayer* rule_font_marker = new QgsFontMarkerSymbolLayer(label_style_font_family.c_str());
+	QgsFontMarkerSymbolLayer* rule_font_marker = new QgsFontMarkerSymbolLayer(font_style["fontFamily"].toString());
 	rule_font_marker->setSizeUnit(Qgis::RenderUnit::Millimeters);
 	rule_font_marker->setSize(QgsUtil::d300_pixel_to_mm(label_style_font_size));
-	rule_font_marker->setColor(QColor(label_font_color.c_str()));
+	rule_font_marker->setColor(QColor(font_style["fontColor"].toString()));
 	rule_font_marker->setDataDefinedProperty(QgsSymbolLayer::Property::Character, QgsProperty::fromExpression("name"));
 	rule_font_marker->setOffset(QPointF(0, -5));
 
@@ -37,9 +55,9 @@ QgsFeatureRenderer* StylePoint::get2d_rule_based_renderer(QString& font_style, Q
 	rule_symbol->appendSymbolLayer(rule_font_marker);
 	//QgsSymbol* cluster_symbol = QgsSymbol::defaultSymbol(Qgis::GeometryType::Point);
 	QgsMarkerSymbol* cluster_symbol = new QgsMarkerSymbol();
-	QgsFontMarkerSymbolLayer* font_marker = new QgsFontMarkerSymbolLayer(label_style_font_family.c_str());
+	QgsFontMarkerSymbolLayer* font_marker = new QgsFontMarkerSymbolLayer(font_style["fontFamily"].toString());
 	font_marker->setSize(QgsUtil::d300_pixel_to_mm(label_style_font_size));
-	font_marker->setColor(QColor(label_font_color.c_str()));
+	font_marker->setColor(QColor(font_style["fontColor"].toString()));
 	font_marker->setDataDefinedProperty(QgsSymbolLayer::Property::Character, QgsProperty::fromExpression("concat('(', @cluster_size, ')')"));
 	font_marker->setOffset(QPointF(0, -5));
 

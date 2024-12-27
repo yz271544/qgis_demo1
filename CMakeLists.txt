@@ -204,6 +204,9 @@ add_executable(test_utils
         core/utils/ColorTransformUtil.cpp
         core/utils/ColorTransformUtil.h
         core/utils/QgsUtil.cpp
-        core/utils/QgsUtil.h)
-target_link_libraries(test_utils Qt5::Core Qt5::Test)
+        core/utils/QgsUtil.h
+        core/utils/FileUtil.cpp
+        core/utils/FileUtil.h
+)
+target_link_libraries(test_utils ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Test)
 add_test(NAME UtilsTest COMMAND test_utils)

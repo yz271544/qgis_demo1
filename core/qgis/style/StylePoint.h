@@ -29,7 +29,7 @@
 
 class StylePoint {
 public:
-	static QgsFeatureRenderer* get2d_rule_based_renderer(QString& font_style, QJsonDocument& layer_style, QString& icon_path, qreal point_size);
+	static QgsFeatureRenderer* get2d_rule_based_renderer(QJsonObject& font_style, QJsonObject& layer_style, QString& icon_path, qreal point_size);
 };
 
 

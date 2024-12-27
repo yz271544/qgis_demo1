@@ -4,6 +4,7 @@
 #if defined(_WIN32)
 #include <windows.h>
 #endif
+#include <iostream>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -66,6 +67,102 @@ private slots:
 			}
 		}
 		qDebug() << "test success";
+	}
+
+	void test_parse_topic_payload() {
+		QFile file("/lyndon/iProject/cpath/qgis_demo1/common/input/topicMap.json");
+		if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+			qCritical() << "Could not open file";
+		}
+		QByteArray jsonData = file.readAll();
+		file.close();
+
+		QJsonDocument doc = QJsonDocument::fromJson(jsonData);
+		if (doc.isNull()) {
+			qCritical() << "Failed to parse JSON document";
+		}
+
+
+		if (doc.isObject()) {
+			QJsonObject obj = doc.object();
+			// 访问对象中的键值对
+			if (obj.contains("data")) {
+				QJsonValue data = obj.value("data");
+				if (data.isArray()) {
+					auto data1 = data[0];
+					if (data1.isObject()) {
+						QJsonObject dataObj = data1.toObject();
+						if (dataObj.contains("name")) {
+							QString name = dataObj.value("name").toString();
+							qDebug() << "name: " << name;
+						}
+						if (dataObj.contains("plottings")) {
+							QJsonValue plottings = dataObj.value("plottings");
+							if (plottings.isArray()) {
+								QJsonArray plottingsArray = plottings.toArray();
+								QJsonValue json_value = plottingsArray.at(0);
+								if (json_value.isObject()) {
+									QJsonObject json_obj = json_value.toObject();
+									if (json_obj.contains("name")) {
+										QString name = json_obj.value("name").toString();
+										qDebug() << "element name: " << name;
+									}
+									if (json_obj.contains("styleInfoJson")) {
+										QJsonValue styleInfoJson = json_obj.value("styleInfoJson");
+										if (styleInfoJson.isObject()) {
+											QJsonObject styleInfoJsonObj = styleInfoJson.toObject();
+											if (styleInfoJsonObj.contains("color")) {
+												QJsonValue color = styleInfoJsonObj.value("color");
+												if (color.isString()) {
+													qDebug() << "color: " << color;
+												}
+											}
+										} else {
+											qDebug() << "styleInfoJson type:" << styleInfoJson.type();
+										}
+										if (styleInfoJson.isString()) {
+											qDebug() << "111";
+											QJsonDocument style = QJsonDocument::fromJson(QString(styleInfoJson.toString()).toUtf8());
+											if (style.isObject()) {
+												QJsonObject styleObj = style.object();
+												if (styleObj.contains("fontStyle")) {
+													qDebug() << "222 fontStyle type:" << styleObj["fontStyle"].type();
+													QJsonObject fontStyle = styleObj["fontStyle"].toObject();
+													QJsonObject::const_iterator it;
+													for (it = fontStyle.begin(); it!= fontStyle.end(); ++it) {
+														QString key = it.key();
+														QJsonValue value = it.value();
+														if (value.isString()) {
+															qDebug() << key << ": " << value.toString();
+														} else if (value.isDouble()) {
+															qDebug() << key << ": " << value.toDouble();
+														} else if (value.isArray()) {
+															qDebug() << key << " (array): ";
+															QJsonArray jsonArray = value.toArray();
+															for (int i = 0; i < jsonArray.size(); ++i) {
+																qDebug() << "    - " << jsonArray.at(i).toString();
+															}
+														} else if (value.isObject()) {
+															qDebug() << key << " (object): ";
+															QJsonObject subObject = value.toObject();
+															QJsonObject::const_iterator subIt;
+															for (subIt = subObject.begin(); subIt!= subObject.end(); ++subIt) {
+																qDebug() << "    " << subIt.key() << ": " << subIt.value().toString();
+															}
+														}
+													}
+												}
+												//fontStyle
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 };
