@@ -53,8 +53,8 @@ int main(int argc, char *argv[]) {
 
     // init QGIS app
     QgsApplication app(argc, argv, true);
-    //QgsApplication::setPrefixPath(QGIS_PREFIX_PATH, true);
-    QgsApplication::setPrefixPath("/usr", true);
+    QgsApplication::setPrefixPath(QGIS_PREFIX_PATH, true);
+    //QgsApplication::setPrefixPath("/usr", true);
     QgsApplication::init();
     QgsApplication::initQgis();
     Qgs3D::initialize();
@@ -135,12 +135,9 @@ int main(int argc, char *argv[]) {
     QgsCoordinateTransform *transformer = new QgsCoordinateTransform(crs_4326, crs_3857, project);
 
     point_layer->startEditing();
-    qDebug() << "init InputPoints";
     //QgsPoint point(111.482116, 40.724241, 1019.501738);
     QList<InputPoint*> points;
-    qDebug() << "append 1";
     points.append(new InputPoint(QString("等等") ,QgsPoint(111.482116, 40.724241, 1019.501738)));
-    qDebug() << "appended 1";
     points.append(new InputPoint(QString("张三"), QgsPoint(111.482624, 40.724823, 1020.262739)));
     points.append(new InputPoint(QString("李四"), QgsPoint(111.483443, 40.724982, 1020.800378)));
     points.append(new InputPoint(QString("王五"), QgsPoint(111.484411, 40.724352, 1022.498272)));
@@ -166,14 +163,11 @@ int main(int argc, char *argv[]) {
         QgsFeature *feature = new QgsFeature(point_layer->fields());
         feature->setAttributes(*attributes);
         QgsGeometry geometry = QgsGeometry::fromPoint(*qgs_point);
-        QgsPoint vertexOfGeometry = geometry.vertexAt(0);
-        qDebug() << "geometry: " << vertexOfGeometry.x() << " " << vertexOfGeometry.y() << " " << vertexOfGeometry.z();
+        /*QgsPoint vertexOfGeometry = geometry.vertexAt(0);
+        qDebug() << "geometry: " << vertexOfGeometry.x() << " " << vertexOfGeometry.y() << " " << vertexOfGeometry.z();*/
         feature->setGeometry(geometry);
         point_provider->addFeature(*feature);
-        // QgsFeatureList qgs_feature_list{ feature };
-        // point_provider->addFeatures(qgs_feature_list);
     }
-
 
     // # Commit changes to the vector layer
     if (point_layer->commitChanges()) {
@@ -181,15 +175,6 @@ int main(int argc, char *argv[]) {
     } else {
         qCritical() << "critical：point layer commit changes 数据提交到图层失败:" << point_provider->error().message();
     }
-    //point_layer->updateExtents();
-    // Print the updated extent
-    // QgsRectangle point_layer_extent = point_layer->extent();
-    // qDebug() << "Updated extent: " << point_layer_extent << " width: " << point_layer_extent.width() << " height: " << point_layer_extent.height()
-    // 	<< " xMinimum:" << point_layer_extent.xMinimum() << " yMinimum:" << point_layer_extent.yMinimum() << " xMaximum:" << point_layer_extent.
-    // 	xMaximum() << " yMaximum:" << point_layer_extent.yMaximum()
-    // 	<< " area: " << point_layer_extent.area() << " perimeter: " << point_layer_extent.perimeter() << " center: " << point_layer_extent.center()
-    // 	<< " isEmpty: " << point_layer_extent.isEmpty() << " isNull: " << point_layer_extent.isNull() << " isFinite: " << point_layer_extent.isFinite();
-
     // # Save the vector layer to a GeoJSON file
     QgsVectorFileWriter::SaveVectorOptions options{};
     options.driverName = "GeoJSON";
@@ -199,8 +184,6 @@ int main(int argc, char *argv[]) {
 
     QString layer_persist_prefix = QString().append(save_qgis_project_path).append("/").append(layer_name);
     QString geojson_path = QString(layer_persist_prefix).append(".geojson");
-    // QgsVectorFileWriter::writeAsVectorFormatV3(point_layer, geojson_path, QgsCoordinateTransformContext(), options);
-    // QgsVectorFileWriter* writer = new QgsVectorFileWriter(geojson_path, QGIS_LAYER_ENCODING, fields, Qgis::WkbType::PointZ, project->crs());
     QgsVectorFileWriter *writer = QgsVectorFileWriter::create(geojson_path, fields, Qgis::WkbType::PointZ,
                                                               project->crs(), QgsCoordinateTransformContext(), options);
     writer->writeAsVectorFormatV3(point_layer, geojson_path, project->transformContext(), options);
@@ -209,13 +192,6 @@ int main(int argc, char *argv[]) {
     // # Load the GeoJSON file
     QgsVectorLayer *p_point_layer = new QgsVectorLayer(geojson_path, layer_name, "ogr");
     p_point_layer->setCrs(project->crs());
-    // p_point_layer->updateExtents();
-    // QgsRectangle p_point_layer_extent = p_point_layer->extent();
-    // qDebug() << "222 Updated extent: " << p_point_layer_extent << " width: " << p_point_layer_extent.width() << " height: " << p_point_layer_extent.height()
-    // 	<< " xMinimum:" << p_point_layer_extent.xMinimum() << " yMinimum:" << p_point_layer_extent.yMinimum() << " xMaximum:" << p_point_layer_extent.
-    // 	xMaximum() << " yMaximum:" << p_point_layer_extent.yMaximum()
-    // 	<< " area: " << p_point_layer_extent.area() << " perimeter: " << p_point_layer_extent.perimeter() << " center: " << p_point_layer_extent.center()
-    // 	<< " isEmpty: " << p_point_layer_extent.isEmpty() << " isNull: " << p_point_layer_extent.isNull() << " isFinite: " << p_point_layer_extent.isFinite();
 
     if (!p_point_layer->isValid()) {
         qCritical("Failed to load the layer!");
@@ -289,34 +265,9 @@ int main(int argc, char *argv[]) {
     qgs_map_settings.setExtent(extent, false);
     canvas->setLayers(b_layers);
     canvas->setExtent(extent, false);
-    // canvas->zoomToFullExtent();
-    // QgsRectangle full_extent = qgs_map_settings.fullExtent();
-    // qDebug() << "full_extent: " << full_extent << " width: " << full_extent.width() << " height: " << full_extent.
-    //         height()
-    //         << " xMinimum:" << full_extent.xMinimum() << " yMinimum:" << full_extent.yMinimum() << " xMaximum:" <<
-    //         full_extent.
-    //         xMaximum() << " yMaximum:" << full_extent.yMaximum()
-    //         << " area: " << full_extent.area() << " perimeter: " << full_extent.perimeter() << " center: " <<
-    //         full_extent.center()
-    //         << " isEmpty: " << full_extent.isEmpty() << " isNull: " << full_extent.isNull() << " isFinite: " <<
-    //         full_extent.isFinite();
-    // canvas->setVisible(true);
     canvas->refresh();
-    // canvas->show();
-    //Qgs3DMapCanvas* canvas3d = new Qgs3DMapCanvas;
     QgsReferencedRectangle *referenced_rectangle = new QgsReferencedRectangle(extent, project->crs());
     project->viewSettings()->setDefaultViewExtent(*referenced_rectangle);
-    // project->viewSettings()->setPresetFullExtent(*referenced_rectangle);
-    // QgsMapSettings map_settings;
-    // map_settings.setDestinationCrs(qgscrs);
-    // map_settings.setExtent(extent);
-
-
-    /*QgsReferencedRectangle qgs_extent(extent, qgscrs);
-    QgsProjectViewSettings* qgs_project_view_settings = project->viewSettings();
-    qgs_project_view_settings->setDefaultViewExtent(qgs_extent);
-    qgs_project_view_settings->setPresetFullExtent(qgs_extent);*/
-
 
     QString projectPath = QString().append(save_qgis_project_path).append(QGIS_PROJECT_FILE_NAME);
 
