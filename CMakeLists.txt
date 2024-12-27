@@ -141,6 +141,8 @@ add_executable(qgis_demo3d1 main3d1.cpp
         JwGeometry.cpp
         core/qgis/style/StylePoint.cpp
         core/qgis/style/StylePoint.h
+        core/qgis/payload/InputPoint.cpp
+        core/qgis/payload/InputPoint.h
 )
 
 add_executable(test_main test_main.cpp test_main.h)
