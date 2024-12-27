@@ -1,4 +1,4 @@
-﻿//
+//
 // Created by Lyndon on 2024/12/17.
 //
 
@@ -17,7 +17,7 @@ inline const char* QGIS_PROJECT_PATH = "D:/iProject/cpath/qgis_demo1/common/proj
 inline const char* QGIS_PROJECT_FILE_NAME = "/project3d1.qgz";
 #elif defined(__linux__)
 // for Linux
-inline const char* QGIS_PREFIX_PATH = "/lyndon/iProject/cpath/QGIS/output";
+inline const char* QGIS_PREFIX_PATH = "@QGIS_PREFIX_PATH@";
 inline const char* QGIS_PROJECT_PATH = "/lyndon/iProject/cpath/qgis_demo1/common/project";
 inline const char* QGIS_PROJECT_FILE_NAME = "/project3d1.qgz";
 #endif

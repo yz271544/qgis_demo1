@@ -70,6 +70,20 @@ elseif(UNIX)
 #        find_library(QGIS_3D_LIBRARY NAMES qgis_3d HINTS ${QGIS_LIB_PATH})
 
     endif()
+
+    # 检查 CMAKE_BUILD_TYPE 的值
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(QGIS_PREFIX_PATH "/lyndon/iProject/cpath/QGIS/output")
+    elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
+        set(QGIS_PREFIX_PATH "/usr")
+    else()
+        # 可以添加一个默认值或错误处理
+        message(FATAL_ERROR "Unsupported CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+    endif()
+
+    # 生成 config.h 头文件
+    configure_file(config.h.in ${CMAKE_HOME_DIRECTORY}/config.h)
+
     message("start find Qt package")
     find_package(Qt5 REQUIRED COMPONENTS
             Core
@@ -138,6 +152,7 @@ add_executable(qgis_demo4 main4.cpp)
 add_executable(qgis_demo3d0 main3d0.cpp
         JwGeometry.cpp)
 add_executable(qgis_demo3d1 main3d1.cpp
+        config.h
         JwGeometry.cpp
         core/qgis/style/StylePoint.cpp
         core/qgis/style/StylePoint.h
