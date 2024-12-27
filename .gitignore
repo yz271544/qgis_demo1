@@ -5,3 +5,4 @@ common/
 out/
 doc/
 .vs/
+config.h
