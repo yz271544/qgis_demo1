@@ -12,7 +12,8 @@ std::pair<QString, QByteArray> ImageUtil::parse_base64_image(const QString& base
 
     // 获取数据类型及 Base64 编码部分
     QString data_type = parts[0];
-    qDebug() << "---- base64_str:" << base64_str;
+    qDebug() << "BASE64_STR: " << base64_str;
+    qDebug() << "PARTS1_STR: " << parts[1];
     QByteArray base64_data = base64_str.toUtf8();
 
     // 提取扩展名
@@ -25,7 +26,8 @@ std::pair<QString, QByteArray> ImageUtil::parse_base64_image(const QString& base
     QString extension = dataTypeView.mid(slashPos + 1, semicolonPos - slashPos - 1).toString();
 
     // 对 Base64 数据进行解码
-    QByteArray image_data = QByteArray::fromBase64(base64_data);
+    //QByteArray image_data = QByteArray::fromBase64(base64_data);
+    QByteArray image_data = QByteArray::fromBase64(parts[1].toUtf8());
 
     // 检查解码是否成功
     if (image_data.isEmpty()) {

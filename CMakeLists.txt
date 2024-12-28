@@ -207,6 +207,8 @@ add_executable(test_utils
         core/utils/QgsUtil.h
         core/utils/FileUtil.cpp
         core/utils/FileUtil.h
+        core/utils/ImageUtil.cpp
+        core/utils/ImageUtil.h
 )
 target_link_libraries(test_utils ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Test)
 add_test(NAME UtilsTest COMMAND test_utils)

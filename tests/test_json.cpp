@@ -165,6 +165,39 @@ private slots:
 		}
 	}
 
+    void test_parse_json2() {
+//        QString font_style_payloads = R"({"borderColor":"rgba(255,255,255,1)\","loadFlag":true,"x":0,"y":35,"fontSize":60,"fontColor":"rgba(237, 233, 26, 1)\","fontFlag":true})";
+        QString styleInfoJson = "{\"color\":\"rgba(255,255,255,1)\",\"bim\":\"\",\"num\":2,\"loadFlag\":false,\"fontStyle\":{\"borderColor\":\"rgba(255,255,255,1)\",\"loadFlag\":true,\"x\":0,\"y\":35,\"fontSize\":60,\"fontColor\":\"rgba(237, 233, 26, 1)\",\"fontFlag\":true},\"radius\":100}";
+        QJsonObject styleInfoJsonObj = QJsonDocument::fromJson(styleInfoJson.toUtf8()).object();
+        QJsonObject::const_iterator it;
+        for (it = styleInfoJsonObj.begin(); it!= styleInfoJsonObj.end(); ++it) {
+            QString key = it.key();
+            QJsonValue value = it.value();
+            qDebug() << key << ": " << value;
+        }
+
+        if (styleInfoJsonObj.contains("fontStyle")) {
+            QJsonObject fontStyleObj = styleInfoJsonObj["fontStyle"].toObject();
+            qDebug() << "borderColor:" << fontStyleObj["borderColor"];
+            qDebug() << "fontColor:" << fontStyleObj["fontColor"];
+            qDebug() << "fontFlag:" << fontStyleObj["fontFlag"];
+            qDebug() << "loadFlag:" << fontStyleObj["loadFlag"];
+            qDebug() << "x:" << fontStyleObj["x"];
+            qDebug() << "y:" << fontStyleObj["y"];
+        }
+    }
+
+    void test_parse_layerStyle_json() {
+        QString layerStyle = "{\"scale\":0.8}";
+        QJsonObject layerStyleObj = QJsonDocument::fromJson(layerStyle.toUtf8()).object();
+        QJsonObject::const_iterator it;
+        for (it = layerStyleObj.begin(); it!= layerStyleObj.end(); ++it) {
+            QString key = it.key();
+            QJsonValue value = it.value();
+            qDebug() << key << ": " << value;
+        }
+    }
+
 };
 
 QTEST_MAIN(TestJson)
