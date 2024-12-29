@@ -244,8 +244,8 @@ QgsRuleBased3DRenderer* StylePoint::get3d_rule_renderer(
     mark_symbol->setFlags(Qgis::SymbolFlag::AffectsLabeling);
 
     QgsPoint3DSymbol *symbol = new QgsPoint3DSymbol();
-    QgsNullMaterialSettings* null_material_settintgs = new QgsNullMaterialSettings();
-    symbol->setMaterialSettings(null_material_settintgs);
+    QgsNullMaterialSettings* null_material_settings = new QgsNullMaterialSettings();
+    symbol->setMaterialSettings(null_material_settings);
     symbol->setShape(Qgis::Point3DShape::Billboard);
 
     QgsRuleBased3DRenderer::Rule* rule = new QgsRuleBased3DRenderer::Rule(nullptr);
