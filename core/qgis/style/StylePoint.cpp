@@ -76,8 +76,6 @@ QgsFeatureRenderer* StylePoint::get2d_rule_based_renderer(QJsonObject& font_styl
 	if (!ENABLE_POINT_CLUSTER) {
 		return rule_renderer;
 	}
-
-	rule_symbol->appendSymbolLayer(rule_font_marker);
 	//QgsSymbol* cluster_symbol = QgsSymbol::defaultSymbol(Qgis::GeometryType::Point);
 	QgsMarkerSymbol* cluster_symbol = new QgsMarkerSymbol();
 	QgsFontMarkerSymbolLayer* font_marker = new QgsFontMarkerSymbolLayer(label_style["fontFamily"].toString());
