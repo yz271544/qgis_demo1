@@ -1,4 +1,7 @@
 ﻿
+
+#include <qgsvectorlayer3drenderer.h>
+#include <qgsnullmaterialsettings.h>
 #include "StylePoint.h"
 
 
@@ -95,4 +98,162 @@ QgsFeatureRenderer* StylePoint::get2d_rule_based_renderer(QJsonObject& font_styl
 	cluster_renderer->setEmbeddedRenderer(rule_renderer);
 
 	return cluster_renderer;
+}
+
+QgsAbstract3DRenderer* StylePoint::get3d_single_symbol_renderer(
+        QgsVectorLayer &point_layer,
+        QJsonObject& font_style,
+        QJsonObject& layer_style,
+        QString& icon_path,
+        qreal point_size) {
+    QgsPoint3DSymbol symbol;
+    QgsPhongMaterialSettings material_settings{};
+
+    QString font_color;
+    if (font_style.contains("fontColor")) {
+        font_color = font_style["fontColor"].toString();
+    } else {
+        font_color = "#000000";
+    }
+
+    std::pair<QString, float> colorOpacity = ColorTransformUtil::str_rgba_to_hex(font_color);
+    QString material_font_color = colorOpacity.first;
+    float material_font_opacity = colorOpacity.second;
+
+    material_settings.setOpacity(material_font_opacity);
+
+    material_settings.setDiffuse(QColor(font_color));
+    material_settings.setAmbient(QColor(font_color));
+    symbol.setMaterialSettings(&material_settings);
+
+    QgsVectorLayer3DRenderer *renderer = new QgsVectorLayer3DRenderer();
+    renderer->setLayer(&point_layer);
+    renderer->setSymbol(&symbol);
+    return renderer;
+}
+
+QgsAbstract3DRenderer* StylePoint::get3d_single_raster_symbol_renderer(
+        QgsVectorLayer &point_layer,
+        QJsonObject& font_style,
+        QJsonObject& layer_style,
+        QString& icon_path,
+        qreal point_size) {
+    QMap<QString, QVariant> label_style;
+
+    if (font_style.contains("fontColor")) {
+        QString font_color = font_style["fontColor"].toString();
+        std::pair<QString, float> colorOpacity = ColorTransformUtil::str_rgba_to_hex(font_color);
+        label_style.insert("fontColor", colorOpacity.first);
+        label_style.insert("fontOpacity", colorOpacity.second);
+
+    } else {
+        label_style.insert("fontColor", "#000000");
+        label_style.insert("fontOpacity", 1.0);
+    }
+    if (font_style.contains("fontFamily")) {
+        label_style.insert("fontFamily", font_style["fontFamily"].toString());
+    } else {
+        label_style.insert("fontFamily", "SimSun");
+    }
+    if (font_style.contains("fontSize")) {
+        label_style.insert("fontSize", font_style["fontSize"].toInt());
+    } else {
+        label_style.insert("fontSize", 12);
+    }
+    label_style.insert("is_bold", true);
+    label_style.insert("is_italic", false);
+    label_style.insert("spacing", 0.0);
+
+
+    float point_size_mm = QgsUtil::d300_pixel_to_mm(point_size);
+    // 创建一个嵌入式规则渲染器
+    QgsRasterMarkerSymbolLayer* raster_marker = new QgsRasterMarkerSymbolLayer(icon_path);
+
+    raster_marker->setSize(point_size_mm);
+    raster_marker->setSizeUnit(Qgis::RenderUnit::Millimeters);
+    raster_marker->setOpacity(1.0);
+    raster_marker->setAngle(0.0);
+    raster_marker->setOffset(QPointF(0, 0));
+    raster_marker->setVerticalAnchorPoint(QgsMarkerSymbolLayer::VerticalAnchorPoint::VCenter);
+    raster_marker->setHorizontalAnchorPoint(QgsMarkerSymbolLayer::HorizontalAnchorPoint::HCenter);
+
+    QgsPoint3DSymbol *symbol = new QgsPoint3DSymbol();
+    symbol->setShape(Qgis::Point3DShape::Billboard);
+    QgsMarkerSymbol* marker_symbol = symbol->billboardSymbol();
+    marker_symbol->changeSymbolLayer(0, raster_marker);
+
+    QgsVectorLayer3DRenderer* renderer = new QgsVectorLayer3DRenderer();
+    renderer->setSymbol(symbol);
+    return renderer;
+}
+
+QgsRuleBased3DRenderer* StylePoint::get3d_rule_renderer(
+        QgsVectorLayer &point_layer,
+        QJsonObject& font_style,
+        QJsonObject& layer_style,
+        QString& icon_path,
+        qreal point_size) {
+    // Create the root rule
+    QgsRuleBased3DRenderer::Rule* root_rule = new QgsRuleBased3DRenderer::Rule(nullptr);
+
+    QMap<QString, QVariant> label_style;
+
+    if (font_style.contains("fontColor")) {
+        QString font_color = font_style["fontColor"].toString();
+        std::pair<QString, float> colorOpacity = ColorTransformUtil::str_rgba_to_hex(font_color);
+        label_style.insert("fontColor", colorOpacity.first);
+        label_style.insert("fontOpacity", colorOpacity.second);
+
+    } else {
+        label_style.insert("fontColor", "#000000");
+        label_style.insert("fontOpacity", 1.0);
+    }
+    if (font_style.contains("fontFamily")) {
+        label_style.insert("fontFamily", font_style["fontFamily"].toString());
+    } else {
+        label_style.insert("fontFamily", "SimSun");
+    }
+    if (font_style.contains("fontSize")) {
+        label_style.insert("fontSize", font_style["fontSize"].toInt());
+    } else {
+        label_style.insert("fontSize", 12);
+    }
+    label_style.insert("is_bold", true);
+    label_style.insert("is_italic", false);
+    label_style.insert("spacing", 0.0);
+
+
+    float point_size_mm = QgsUtil::d300_pixel_to_mm(point_size);
+    // 创建一个嵌入式规则渲染器
+    QgsMarkerSymbol* mark_symbol = new QgsMarkerSymbol();
+    mark_symbol->setSize(point_size_mm);
+    mark_symbol->setSizeUnit(Qgis::RenderUnit::Millimeters);
+    mark_symbol->setOpacity(1.0);
+    mark_symbol->setAngle(0.0);
+
+    QgsRasterMarkerSymbolLayer* raster_marker = new QgsRasterMarkerSymbolLayer(icon_path);
+    raster_marker->setSize(point_size_mm);
+    raster_marker->setSizeUnit(Qgis::RenderUnit::Millimeters);
+    raster_marker->setOpacity(1.0);
+    raster_marker->setAngle(0.0);
+    raster_marker->setOffset(QPointF(0, 0));
+    raster_marker->setVerticalAnchorPoint(QgsMarkerSymbolLayer::VerticalAnchorPoint::VCenter);
+    raster_marker->setHorizontalAnchorPoint(QgsMarkerSymbolLayer::HorizontalAnchorPoint::HCenter);
+
+    mark_symbol->changeSymbolLayer(0, raster_marker);
+    mark_symbol->setFlags(Qgis::SymbolFlag::AffectsLabeling);
+
+    QgsPoint3DSymbol *symbol = new QgsPoint3DSymbol();
+    QgsNullMaterialSettings* null_material_settintgs = new QgsNullMaterialSettings();
+    symbol->setMaterialSettings(null_material_settintgs);
+    symbol->setShape(Qgis::Point3DShape::Billboard);
+
+    QgsRuleBased3DRenderer::Rule* rule = new QgsRuleBased3DRenderer::Rule(nullptr);
+
+    rule->setSymbol(symbol);
+    root_rule->appendChild(rule);
+
+    QgsRuleBased3DRenderer* renderer3d = new QgsRuleBased3DRenderer(root_rule);
+
+    return renderer3d;
 }

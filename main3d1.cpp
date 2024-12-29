@@ -245,12 +245,14 @@ int main(int argc, char *argv[]) {
 
     p_point_layer->setRenderer(feature_renderer);
 
+    if (ENABLE_3D) {
+        QgsAbstract3DRenderer* renderer3d = StylePoint::get3d_single_raster_symbol_renderer(*p_point_layer, fontStyleObj, layerStyleObj, icon_path, 20.0);
+        p_point_layer->setRenderer3D(renderer3d);
+    }
+
     p_point_layer->triggerRepaint();
 
     project->addMapLayer(p_point_layer);
-
-
-
 
     QgsMapCanvas *canvas = new QgsMapCanvas();
     canvas->setDestinationCrs(qgscrs);

@@ -21,6 +21,9 @@
 #include "qgsproperty.h"
 #include "qgsunittypes.h"
 #include "qgswkbtypes.h"
+#include <qgspoint3dsymbol.h>
+#include <qgsphongmaterialsettings.h>
+#include <qgsrulebased3drenderer.h>
 
 #include "../../../config.h"
 #include "../../../core/utils/QgsUtil.h"
@@ -29,7 +32,32 @@
 
 class StylePoint {
 public:
-	static QgsFeatureRenderer* get2d_rule_based_renderer(QJsonObject& font_style, QJsonObject& layer_style, QString& icon_path, qreal point_size);
+	static QgsFeatureRenderer* get2d_rule_based_renderer(
+            QJsonObject& font_style,
+            QJsonObject& layer_style,
+            QString& icon_path,
+            qreal point_size);
+
+    static QgsAbstract3DRenderer* get3d_single_symbol_renderer(
+            QgsVectorLayer &point_layer,
+            QJsonObject& font_style,
+            QJsonObject& layer_style,
+            QString& icon_path,
+            qreal point_size);
+
+    static QgsAbstract3DRenderer* get3d_single_raster_symbol_renderer(
+            QgsVectorLayer &point_layer,
+            QJsonObject& font_style,
+            QJsonObject& layer_style,
+            QString& icon_path,
+            qreal point_size);
+
+    static QgsRuleBased3DRenderer* get3d_rule_renderer(
+            QgsVectorLayer &point_layer,
+            QJsonObject& font_style,
+            QJsonObject& layer_style,
+            QString& icon_path,
+            qreal point_size);
 };
 
 

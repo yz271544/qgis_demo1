@@ -48,4 +48,6 @@ inline bool getEnvBool(const char* envVarName, bool defaultValue = false) {
 // Get ENABLE_POINT_CLUSTER from environment variable, default to false
 inline bool ENABLE_POINT_CLUSTER = getEnvBool("ENABLE_POINT_CLUSTER", false);
 
+inline bool ENABLE_3D = getEnvBool("ENABLE_3D", true);
+
 #endif //CONFIG_H
