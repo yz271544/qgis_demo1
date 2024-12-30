@@ -53,6 +53,9 @@ public:
 
 
 	static void delete_file(const QString& file_path);
+
+
+	static bool delete_file_with_status(const QString& file_path);
 };
 
 

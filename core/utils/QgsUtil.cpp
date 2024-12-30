@@ -90,59 +90,82 @@ QgsVectorLayer* QgsUtil::write_persisted_layer(const QString& layer_name,
 
 	qDebug() << "CRS: " << crs.toWkt();
 	qDebug() << "Number of features in layer: " << layer->featureCount();
-	// file path
+	// QgsFeatureIterator it = layer->getFeatures();
+	// QgsFeature feature;
+	// while (it.nextFeature(feature)) {
+	// 	qDebug() << "Feature ID:" << feature.id();
+	// 	qDebug() << "Geometry:" << feature.geometry().asWkt();
+	// 	qDebug() << "Attributes:" << feature.attributes();
+	// }
+
 	QString file_prefix = QString().append(project_dir).append("/").append(layer_name);
 	QString file_path = QString().append(file_prefix).append(".geojson");
+	QString temp_file_path = QString().append(file_prefix).append(".tmp");
+
 	qDebug() << "GeoJSON file path: " << file_path;
-	// Delete existing GeoJSON file if it exists
-	qDebug() << "delete geojson file:" << file_path;
-	QFile::remove(file_path);
-	//FileUtil::delete_file(file_path);
 
+	// 删除旧文件
+	if (QFile::exists(file_path)) {
+		if (!QFile::remove(file_path)) {
+			qDebug() << "Failed to delete existing file: " << file_path;
+			return nullptr;
+		}
+	}
 
-	// options
+	// 设置写入选项
 	QgsVectorFileWriter::SaveVectorOptions options;
 	options.driverName = "GeoJSON";
 	options.fileEncoding = "UTF-8";
 	options.includeZ = true;
 	options.overrideGeometryType = qgs_wkb_type;
-	// options.layerName = layer_name;
-	qDebug() << "prepare writer file:" << file_path;
-	// Create a new vector file writer
-	// std::unique_ptr<QgsVectorFileWriter> writer(QgsVectorFileWriter::create(
-	// 	file_path,
-	// 	fields,
-	// 	qgs_wkb_type,
-	// 	crs,
-	// 	cts,
-	// 	options
-	// ));
 
-	QgsVectorFileWriter *writer = QgsVectorFileWriter::create(
-	    file_path,
-	    fields,
-	    qgs_wkb_type,
-	    crs,
-	    cts,
-	    options
+	// 写入临时文件
+	QgsVectorFileWriter* writer = QgsVectorFileWriter::create(
+		temp_file_path,
+		fields,
+		qgs_wkb_type,
+		crs,
+		cts,
+		options
 	);
-	// assert
+
 	if (writer->hasError() != QgsVectorFileWriter::NoError) {
 		std::cerr << "Error creating file writer: " << writer->errorMessage().toStdString() << std::endl;
+		delete writer;
 		return nullptr;
 	}
-	// write
-	qDebug() << "writting: " << file_path << " ...";
-	writer->writeAsVectorFormatV3(layer, file_path, cts, options);
-	qDebug() << "writted the layer to geojson file";
-	// flush disk
+
+	// 写入所有要素
+	QgsFeatureIterator it = layer->getFeatures();
+	QgsFeature feature;
+	while (it.nextFeature(feature)) {
+		if (writer->addFeature(feature) != QgsVectorFileWriter::NoError) {
+			qDebug() << "Failed to write feature ID:" << feature.id();
+		}
+	}
+
 	writer->flushBuffer();
 	delete writer;
-	// delete gpkg
-	// 假设 FileUtil 中的 delete_file 函数已经实现
-	QString gpkg_file = QString().append(file_prefix).append(".gpkg");
-	qDebug() << "delete file:" << gpkg_file;
-	FileUtil::delete_file(gpkg_file);
-	// return persistence layer
+
+	// 确保资源释放
+	QThread::msleep(100);
+
+	// QgsVectorFileWriter::writeAsVectorFormatV3(
+	// 	layer,                    // 原始图层
+	// 	file_path,                // 目标文件路径
+	// 	cts,                      // 坐标转换上下文
+	// 	options                   // 写入选项
+	// );
+
+	// 重命名临时文件
+	QString temp_real_file_path = QString(temp_file_path).append(".geojson");
+	if (!QFile::rename(temp_real_file_path, file_path)) {
+		qDebug() << "Failed to rename temp file to target file.";
+		qDebug() << "Temp file path:" << temp_file_path;
+		qDebug() << "Target file path:" << file_path;
+		return nullptr;
+	}
+
+	qDebug() << "Successfully wrote GeoJSON file: " << file_path << " baseName:" << layer_name;
 	return new QgsVectorLayer(file_path, layer_name, "ogr");
 }

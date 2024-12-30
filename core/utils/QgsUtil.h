@@ -17,6 +17,7 @@
 #include <qgsvectorfilewriter.h>
 #include <qgsvectorlayer.h>
 #include <qgsvectorlayerlabeling.h>
+#include <qthread.h>
 
 #if defined(_WIN32)
 #include <windows.h>

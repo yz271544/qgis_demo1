@@ -68,3 +68,14 @@ void FileUtil::delete_file(const QString& file_path)
 		}
 	}
 }
+
+bool FileUtil::delete_file_with_status(const QString& file_path)
+{
+	QFile file(file_path);
+	if (file.exists())
+	{
+		return file.remove();
+	} else {
+		return true;
+	}
+}

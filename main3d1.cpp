@@ -41,6 +41,7 @@
 #include "core/utils/ImageUtil.h"
 #include "qgspluginlayerregistry.h"
 #include "core/qgis/style/StylePoint.h"
+#include "core/utils/FileUtil.h"
 #if defined(_WIN32)
 #include <windows.h>
 #endif
@@ -77,13 +78,13 @@ int main(int argc, char* argv[]) {
 	QString baseXyzUrl = "type=xyz&url=http://47.94.145.6/map/lx/{z}/{x}/{y}.png&zmax=19&zmin=0";
 	//QString baseXyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
 
-	QgsRasterLayer baseXyzLayer(baseXyzUrl, BASE_TILE_NAME, "wms");
-	if (!baseXyzLayer.isValid()) {
-		qWarning() << "XYZ xyzLayer layer invalid!" << baseXyzLayer.error().message();
+	QgsRasterLayer* baseXyzLayer = new QgsRasterLayer(baseXyzUrl, BASE_TILE_NAME, "wms");
+	if (!baseXyzLayer->isValid()) {
+		qWarning() << "XYZ xyzLayer layer invalid!" << baseXyzLayer->error().message();
 		return -1;
 	}
 	// add base layer to project
-	project->addMapLayer(&baseXyzLayer);
+	project->addMapLayer(baseXyzLayer);
 	qDebug() << "add base layer to project";
 
 	// create MAIN XYZ layer
@@ -93,27 +94,27 @@ int main(int argc, char* argv[]) {
 	encodedOrthogonalXyzUrl.append("/{z}/{x}/{y}");
 	encodedOrthogonalXyzUrl.append(".png");
 	qDebug().noquote() << "encodedOrthogonalXyzUrl: " << encodedOrthogonalXyzUrl;
-	QgsRasterLayer orthogonalLayer(encodedOrthogonalXyzUrl, MAIN_TILE_NAME, "wms");
-	if (!orthogonalLayer.isValid()) {
-		qWarning() << "XYZ orthogonalLayer layer invalid!" << orthogonalLayer.error().message();
+	QgsRasterLayer* orthogonalLayer = new QgsRasterLayer(encodedOrthogonalXyzUrl, MAIN_TILE_NAME, "wms");
+	if (!orthogonalLayer->isValid()) {
+		qWarning() << "XYZ orthogonalLayer layer invalid!" << orthogonalLayer->error().message();
 		return -1;
 	}
-	project->addMapLayer(&orthogonalLayer);
+	project->addMapLayer(orthogonalLayer);
 	qDebug() << "add orthogonal layer to project";
 
 	// 3D Scene
 	QString realistic3d_tile_url =
 		"url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
-	QgsTiledSceneLayer tiled_scene_layer(realistic3d_tile_url, REAL3D_TILE_NAME, "cesiumtiles");
+	QgsTiledSceneLayer* tiled_scene_layer = new QgsTiledSceneLayer(realistic3d_tile_url, REAL3D_TILE_NAME, "cesiumtiles");
 	QgsTiledSceneLayer3DRenderer* qgs_tiled_scene_layer_3d_renderer = new QgsTiledSceneLayer3DRenderer();
-	qgs_tiled_scene_layer_3d_renderer->setLayer(&tiled_scene_layer);
-	tiled_scene_layer.setRenderer3D(qgs_tiled_scene_layer_3d_renderer);
-	if (!tiled_scene_layer.isValid()) {
-		qWarning() << "cesiumtiles 3D tiled_scene_layer layer invalid!" << tiled_scene_layer.error().message();
+	qgs_tiled_scene_layer_3d_renderer->setLayer(tiled_scene_layer);
+	tiled_scene_layer->setRenderer3D(qgs_tiled_scene_layer_3d_renderer);
+	if (!tiled_scene_layer->isValid()) {
+		qWarning() << "cesiumtiles 3D tiled_scene_layer layer invalid!" << tiled_scene_layer->error().message();
 		return -1;
 	}
 	// add layer to project
-	project->addMapLayer(&tiled_scene_layer);
+	project->addMapLayer(tiled_scene_layer);
 	qDebug() << "add 3d scene layer to project";
 
 	QString layer_name = QString("民警");
@@ -201,6 +202,9 @@ int main(int argc, char* argv[]) {
 		Qgis::WkbType::PointZ,
 		project->transformContext(),
 		project->crs());
+
+	// delete point_layer;
+
 	p_point_layer->setCrs(project->crs());
 
 	if (!p_point_layer->isValid()) {
@@ -209,7 +213,7 @@ int main(int argc, char* argv[]) {
 	}
 	// # icon_path = "D:/iProject/pypath/qgis-x/common/icon/民警.png"
 	// QString icon_path = QString(layer_persist_prefix).append(".png");
-	qDebug() << "icon_base64:" << icon_base64;
+	// qDebug() << "icon_base64:" << icon_base64;
 	QString icon_path = QString().append(save_qgis_project_path).append("/").append(layer_name).append(".png");
 	qDebug() << "icon_path:" << icon_path;
 	if (!icon_base64.isEmpty())
@@ -218,6 +222,7 @@ int main(int argc, char* argv[]) {
 		QFile iconFile(icon_path);
 		if (iconFile.open(QIODevice::WriteOnly)) {
 			iconFile.write(base64_image.second);
+			iconFile.flush();
 			iconFile.close();
 		}
 		else {
@@ -322,15 +327,78 @@ int main(int argc, char* argv[]) {
 
 	qDebug() << "save projectPath:" << projectPath << "successes";
 
-	QgsLayoutManager* layout_manager = project->layoutManager();
-	QList<QgsMasterLayoutInterface*> layouts = layout_manager->layouts();
-	for (int i = 0; i < layouts.size(); ++i) {
-		QgsMasterLayoutInterface* layout = layouts.at(i);
-		qDebug() << "remove layout name:" << layout->name();
-		layout_manager->removeLayout(layout);
+	// 清理关系
+	// qDebug() << "清理关系";
+	// QgsRelationManager* relationManager = project->relationManager();
+	// if (relationManager) {
+	// 	QMap<QString, QgsRelation> qgs_relations = relationManager->relations();
+	// 	qDebug() << " relation count: " << qgs_relations.count();
+	// 	for (auto it = qgs_relations.constBegin(); it != qgs_relations.constEnd(); ++it) {
+	// 		qDebug() << "Relation ID:" << it.key() << " Name:" << it.value().name();
+	// 		relationManager->removeRelation(it.key());
+	// 	}
+	// }
+
+	// 清理布局
+	// qDebug() << "清理布局";
+	// QgsLayoutManager* layout_manager = project->layoutManager();
+	// QList<QgsMasterLayoutInterface*> layouts = layout_manager->layouts();
+	// qDebug() << " layouts count: " << layouts.count();
+	// for (int i = 0; i < layouts.size(); ++i) {
+	// 	QgsMasterLayoutInterface* layout = layouts.at(i);
+	// 	qDebug() << "remove layout name:" << layout->name();
+	// 	layout_manager->removeLayout(layout);
+	// }
+
+	// 清理图层
+	// qDebug() << "清理图层";
+	// auto layers = project->mapLayers();
+	// qDebug() << "layers count:" << layers.size();
+	// for (auto it = layers.constBegin(); it != layers.constEnd(); ++it) {
+	// 	qDebug() << "Layer ID:" << it.key() << " Name:" << it.value()->name();
+	// 	project->removeMapLayer(it.key());
+	// 	delete it.value();
+	// }
+
+
+	auto layers = project->mapLayers();
+	qDebug() << "layers count:" << layers.size() ;
+	for (auto it = layers.constBegin(); it != layers.constEnd(); ++it) {
+		qDebug() << "Layer ID:" << it.key() << " Name:" << it.value()->name();
+		QgsVectorLayer* vectorLayer = dynamic_cast<QgsVectorLayer*>(it.value());
+		if (vectorLayer) {
+			qDebug() << "Checking relations for layer:" << vectorLayer->name();
+			std::reference_wrapper<QgsVectorLayer> reference_wrapper = std::ref(*vectorLayer);
+
+
+			// for (int i = 0; i < vectorLayer->fields().count(); ++i) {
+			// 	qDebug() << "Field index:" << i << " Name:" << vectorLayer->fields().at(i).name();
+			// 	QList<QgsRelation> relations = vectorLayer->referencingRelations(i);
+			// 	qDebug() << "Field index:" << i << " has referencing relations count:" << relations.size();
+			// 	if (!relations.isEmpty()) {
+			// 		qDebug() << "Field index:" << i << " has referencing relations:";
+			// 		for (const QgsRelation& relation : relations) {
+			// 			qDebug() << "Relation name:" << relation.name();
+			// 			qDebug() << "Referenced layer ID:" << relation.referencedLayerId();
+			// 		}
+			// 	}
+			// }
+		}
+		qDebug() << "removeMapLayer" << it.key();
+		project->removeMapLayer(it.key());
 	}
-	layout_manager->clear();
+	// qDebug() << "remove all layouts";
+	// layout_manager->clear();
+	// qDebug() << "removeAllMapLayers";
+	// project->removeAllMapLayers();
+	// qDebug() << "project -> clear()";
 	// project->clear();
+
+	QString delete_file_test = "D:/iProject/cpath/qgis_demo1/common/project/民警.geojson";
+	//bool delete_file_status = FileUtil::delete_file_with_status(delete_file_test);
+	QFile file(delete_file_test);
+	bool delete_file_status = file.remove();
+	qDebug() << "delete file: " << delete_file_test << " status:" << delete_file_status;
 
 	//return app.exec();
 	return 0;
