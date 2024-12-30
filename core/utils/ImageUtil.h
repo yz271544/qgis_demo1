@@ -24,7 +24,7 @@
 
 class ImageUtil {
 public:
-    static std::pair<QString, QByteArray> parse_base64_image(const QString& base64_str);
+	static std::pair<QString, QByteArray> parse_base64_image(const QString& base64_str);
 };
 
 

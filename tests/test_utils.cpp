@@ -80,28 +80,28 @@ private slots:
 		QCOMPARE(color_dict["#1c6ad6-#00cd52-#cbc829"], 1);
 	}
 
-    void test_base64_case1() {
-        QString save_qgis_project_path = "/lyndon/iProject/cpath/qgis_demo1/common/png";
-        QString layer_name = "民警";
-        QString icon_base64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAolBMVEUAAAC1xPmIn/SKn//n6/3e5PzS2vvN1vusvPeUqfWNpPUAMub////z9f6mt/by9P1Ia+2MovP6+/72+P7AzPiUqfQrVOoFNuYgTOnp7fzi5/xOcO2dr/UuV+p6lPISQOisvPejtPZ/l/IcSOje5Ptaeu9EaOybrvV3kfFTdO7X3vvI0vm9yfi6x/iDm/Jvi/BphvBVdu5Nb+05X+uPpPSOpPN4UAcsAAAAC3RSTlMA0y0M/fny7sF6UvKXmSMAAAGJSURBVDjLhZNXYoMwDEAhkGnZmGFICZBA9l7t/a9WRx6h6Qfvx0g22nLeeGN32Ke0P3THnvOfnhtAkLAwZIn8cHsf194ojgqeESTjRRSPvD+/D4BNSYspg0HLyMSnM/LBjPoT+7+fp6icX9liwa5zFMrc1za8AcX7VFBYheEKqEC5pAMVxwjQ/gYkBec1SDboBUboIGbKfiQvdpwX8ohUxCx+OXG1REJ5E+y+X++EziVyZQTBlijm+ZfGX2pVEXjOGDjRnEFzNhoOY8cNMiOKphF1LapdaDRZ4DrDhBiOAP7hkAMcrSoZOn1mJQEaYVWs79DQSiVoSqsKKT4wLABZkNYD5cImCpJ8TlouMEjLxpbZBolpWu4gWWtBp/kuVNqcAH5kHKcmbRXKCwqVQqISWOORlKbUplmPGJD9XZ3xQzXLtHtJQfF8goIusd1mYNag2e9Bs8aBMSOXVStAqkqdqyZL1cjZoV3y20XUVVWLy41L+6ka2u6x714cu3rb9+pt7ep1L2/n+v8CysQxDA9OhyUAAAAASUVORK5CYII=";
-        qDebug() << "icon_base64:" << icon_base64;
-        QString icon_path = QString().append(save_qgis_project_path).append("/").append(layer_name).append(".png");
-        qDebug() << "icon_path:" << icon_path;
-        if (!icon_base64.isEmpty())
-        {
-            std::pair<QString, QByteArray> base64_image = ImageUtil::parse_base64_image(icon_base64);
-            qDebug() << "parsed the extension is:" << base64_image.first;
-            qDebug() << "parsed the bytearray is:" << base64_image.second;
-            QFile iconFile(icon_path);
-            if (iconFile.open(QIODevice::WriteOnly)) {
-                iconFile.write(base64_image.second);
-                iconFile.close();
-            }
-            else {
-                qWarning() << "Failed to open file for writing:" << icon_path;
-            }
-        }
-    }
+	void test_base64_case1() {
+		QString save_qgis_project_path = "/lyndon/iProject/cpath/qgis_demo1/common/png";
+		QString layer_name = "民警";
+		QString icon_base64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAolBMVEUAAAC1xPmIn/SKn//n6/3e5PzS2vvN1vusvPeUqfWNpPUAMub////z9f6mt/by9P1Ia+2MovP6+/72+P7AzPiUqfQrVOoFNuYgTOnp7fzi5/xOcO2dr/UuV+p6lPISQOisvPejtPZ/l/IcSOje5Ptaeu9EaOybrvV3kfFTdO7X3vvI0vm9yfi6x/iDm/Jvi/BphvBVdu5Nb+05X+uPpPSOpPN4UAcsAAAAC3RSTlMA0y0M/fny7sF6UvKXmSMAAAGJSURBVDjLhZNXYoMwDEAhkGnZmGFICZBA9l7t/a9WRx6h6Qfvx0g22nLeeGN32Ke0P3THnvOfnhtAkLAwZIn8cHsf194ojgqeESTjRRSPvD+/D4BNSYspg0HLyMSnM/LBjPoT+7+fp6icX9liwa5zFMrc1za8AcX7VFBYheEKqEC5pAMVxwjQ/gYkBec1SDboBUboIGbKfiQvdpwX8ohUxCx+OXG1REJ5E+y+X++EziVyZQTBlijm+ZfGX2pVEXjOGDjRnEFzNhoOY8cNMiOKphF1LapdaDRZ4DrDhBiOAP7hkAMcrSoZOn1mJQEaYVWs79DQSiVoSqsKKT4wLABZkNYD5cImCpJ8TlouMEjLxpbZBolpWu4gWWtBp/kuVNqcAH5kHKcmbRXKCwqVQqISWOORlKbUplmPGJD9XZ3xQzXLtHtJQfF8goIusd1mYNag2e9Bs8aBMSOXVStAqkqdqyZL1cjZoV3y20XUVVWLy41L+6ka2u6x714cu3rb9+pt7ep1L2/n+v8CysQxDA9OhyUAAAAASUVORK5CYII=";
+		qDebug() << "icon_base64:" << icon_base64;
+		QString icon_path = QString().append(save_qgis_project_path).append("/").append(layer_name).append(".png");
+		qDebug() << "icon_path:" << icon_path;
+		if (!icon_base64.isEmpty())
+		{
+			std::pair<QString, QByteArray> base64_image = ImageUtil::parse_base64_image(icon_base64);
+			qDebug() << "parsed the extension is:" << base64_image.first;
+			qDebug() << "parsed the bytearray is:" << base64_image.second;
+			QFile iconFile(icon_path);
+			if (iconFile.open(QIODevice::WriteOnly)) {
+				iconFile.write(base64_image.second);
+				iconFile.close();
+			}
+			else {
+				qWarning() << "Failed to open file for writing:" << icon_path;
+			}
+		}
+	}
 
 };
 

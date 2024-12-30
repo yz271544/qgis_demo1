@@ -19,38 +19,38 @@
 class FileOperationError : public std::exception
 {
 private:
-    std::string message;
+	std::string message;
 
 public:
-    FileOperationError(const std::string& msg) : message(msg)
-    {
-    }
+	FileOperationError(const std::string& msg) : message(msg)
+	{
+	}
 
-    const char* what() const noexcept override
-    {
-        return message.c_str();
-    }
+	const char* what() const noexcept override
+	{
+		return message.c_str();
+	}
 };
 
 class FileUtil
 {
 public:
-    static void create_directory(const std::string& directory_path);
+	static void create_directory(const std::string& directory_path);
 
 
-    static void delete_directory(const std::string& directory_path);
+	static void delete_directory(const std::string& directory_path);
 
 
-    static std::vector<std::string> list_files(const std::string& directory_path);
+	static std::vector<std::string> list_files(const std::string& directory_path);
 
 
-    static void copy_file(const std::string& source_path, const std::string& destination_path);
+	static void copy_file(const std::string& source_path, const std::string& destination_path);
 
 
-    static void move_file(const std::string& source_path, const std::string& destination_path);
+	static void move_file(const std::string& source_path, const std::string& destination_path);
 
 
-    static void delete_file(const QString& file_path);
+	static void delete_file(const QString& file_path);
 };
 
 

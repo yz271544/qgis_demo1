@@ -6,17 +6,17 @@ std::tuple<int, int, int, float> ColorTransformUtil::str_rgba_to_tuple_int(const
 	std::string str = rgba.toStdString();
 	// 移除 "rgba(" 和 ")"
 	size_t start = str.find("rgba(");
-	if (start!= std::string::npos) {
+	if (start != std::string::npos) {
 		str = str.substr(start + 5);
 	}
 	size_t end = str.find(")");
-	if (end!= std::string::npos) {
+	if (end != std::string::npos) {
 		str = str.substr(0, end);
 	}
 	// 按逗号分割字符串
 	QVector<QString> parts;
 	size_t pos = 0;
-	while ((pos = str.find(','))!= std::string::npos) {
+	while ((pos = str.find(',')) != std::string::npos) {
 		parts.push_back(QString::fromStdString(str.substr(0, pos)));
 		str.erase(0, pos + 1);
 	}
@@ -32,9 +32,9 @@ std::tuple<int, int, int, float> ColorTransformUtil::str_rgba_to_tuple_int(const
 // 将 RGB 元组转换为十六进制字符串
 QString ColorTransformUtil::rgb_to_hex(const std::tuple<int, int, int>& rgb) {
 	return QString("#%1%2%3")
-		  .arg(std::get<0>(rgb), 2, 16, QLatin1Char('0'))
-		  .arg(std::get<1>(rgb), 2, 16, QLatin1Char('0'))
-		  .arg(std::get<2>(rgb), 2, 16, QLatin1Char('0'));
+		.arg(std::get<0>(rgb), 2, 16, QLatin1Char('0'))
+		.arg(std::get<1>(rgb), 2, 16, QLatin1Char('0'))
+		.arg(std::get<2>(rgb), 2, 16, QLatin1Char('0'));
 }
 
 std::pair<QString, float> ColorTransformUtil::str_rgba_to_hex(const QString& rgba) {
@@ -78,7 +78,7 @@ QVector<QString> ColorTransformUtil::split_color(const QString& merged_color) {
 	QVector<QString> result;
 	int start = 0;
 	int pos = 0;
-	while ((pos = merged_color.indexOf('-', start))!= -1) {
+	while ((pos = merged_color.indexOf('-', start)) != -1) {
 		result.push_back(merged_color.mid(start, pos - start));
 		start = pos + 1;
 	}
@@ -94,7 +94,8 @@ QHash<QString, int> ColorTransformUtil::multi_color_group(const QVector<QVector<
 		QString style_color_merged = merge_color(style_color);
 		if (color_dict.contains(style_color_merged)) {
 			color_dict[style_color_merged]++;
-		} else {
+		}
+		else {
 			color_dict[style_color_merged] = 1;
 		}
 	}

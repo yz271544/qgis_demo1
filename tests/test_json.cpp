@@ -117,7 +117,8 @@ private slots:
 													qDebug() << "color: " << color;
 												}
 											}
-										} else {
+										}
+										else {
 											qDebug() << "styleInfoJson type:" << styleInfoJson.type();
 										}
 										if (styleInfoJson.isString()) {
@@ -129,24 +130,27 @@ private slots:
 													qDebug() << "222 fontStyle type:" << styleObj["fontStyle"].type();
 													QJsonObject fontStyle = styleObj["fontStyle"].toObject();
 													QJsonObject::const_iterator it;
-													for (it = fontStyle.begin(); it!= fontStyle.end(); ++it) {
+													for (it = fontStyle.begin(); it != fontStyle.end(); ++it) {
 														QString key = it.key();
 														QJsonValue value = it.value();
 														if (value.isString()) {
 															qDebug() << key << ": " << value.toString();
-														} else if (value.isDouble()) {
+														}
+														else if (value.isDouble()) {
 															qDebug() << key << ": " << value.toDouble();
-														} else if (value.isArray()) {
+														}
+														else if (value.isArray()) {
 															qDebug() << key << " (array): ";
 															QJsonArray jsonArray = value.toArray();
 															for (int i = 0; i < jsonArray.size(); ++i) {
 																qDebug() << "    - " << jsonArray.at(i).toString();
 															}
-														} else if (value.isObject()) {
+														}
+														else if (value.isObject()) {
 															qDebug() << key << " (object): ";
 															QJsonObject subObject = value.toObject();
 															QJsonObject::const_iterator subIt;
-															for (subIt = subObject.begin(); subIt!= subObject.end(); ++subIt) {
+															for (subIt = subObject.begin(); subIt != subObject.end(); ++subIt) {
 																qDebug() << "    " << subIt.key() << ": " << subIt.value().toString();
 															}
 														}
@@ -165,38 +169,38 @@ private slots:
 		}
 	}
 
-    void test_parse_json2() {
-//        QString font_style_payloads = R"({"borderColor":"rgba(255,255,255,1)\","loadFlag":true,"x":0,"y":35,"fontSize":60,"fontColor":"rgba(237, 233, 26, 1)\","fontFlag":true})";
-        QString styleInfoJson = "{\"color\":\"rgba(255,255,255,1)\",\"bim\":\"\",\"num\":2,\"loadFlag\":false,\"fontStyle\":{\"borderColor\":\"rgba(255,255,255,1)\",\"loadFlag\":true,\"x\":0,\"y\":35,\"fontSize\":60,\"fontColor\":\"rgba(237, 233, 26, 1)\",\"fontFlag\":true},\"radius\":100}";
-        QJsonObject styleInfoJsonObj = QJsonDocument::fromJson(styleInfoJson.toUtf8()).object();
-        QJsonObject::const_iterator it;
-        for (it = styleInfoJsonObj.begin(); it!= styleInfoJsonObj.end(); ++it) {
-            QString key = it.key();
-            QJsonValue value = it.value();
-            qDebug() << key << ": " << value;
-        }
+	void test_parse_json2() {
+		//        QString font_style_payloads = R"({"borderColor":"rgba(255,255,255,1)\","loadFlag":true,"x":0,"y":35,"fontSize":60,"fontColor":"rgba(237, 233, 26, 1)\","fontFlag":true})";
+		QString styleInfoJson = "{\"color\":\"rgba(255,255,255,1)\",\"bim\":\"\",\"num\":2,\"loadFlag\":false,\"fontStyle\":{\"borderColor\":\"rgba(255,255,255,1)\",\"loadFlag\":true,\"x\":0,\"y\":35,\"fontSize\":60,\"fontColor\":\"rgba(237, 233, 26, 1)\",\"fontFlag\":true},\"radius\":100}";
+		QJsonObject styleInfoJsonObj = QJsonDocument::fromJson(styleInfoJson.toUtf8()).object();
+		QJsonObject::const_iterator it;
+		for (it = styleInfoJsonObj.begin(); it != styleInfoJsonObj.end(); ++it) {
+			QString key = it.key();
+			QJsonValue value = it.value();
+			qDebug() << key << ": " << value;
+		}
 
-        if (styleInfoJsonObj.contains("fontStyle")) {
-            QJsonObject fontStyleObj = styleInfoJsonObj["fontStyle"].toObject();
-            qDebug() << "borderColor:" << fontStyleObj["borderColor"];
-            qDebug() << "fontColor:" << fontStyleObj["fontColor"];
-            qDebug() << "fontFlag:" << fontStyleObj["fontFlag"];
-            qDebug() << "loadFlag:" << fontStyleObj["loadFlag"];
-            qDebug() << "x:" << fontStyleObj["x"];
-            qDebug() << "y:" << fontStyleObj["y"];
-        }
-    }
+		if (styleInfoJsonObj.contains("fontStyle")) {
+			QJsonObject fontStyleObj = styleInfoJsonObj["fontStyle"].toObject();
+			qDebug() << "borderColor:" << fontStyleObj["borderColor"];
+			qDebug() << "fontColor:" << fontStyleObj["fontColor"];
+			qDebug() << "fontFlag:" << fontStyleObj["fontFlag"];
+			qDebug() << "loadFlag:" << fontStyleObj["loadFlag"];
+			qDebug() << "x:" << fontStyleObj["x"];
+			qDebug() << "y:" << fontStyleObj["y"];
+		}
+	}
 
-    void test_parse_layerStyle_json() {
-        QString layerStyle = "{\"scale\":0.8}";
-        QJsonObject layerStyleObj = QJsonDocument::fromJson(layerStyle.toUtf8()).object();
-        QJsonObject::const_iterator it;
-        for (it = layerStyleObj.begin(); it!= layerStyleObj.end(); ++it) {
-            QString key = it.key();
-            QJsonValue value = it.value();
-            qDebug() << key << ": " << value;
-        }
-    }
+	void test_parse_layerStyle_json() {
+		QString layerStyle = "{\"scale\":0.8}";
+		QJsonObject layerStyleObj = QJsonDocument::fromJson(layerStyle.toUtf8()).object();
+		QJsonObject::const_iterator it;
+		for (it = layerStyleObj.begin(); it != layerStyleObj.end(); ++it) {
+			QString key = it.key();
+			QJsonValue value = it.value();
+			qDebug() << key << ": " << value;
+		}
+	}
 
 };
 

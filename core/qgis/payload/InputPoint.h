@@ -16,23 +16,23 @@
 
 class InputPoint {
 private:
-    QString name;
-    QgsPoint point;
+	QString name;
+	QgsPoint point;
 
 public:
-    InputPoint();
+	InputPoint();
 
-    ~InputPoint();
+	~InputPoint();
 
-    InputPoint(const QString &name, const QgsPoint &point);
+	InputPoint(const QString& name, const QgsPoint& point);
 
-    QString getName();
+	QString getName();
 
-    QgsPoint getPoint();
+	QgsPoint getPoint();
 
-    void setName(const QString &name);
+	void setName(const QString& name);
 
-    void setPoint(const QgsPoint &point);
+	void setPoint(const QgsPoint& point);
 
 };
 

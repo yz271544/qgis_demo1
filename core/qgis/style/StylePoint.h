@@ -33,31 +33,31 @@
 class StylePoint {
 public:
 	static QgsFeatureRenderer* get2d_rule_based_renderer(
-            QJsonObject& font_style,
-            QJsonObject& layer_style,
-            QString& icon_path,
-            qreal point_size);
+		QJsonObject& font_style,
+		QJsonObject& layer_style,
+		QString& icon_path,
+		qreal point_size);
 
-    static QgsAbstract3DRenderer* get3d_single_symbol_renderer(
-            QgsVectorLayer &point_layer,
-            QJsonObject& font_style,
-            QJsonObject& layer_style,
-            QString& icon_path,
-            qreal point_size);
+	static QgsAbstract3DRenderer* get3d_single_symbol_renderer(
+		QgsVectorLayer& point_layer,
+		QJsonObject& font_style,
+		QJsonObject& layer_style,
+		QString& icon_path,
+		qreal point_size);
 
-    static QgsAbstract3DRenderer* get3d_single_raster_symbol_renderer(
-            QgsVectorLayer &point_layer,
-            QJsonObject& font_style,
-            QJsonObject& layer_style,
-            QString& icon_path,
-            qreal point_size);
+	static QgsAbstract3DRenderer* get3d_single_raster_symbol_renderer(
+		QgsVectorLayer& point_layer,
+		QJsonObject& font_style,
+		QJsonObject& layer_style,
+		QString& icon_path,
+		qreal point_size);
 
-    static QgsRuleBased3DRenderer* get3d_rule_renderer(
-            QgsVectorLayer &point_layer,
-            QJsonObject& font_style,
-            QJsonObject& layer_style,
-            QString& icon_path,
-            qreal point_size);
+	static QgsRuleBased3DRenderer* get3d_rule_renderer(
+		QgsVectorLayer& point_layer,
+		QJsonObject& font_style,
+		QJsonObject& layer_style,
+		QString& icon_path,
+		qreal point_size);
 };
 
 
