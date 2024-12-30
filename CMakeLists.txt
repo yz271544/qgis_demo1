@@ -15,6 +15,7 @@ if (WIN32)
     if(MSVC)
         add_compile_options(/wd4819)
         add_definitions(-D_USE_MATH_DEFINES)
+        add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     endif()
     message("Win32 Searching for QGIS in $ENV{QGISPROGRAMFILES}/qgis")
     # 设置QGIS库的路径

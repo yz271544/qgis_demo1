@@ -1,7 +1,6 @@
 ﻿
 
-#include <qgsvectorlayer3drenderer.h>
-#include <qgsnullmaterialsettings.h>
+
 #include "StylePoint.h"
 
 

@@ -1,12 +1,18 @@
 ﻿//
 // Created by Lyndon on 2024/12/12.
 //
-
+#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 #include <fstream>
 #include <vector>
 #include <QByteArray>
 #include <QFile>
 #include <QIODevice>
+#include "qgspluginlayerregistry.h"
 
 #include <complex>
 #include <execution>

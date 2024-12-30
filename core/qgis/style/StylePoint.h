@@ -24,7 +24,8 @@
 #include <qgspoint3dsymbol.h>
 #include <qgsphongmaterialsettings.h>
 #include <qgsrulebased3drenderer.h>
-
+#include <qgsvectorlayer3drenderer.h>
+#include <qgsnullmaterialsettings.h>
 #include "../../../config.h"
 #include "../../../core/utils/QgsUtil.h"
 #include "../../utils/ColorTransformUtil.h"

@@ -1,4 +1,10 @@
-﻿#include <QCoreApplication>
+﻿#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+#if defined(_WIN32)
+#include <windows.h>
+#endif
+#include <QCoreApplication>
 #include <QFileInfo>
 #include <qgsapplication.h>
 #include <qgsproject.h>
@@ -13,7 +19,7 @@ int main(int argc, char* argv[])
 	// 初始化 QGIS 应用程序
 	QgsApplication app(argc, argv, true);
 	// QgsApplication::setPrefixPath("/lyndon/iProject/cpath/QGIS/output", true);
-	QgsApplication::setPrefixPath(qgisPrefixPath, true);
+	QgsApplication::setPrefixPath(QGIS_PREFIX_PATH, true);
 	QgsApplication::init();
 	QgsApplication::initQgis();
 
@@ -43,9 +49,9 @@ int main(int argc, char* argv[])
 
 	// 将图层添加到项目中
 	project->addMapLayer(xyzLayer);
-	qDebug() << "qgisProjectPath:" << qgisProjectPath;
+	qDebug() << "qgisProjectPath:" << QGIS_PREFIX_PATH;
 	// 保存项目为 .qgz 文件
-	QString projectPath = qgisProjectPath;
+	QString projectPath = QGIS_PREFIX_PATH;
 	qDebug() << "projectPath:" << projectPath;
 	if (!project->write(projectPath)) {
 		qWarning() << "无法保存项目文件!";

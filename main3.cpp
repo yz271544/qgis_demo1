@@ -1,4 +1,10 @@
-﻿#include <iomanip>
+﻿#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+#if defined(_WIN32)
+#include <windows.h>
+#endif
+#include <iomanip>
 #include <iostream>
 #include <cstdlib>
 #include "qgsproject.h"
