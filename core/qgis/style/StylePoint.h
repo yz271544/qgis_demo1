@@ -7,9 +7,6 @@
 #if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
-#if defined(_WIN32)
-#include <windows.h>
-#endif
 #include <qgsrenderer.h>
 #include <qgis.h>
 #include "qgssymbol.h"
@@ -26,10 +23,21 @@
 #include <qgsrulebased3drenderer.h>
 #include <qgsvectorlayer3drenderer.h>
 #include <qgsnullmaterialsettings.h>
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
+#include "qgsstatisticalsummary.h"
 #include "../../../config.h"
 #include "../../../core/utils/QgsUtil.h"
 #include "../../utils/ColorTransformUtil.h"
-
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 class StylePoint {
 public:

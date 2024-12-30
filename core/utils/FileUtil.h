@@ -7,14 +7,16 @@
 #if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
-#if defined(_WIN32)
-#include <windows.h>
-#endif
+
 #include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
 #include <QDebug>
 #include <iostream>
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 class FileOperationError : public std::exception
 {

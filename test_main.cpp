@@ -4,9 +4,7 @@
 #if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
-#if defined(_WIN32)
-#include <windows.h>
-#endif
+
 #include <fstream>
 #include <vector>
 #include <QByteArray>
@@ -42,6 +40,10 @@
 #include "config.h"
 
 #include <QDebug>
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 QgsPointXY validateAndTransformPoint(const QgsPointXY& point, const QgsCoordinateTransform& transformer) {
 	double lat = point.y();

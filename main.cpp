@@ -1,9 +1,7 @@
 ﻿#if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
-#if defined(_WIN32)
-#include <windows.h>
-#endif
+
 #include <cstdlib>
 #include "qgsproject.h"
 #include "qgsapplication.h"
@@ -17,6 +15,10 @@
 #include <QDebug>  // For logging
 #include <qgspluginlayerregistry.h>
 #include <QProcess>
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 // #define HAVE_STATIC_PROVIDERS
 

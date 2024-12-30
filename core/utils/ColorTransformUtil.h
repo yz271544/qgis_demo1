@@ -6,9 +6,8 @@
 #if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
-#if defined(_WIN32)
-#include <windows.h>
-#endif
+
+#include <QDebug>
 #include <QString>
 #include <QVector>
 #include <QHash>
@@ -21,6 +20,12 @@
 #include <utility>
 #include <unordered_map>
 #include <algorithm>
+#include <cctype>
+
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 class ColorTransformUtil {
 public:
 	/**

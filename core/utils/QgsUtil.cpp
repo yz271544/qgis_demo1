@@ -87,9 +87,17 @@ QgsVectorLayer* QgsUtil::write_persisted_layer(const QString& layer_name,
 	Qgis::WkbType qgs_wkb_type,
 	const QgsCoordinateTransformContext& cts,
 	const QgsCoordinateReferenceSystem& crs) {
+
+	qDebug() << "CRS: " << crs.toWkt();
 	// file path
 	QString file_prefix = QString().append(project_dir).append("/").append(layer_name);
 	QString file_path = QString().append(file_prefix).append(".geojson");
+
+	// Delete existing GeoJSON file if it exists
+	qDebug() << "delete geojson file:" << file_path;
+	QFile::remove(file_path);
+	//FileUtil::delete_file(file_path);
+
 
 	// options
 	QgsVectorFileWriter::SaveVectorOptions options;
@@ -100,23 +108,23 @@ QgsVectorLayer* QgsUtil::write_persisted_layer(const QString& layer_name,
 	// options.layerName = layer_name;
 	qDebug() << "prepare writer file:" << file_path;
 	// Create a new vector file writer
-	std::unique_ptr<QgsVectorFileWriter> writer(QgsVectorFileWriter::create(
-		file_path,
-		fields,
-		qgs_wkb_type,
-		crs,
-		cts,
-		options
-	));
+	// std::unique_ptr<QgsVectorFileWriter> writer(QgsVectorFileWriter::create(
+	// 	file_path,
+	// 	fields,
+	// 	qgs_wkb_type,
+	// 	crs,
+	// 	cts,
+	// 	options
+	// ));
 
-	// QgsVectorFileWriter *writer = QgsVectorFileWriter::create(
-	//     file_path,
-	//     fields,
-	//     qgs_wkb_type,
-	//     crs,
-	//     cts,
-	//     options
-	// );
+	QgsVectorFileWriter *writer = QgsVectorFileWriter::create(
+	    file_path,
+	    fields,
+	    qgs_wkb_type,
+	    crs,
+	    cts,
+	    options
+	);
 	// assert
 	if (writer->hasError() != QgsVectorFileWriter::NoError) {
 		std::cerr << "Error creating file writer: " << writer->errorMessage().toStdString() << std::endl;
@@ -128,7 +136,7 @@ QgsVectorLayer* QgsUtil::write_persisted_layer(const QString& layer_name,
 	qDebug() << "writted the layer to geojson file";
 	// flush disk
 	writer->flushBuffer();
-	// delete writer;
+	delete writer;
 	// delete gpkg
 	// 假设 FileUtil 中的 delete_file 函数已经实现
 	QString gpkg_file = QString().append(file_prefix).append(".gpkg");

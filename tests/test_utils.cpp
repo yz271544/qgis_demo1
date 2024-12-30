@@ -1,9 +1,7 @@
 ﻿#if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
-#if defined(_WIN32)
-#include <windows.h>
-#endif
+
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -14,6 +12,9 @@
 #include "../core/utils/ColorTransformUtil.h"
 #include "../core/utils/ImageUtil.h"
 
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 class TestUtils : public QObject
 {

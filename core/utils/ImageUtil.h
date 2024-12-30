@@ -8,9 +8,6 @@
 #if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
-#if defined(_WIN32)
-#include <windows.h>
-#endif
 
 #include <iostream>
 #include <string>
@@ -21,6 +18,9 @@
 #include <stdexcept>
 #include <QDebug>
 
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 class ImageUtil {
 public:

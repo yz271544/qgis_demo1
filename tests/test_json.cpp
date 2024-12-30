@@ -1,9 +1,7 @@
 ﻿#if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
-#if defined(_WIN32)
-#include <windows.h>
-#endif
+
 #include <iostream>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -12,6 +10,10 @@
 #include <QDebug>
 #include <QString>
 #include <QtTest>
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 class TestJson : public QObject
 {

@@ -1,31 +1,58 @@
 ﻿
 #include "ColorTransformUtil.h"
 
-// 将 rgba 字符串转换为整数元组
 std::tuple<int, int, int, float> ColorTransformUtil::str_rgba_to_tuple_int(const QString& rgba) {
-	std::string str = rgba.toStdString();
-	// 移除 "rgba(" 和 ")"
-	size_t start = str.find("rgba(");
-	if (start != std::string::npos) {
-		str = str.substr(start + 5);
+	if (rgba.isEmpty()) {
+		qCritical() << "Input string is empty";
+		return std::make_tuple(0, 0, 0, 0.0f);
 	}
-	size_t end = str.find(")");
-	if (end != std::string::npos) {
-		str = str.substr(0, end);
+
+	QString cleanedRgba = rgba.trimmed(); // 去除前后空格
+	// qDebug() << "Original rgba:" << rgba;
+	// qDebug() << "Cleaned rgba:" << cleanedRgba;
+
+	if (!cleanedRgba.startsWith("rgba(") || !cleanedRgba.endsWith(")")) {
+		qCritical() << "Invalid rgba format: must start with 'rgba(' and end with ')'";
+		return std::make_tuple(0, 0, 0, 0.0f);
 	}
-	// 按逗号分割字符串
-	QVector<QString> parts;
-	size_t pos = 0;
-	while ((pos = str.find(',')) != std::string::npos) {
-		parts.push_back(QString::fromStdString(str.substr(0, pos)));
-		str.erase(0, pos + 1);
+
+	// 去掉 'rgba(' 和 ')'
+	cleanedRgba = cleanedRgba.mid(5, cleanedRgba.length() - 6).trimmed();
+	// qDebug() << "After removing 'rgba(' and ')':" << cleanedRgba;
+
+	// 按逗号分割
+	QStringList parts = cleanedRgba.split(",");
+	if (parts.size() != 4) {
+		qCritical() << "Invalid rgba format: expected 4 components, got" << parts.size();
+		return std::make_tuple(0, 0, 0, 0.0f);
 	}
-	parts.push_back(QString::fromStdString(str));
-	// 解析并转换为相应类型
-	int r = parts[0].toInt();
-	int g = parts[1].toInt();
-	int b = parts[2].toInt();
-	float a = parts[3].toFloat();
+
+	// 转换每个部分
+	bool ok;
+	int r = parts[0].trimmed().toInt(&ok);
+	if (!ok) {
+		qCritical() << "Invalid red component:" << parts[0];
+		return std::make_tuple(0, 0, 0, 0.0f);
+	}
+
+	int g = parts[1].trimmed().toInt(&ok);
+	if (!ok) {
+		qCritical() << "Invalid green component:" << parts[1];
+		return std::make_tuple(0, 0, 0, 0.0f);
+	}
+
+	int b = parts[2].trimmed().toInt(&ok);
+	if (!ok) {
+		qCritical() << "Invalid blue component:" << parts[2];
+		return std::make_tuple(0, 0, 0, 0.0f);
+	}
+
+	float a = parts[3].trimmed().toFloat(&ok);
+	if (!ok) {
+		qCritical() << "Invalid alpha component:" << parts[3];
+		return std::make_tuple(0, 0, 0, 0.0f);
+	}
+
 	return std::make_tuple(r, g, b, a);
 }
 

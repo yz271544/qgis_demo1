@@ -1,9 +1,7 @@
 ﻿#if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
-#if defined(_WIN32)
-#include <windows.h>
-#endif
+
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <qgsapplication.h>
@@ -13,6 +11,10 @@
 
 #include "config.h"
 #include "qgspluginlayerregistry.h"
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 int main(int argc, char* argv[])
 {

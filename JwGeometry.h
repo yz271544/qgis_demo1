@@ -7,9 +7,7 @@
 #if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
-#if defined(_WIN32)
-#include <windows.h>
-#endif
+
 #include <iostream>
 #include <vector>
 #include <math.h>
@@ -17,6 +15,10 @@
 #include <qgscoordinatetransform.h>
 #include <qgsgeometry.h>
 #include <qgspoint.h>
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 class QgsCoordinateTransform;
 // 定义命名空间，方便使用QGIS相关类，可根据实际情况调整

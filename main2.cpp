@@ -2,9 +2,7 @@
 #if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
-#if defined(_WIN32)
-#include <windows.h>
-#endif
+
 #include <qgspluginlayerregistry.h>
 
 #include "qgsproject.h"
@@ -15,6 +13,11 @@
 #include "qgsrasterlayer.h"
 #include "qgsmapcanvas.h"
 #include <QMessageBox>
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
+
 int main(int argc, char* argv[])
 {
 	// 初始化QGIS

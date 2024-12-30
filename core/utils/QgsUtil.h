@@ -7,9 +7,7 @@
 #if _MSC_VER >= 1600
 #pragma execution_character_set("utf-8")
 #endif
-#if defined(_WIN32)
-#include <windows.h>
-#endif
+
 #include <QCoreApplication>
 #include <QFont>
 #include <iostream>
@@ -19,6 +17,10 @@
 #include <qgsvectorfilewriter.h>
 #include <qgsvectorlayer.h>
 #include <qgsvectorlayerlabeling.h>
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
 
 class QtFontUtil {
 public:
