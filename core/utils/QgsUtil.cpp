@@ -89,6 +89,7 @@ QgsVectorLayer* QgsUtil::write_persisted_layer(const QString& layer_name,
 	const QgsCoordinateReferenceSystem& crs) {
 
 	qDebug() << "CRS: " << crs.toWkt();
+	qDebug() << "Number of features in layer: " << layer->featureCount();
 	// file path
 	QString file_prefix = QString().append(project_dir).append("/").append(layer_name);
 	QString file_path = QString().append(file_prefix).append(".geojson");
