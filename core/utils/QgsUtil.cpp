@@ -93,7 +93,7 @@ QgsVectorLayer* QgsUtil::write_persisted_layer(const QString& layer_name,
 	// file path
 	QString file_prefix = QString().append(project_dir).append("/").append(layer_name);
 	QString file_path = QString().append(file_prefix).append(".geojson");
-
+	qDebug() << "GeoJSON file path: " << file_path;
 	// Delete existing GeoJSON file if it exists
 	qDebug() << "delete geojson file:" << file_path;
 	QFile::remove(file_path);
