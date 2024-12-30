@@ -369,8 +369,6 @@ int main(int argc, char* argv[]) {
 		if (vectorLayer) {
 			qDebug() << "Checking relations for layer:" << vectorLayer->name();
 			std::reference_wrapper<QgsVectorLayer> reference_wrapper = std::ref(*vectorLayer);
-
-
 			// for (int i = 0; i < vectorLayer->fields().count(); ++i) {
 			// 	qDebug() << "Field index:" << i << " Name:" << vectorLayer->fields().at(i).name();
 			// 	QList<QgsRelation> relations = vectorLayer->referencingRelations(i);
