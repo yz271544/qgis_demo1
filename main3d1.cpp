@@ -387,12 +387,13 @@ int main(int argc, char* argv[]) {
 		qDebug() << "removeMapLayer" << it.key();
 		project->removeMapLayer(it.key());
 	}
-	// qDebug() << "remove all layouts";
-	// layout_manager->clear();
-	// qDebug() << "removeAllMapLayers";
-	// project->removeAllMapLayers();
-	// qDebug() << "project -> clear()";
-	// project->clear();
+	qDebug() << "remove all layouts";
+	QgsLayoutManager* layout_manager = project->layoutManager();
+	layout_manager->clear();
+	qDebug() << "removeAllMapLayers";
+	project->removeAllMapLayers();
+	qDebug() << "project -> clear()";
+	project->clear();
 
 	QString delete_file_test = "D:/iProject/cpath/qgis_demo1/common/project/民警.geojson";
 	//bool delete_file_status = FileUtil::delete_file_with_status(delete_file_test);
