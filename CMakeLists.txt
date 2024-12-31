@@ -152,12 +152,28 @@ link_directories(${QGIS_PREFIX_PATH}/lib /usr/lib/x86_64-linux-gnu)
 add_executable(qgis_demo1 main.cpp
         config.h
         tests/test_json.cpp
- "core/utils/ColorTransformUtil.cpp" "core/utils/ColorTransformUtil.h")
-add_executable(qgis_demo2 main2.cpp "core/utils/ColorTransformUtil.cpp" "core/utils/ColorTransformUtil.h")
-add_executable(qgis_demo3 main3.cpp "core/utils/ColorTransformUtil.cpp" "core/utils/ColorTransformUtil.h")
-add_executable(qgis_demo4 main4.cpp "core/utils/ColorTransformUtil.cpp" "core/utils/ColorTransformUtil.h")
-add_executable(qgis_demo3d0 main3d0.cpp
-        JwGeometry.cpp "core/utils/ColorTransformUtil.cpp" "core/utils/ColorTransformUtil.h")
+        core/utils/ColorTransformUtil.cpp
+        core/utils/ColorTransformUtil.h)
+add_executable(qgis_demo2
+        main2.cpp
+        core/utils/ColorTransformUtil.cpp
+        core/utils/ColorTransformUtil.h
+        tests/test_yaml.cpp)
+add_executable(qgis_demo3
+        main3.cpp
+        core/utils/ColorTransformUtil.cpp
+        core/utils/ColorTransformUtil.h
+        tests/test_yaml.cpp)
+add_executable(qgis_demo4
+        main4.cpp
+        core/utils/ColorTransformUtil.cpp
+        core/utils/ColorTransformUtil.h
+        tests/test_yaml.cpp)
+add_executable(qgis_demo3d0
+        main3d0.cpp
+        JwGeometry.cpp core/utils/ColorTransformUtil.cpp
+        core/utils/ColorTransformUtil.h
+        tests/test_yaml.cpp)
 add_executable(qgis_demo3d1 main3d1.cpp
         config.h
         JwGeometry.cpp
@@ -174,7 +190,10 @@ add_executable(qgis_demo3d1 main3d1.cpp
         core/utils/ImageUtil.cpp
         core/utils/ImageUtil.h)
 
-add_executable(test_main test_main.cpp test_main.h "core/utils/ColorTransformUtil.cpp" "core/utils/ColorTransformUtil.h")
+add_executable(test_main test_main.cpp
+        test_main.h
+        core/utils/ColorTransformUtil.cpp
+        core/utils/ColorTransformUtil.h)
 
 set_target_properties(qgis_demo3d1 PROPERTIES
         POSITION_INDEPENDENT_CODE ON
@@ -209,7 +228,10 @@ add_executable(test_utils
         core/utils/FileUtil.cpp
         core/utils/FileUtil.h
         core/utils/ImageUtil.cpp
-        core/utils/ImageUtil.h
-)
+        core/utils/ImageUtil.h)
 target_link_libraries(test_utils ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::Core Qt5::Gui Qt5::Test)
 add_test(NAME UtilsTest COMMAND test_utils)
+
+add_executable(test_yaml tests/test_yaml.cpp)
+target_link_libraries(test_yaml Qt5::Core Qt5::Test)
+add_test(NAME YamlTest COMMAND test_yaml)
