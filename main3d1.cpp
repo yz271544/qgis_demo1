@@ -248,7 +248,7 @@ int main(int argc, char* argv[]) {
 	QJsonObject layerStyleObj = QJsonDocument::fromJson(layerStyle.toUtf8()).object();
 
 	QgsFeatureRenderer* feature_renderer = StylePoint::get2d_rule_based_renderer(fontStyleObj, layerStyleObj, icon_path, 20.0);
-
+	// QgsFeatureRenderer* feature_renderer = StylePoint::get2d_single_symbol_renderer();
 	p_point_layer->setRenderer(feature_renderer);
 
 	if (ENABLE_3D) {
@@ -362,13 +362,13 @@ int main(int argc, char* argv[]) {
 
 
 	auto layers = project->mapLayers();
-	qDebug() << "layers count:" << layers.size() ;
+	qDebug() << "layers count:" << layers.size();
 	for (auto it = layers.constBegin(); it != layers.constEnd(); ++it) {
 		qDebug() << "Layer ID:" << it.key() << " Name:" << it.value()->name();
 		QgsVectorLayer* vectorLayer = dynamic_cast<QgsVectorLayer*>(it.value());
 		if (vectorLayer) {
 			qDebug() << "Checking relations for layer:" << vectorLayer->name();
-			std::reference_wrapper<QgsVectorLayer> reference_wrapper = std::ref(*vectorLayer);
+			//delete feature_renderer;
 			// for (int i = 0; i < vectorLayer->fields().count(); ++i) {
 			// 	qDebug() << "Field index:" << i << " Name:" << vectorLayer->fields().at(i).name();
 			// 	QList<QgsRelation> relations = vectorLayer->referencingRelations(i);
@@ -385,13 +385,13 @@ int main(int argc, char* argv[]) {
 		qDebug() << "removeMapLayer" << it.key();
 		project->removeMapLayer(it.key());
 	}
-	qDebug() << "remove all layouts";
+	/*qDebug() << "remove all layouts";
 	QgsLayoutManager* layout_manager = project->layoutManager();
 	layout_manager->clear();
 	qDebug() << "removeAllMapLayers";
 	project->removeAllMapLayers();
 	qDebug() << "project -> clear()";
-	project->clear();
+	project->clear();*/
 
 	QString delete_file_test = "D:/iProject/cpath/qgis_demo1/common/project/民警.geojson";
 	//bool delete_file_status = FileUtil::delete_file_with_status(delete_file_test);

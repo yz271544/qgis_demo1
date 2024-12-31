@@ -41,6 +41,9 @@
 
 class StylePoint {
 public:
+
+	static QgsFeatureRenderer* get2d_single_symbol_renderer();
+
 	static QgsFeatureRenderer* get2d_rule_based_renderer(
 		QJsonObject& font_style,
 		QJsonObject& layer_style,

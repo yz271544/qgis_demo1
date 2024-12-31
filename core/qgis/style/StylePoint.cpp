@@ -3,6 +3,25 @@
 
 #include "StylePoint.h"
 
+QgsFeatureRenderer* StylePoint::get2d_single_symbol_renderer()
+{
+	QgsSymbol* rule_symbol = QgsSymbol::defaultSymbol(Qgis::GeometryType::Point);
+	auto* rule_font_marker = new QgsFontMarkerSymbolLayer("SimSun");
+
+	rule_font_marker->setSizeUnit(Qgis::RenderUnit::Millimeters);
+	rule_font_marker->setSize(3);
+	// rule_font_marker->setColor(QColor("#ede91a"));
+	// rule_font_marker->setFillColor(QColor("#ede91a"));
+
+	// rule_font_marker->setDataDefinedProperty(QgsSymbolLayer::Property::Character, QgsProperty::fromExpression("name"));
+	// rule_font_marker->setOffset(QPointF(0, -5));
+
+	const bool is_compatible = rule_symbol->changeSymbolLayer(0, rule_font_marker);
+	qDebug() << "is_compatible: " << is_compatible;
+	auto* rule = new QgsRuleBasedRenderer::Rule(rule_symbol);
+	auto* rule_renderer = new QgsRuleBasedRenderer(rule);
+	return rule_renderer;
+}
 
 QgsFeatureRenderer* StylePoint::get2d_rule_based_renderer(QJsonObject& font_style, QJsonObject& layer_style, QString& icon_path, qreal point_size = 5.0) {
 	QMap<QString, QVariant>* label_style = new QMap<QString, QVariant>();
