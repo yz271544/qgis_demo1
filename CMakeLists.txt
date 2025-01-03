@@ -16,6 +16,9 @@ if (WIN32)
         add_compile_options(/wd4819)
         add_definitions(-D_USE_MATH_DEFINES)
         add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+        # Ensure consistent runtime library settings
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
     endif()
     message("Win32 Searching for QGIS in $ENV{QGISPROGRAMFILES}/qgis")
     # 设置QGIS库的路径
@@ -49,6 +52,38 @@ if (WIN32)
 
     find_path(GDAL_INCLUDE_DIR NAMES gdal.h ogr_api.h gdalwarper.h cpl_conv.h cpl_string.h HINTS $ENV{QGISPROGRAMFILES}/gdal-dev/include)
     find_library(GDAL_LIBRARY NAMES gdal HINTS $ENV{QGISPROGRAMFILES}/gdal-dev/lib)
+
+    message("find yaml-cpp")
+    set(YAML_CPP_PATH "D:/iProject/cpath/OSGeo4W/apps/yaml-cpp")
+#    find_package(yaml-cpp REQUIRED PATHS YAML_CPP_PATH)
+    find_path(YAML_CPP_INCLUDE_DIR
+            NAMES
+            yaml-cpp/null.h
+            yaml-cpp/yaml.h
+            yaml-cpp/traits.h
+            PATHS
+            "D:/iProject/cpath/OSGeo4W/apps/yaml-cpp/include"
+    )
+    set(YAML_CPP_NODE_INCLUDE_DIR ${YAML_CPP_INCLUDE_DIR}/node)
+    set(YAML_CPP_NODE_DETAIL_INCLUDE_DIR ${YAML_CPP_NODE_INCLUDE_DIR}/detail)
+    set(YAML_CPP_CONTRIB_INCLUDE_DIR ${YAML_CPP_INCLUDE_DIR}/contrib)
+    find_library(YAML_CPP_LIBRARIES
+            NAMES yaml-cppd.lib
+            PATHS
+            "D:/iProject/cpath/OSGeo4W/apps/yaml-cpp/lib"
+    )
+    message("yaml-cpp found successfully.")
+    message("YAML_CPP_INCLUDE_DIR: ${YAML_CPP_INCLUDE_DIR}")
+    message("YAML_CPP_LIBRARIES: ${YAML_CPP_LIBRARIES}")
+
+
+    #    if (yaml-cpp_FOUND)
+#        message("yaml-cpp found successfully.")
+#        message("YAML_CPP_INCLUDE_DIR: ${YAML_CPP_INCLUDE_DIR}")
+#        message("yaml-cpp_LIBRARIES: ${YAML_CPP_LIBRARIES}")
+#    else()
+#        message(FATAL_ERROR "Failed to find yaml-cpp.")
+#    endif()
 
 elseif(UNIX)
     message("NIX system - QGISSOURCE: ${QGISSOURCE}")
@@ -136,6 +171,8 @@ include_directories(${Qt5Xml_INCLUDE_DIRS})
 message("GDAL_INCLUDE_DIR: ${GDAL_INCLUDE_DIR}")
 include_directories(${GDAL_INCLUDE_DIR})
 
+include_directories(${YAML_CPP_INCLUDE_DIR} ${YAML_CPP_NODE_INCLUDE_DIR} ${YAML_CPP_CONTRIB_INCLUDE_DIR})
+
 
 if (WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
@@ -144,7 +181,7 @@ else()
 endif()
 
 # Add library directories
-link_directories(${QGIS_PREFIX_PATH}/lib /usr/lib/x86_64-linux-gnu)
+link_directories(${QGIS_PREFIX_PATH}/lib /usr/lib/x86_64-linux-gnu ${YAML_CPP_LIBRARIES} ${YAML_CPP_NODE_DETAIL_INCLUDE_DIR})
 
 #add_executable(qgis_demo1 main.cpp
 #        test_main.cpp
@@ -233,5 +270,5 @@ target_link_libraries(test_utils ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} Qt5::C
 add_test(NAME UtilsTest COMMAND test_utils)
 
 add_executable(test_yaml tests/test_yaml.cpp)
-target_link_libraries(test_yaml Qt5::Core Qt5::Test)
+target_link_libraries(test_yaml Qt5::Core Qt5::Test ${YAML_CPP_LIBRARIES})
 add_test(NAME YamlTest COMMAND test_yaml)

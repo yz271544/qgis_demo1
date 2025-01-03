@@ -20,7 +20,7 @@ class TestUtils : public QObject
 {
 	Q_OBJECT
 private slots:
-	void test_str_rgba_to_tuple_int()
+	static void test_str_rgba_to_tuple_int()
 	{
 		std::tuple<int, int, int, float> rgb_capacity = ColorTransformUtil::str_rgba_to_tuple_int("rgba(255, 255, 255, 0.5)");
 		QCOMPARE(std::get<0>(rgb_capacity), 255);
@@ -29,37 +29,37 @@ private slots:
 		QCOMPARE(std::get<3>(rgb_capacity), 0.5f);
 	}
 
-	void test_rgb_to_hex() {
+	static void test_rgb_to_hex() {
 		QString rgb_hex = ColorTransformUtil::rgb_to_hex(std::make_tuple(255, 255, 255));
 		QCOMPARE(rgb_hex, "#ffffff");
 	}
 
-	void test_str_rgba_to_hex() {
+	static void test_str_rgba_to_hex() {
 		std::pair<QString, float> hex_capacity = ColorTransformUtil::str_rgba_to_hex("rgba(255, 255, 255, 0.5)");
 		QCOMPARE(hex_capacity.first, "#ffffff");
 		QCOMPARE(hex_capacity.second, 0.5f);
 	}
 
-	void test_hex_to_rgb() {
+	static void test_hex_to_rgb() {
 		std::tuple<int, int, int> rgb = ColorTransformUtil::hex_to_rgb("#ffffff");
 		QCOMPARE(std::get<0>(rgb), 255);
 		QCOMPARE(std::get<1>(rgb), 255);
 		QCOMPARE(std::get<2>(rgb), 255);
 	}
 
-	void test_compare_color() {
+	static void test_compare_color() {
 		QVector<QString> color1 = { "#ff4040", "#00cd52", "#2f99f3" };
 		QVector<QString> color2 = { "#ff4040", "#00cd52", "#2f99f3" };
 		QVERIFY(ColorTransformUtil::compare_color(color1, color2));
 	}
 
-	void test_merge_color() {
+	static void test_merge_color() {
 		QVector<QString> color = { "#ff4040", "#00cd52", "#2f99f3" };
 		QString merged_color = ColorTransformUtil::merge_color(color);
 		QCOMPARE(merged_color, "#ff4040-#00cd52-#2f99f3");
 	}
 
-	void tset_split_color() {
+	static void tset_split_color() {
 		QVector<QString> color = { "#ff4040", "#00cd52", "#2f99f3" };
 		QString merged_color = ColorTransformUtil::merge_color(color);
 		QVector<QString> split_color = ColorTransformUtil::split_color(merged_color);
@@ -69,7 +69,7 @@ private slots:
 		QCOMPARE(split_color[2], "#2f99f3");
 	}
 
-	void test_multi_color_group() {
+	static void test_multi_color_group() {
 		QVector<QVector<QString>> style_colors = {
 			{ "#ff4040", "#00cd52", "#2f99f3" },
 			{ "#ff4040", "#00cd52", "#2f99f3" },
@@ -81,7 +81,7 @@ private slots:
 		QCOMPARE(color_dict["#1c6ad6-#00cd52-#cbc829"], 1);
 	}
 
-	void test_base64_case1() {
+	static void test_base64_case1() {
 		QString save_qgis_project_path = "/lyndon/iProject/cpath/qgis_demo1/common/png";
 		QString layer_name = "民警";
 		QString icon_base64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAolBMVEUAAAC1xPmIn/SKn//n6/3e5PzS2vvN1vusvPeUqfWNpPUAMub////z9f6mt/by9P1Ia+2MovP6+/72+P7AzPiUqfQrVOoFNuYgTOnp7fzi5/xOcO2dr/UuV+p6lPISQOisvPejtPZ/l/IcSOje5Ptaeu9EaOybrvV3kfFTdO7X3vvI0vm9yfi6x/iDm/Jvi/BphvBVdu5Nb+05X+uPpPSOpPN4UAcsAAAAC3RSTlMA0y0M/fny7sF6UvKXmSMAAAGJSURBVDjLhZNXYoMwDEAhkGnZmGFICZBA9l7t/a9WRx6h6Qfvx0g22nLeeGN32Ke0P3THnvOfnhtAkLAwZIn8cHsf194ojgqeESTjRRSPvD+/D4BNSYspg0HLyMSnM/LBjPoT+7+fp6icX9liwa5zFMrc1za8AcX7VFBYheEKqEC5pAMVxwjQ/gYkBec1SDboBUboIGbKfiQvdpwX8ohUxCx+OXG1REJ5E+y+X++EziVyZQTBlijm+ZfGX2pVEXjOGDjRnEFzNhoOY8cNMiOKphF1LapdaDRZ4DrDhBiOAP7hkAMcrSoZOn1mJQEaYVWs79DQSiVoSqsKKT4wLABZkNYD5cImCpJ8TlouMEjLxpbZBolpWu4gWWtBp/kuVNqcAH5kHKcmbRXKCwqVQqISWOORlKbUplmPGJD9XZ3xQzXLtHtJQfF8goIusd1mYNag2e9Bs8aBMSOXVStAqkqdqyZL1cjZoV3y20XUVVWLy41L+6ka2u6x714cu3rb9+pt7ep1L2/n+v8CysQxDA9OhyUAAAAASUVORK5CYII=";

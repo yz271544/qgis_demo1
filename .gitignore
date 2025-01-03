@@ -3,7 +3,6 @@ cmake-build-release/
 common/
 .idea/
 out/
-doc/
 .vs/
 config.h
 .cmake/

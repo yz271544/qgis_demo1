@@ -19,12 +19,12 @@ class TestJson : public QObject
 {
 	Q_OBJECT
 private slots:
-	void testCase1()
+	static void testCase1()
 	{
 		QVERIFY(2 + 2 == 4);
 	}
 
-	void testCase2() {
+	static void testCase2() {
 		QString jsonStr = R"({
             "name": "Alice",
             "age": 25,
@@ -71,7 +71,7 @@ private slots:
 		qDebug() << "test success";
 	}
 
-	void test_parse_topic_payload() {
+	static void test_parse_topic_payload() {
 		QFile file("/lyndon/iProject/cpath/qgis_demo1/common/input/topicMap.json");
 		if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 			qCritical() << "Could not open file";
@@ -171,7 +171,7 @@ private slots:
 		}
 	}
 
-	void test_parse_json2() {
+	static void test_parse_json2() {
 		//        QString font_style_payloads = R"({"borderColor":"rgba(255,255,255,1)\","loadFlag":true,"x":0,"y":35,"fontSize":60,"fontColor":"rgba(237, 233, 26, 1)\","fontFlag":true})";
 		QString styleInfoJson = "{\"color\":\"rgba(255,255,255,1)\",\"bim\":\"\",\"num\":2,\"loadFlag\":false,\"fontStyle\":{\"borderColor\":\"rgba(255,255,255,1)\",\"loadFlag\":true,\"x\":0,\"y\":35,\"fontSize\":60,\"fontColor\":\"rgba(237, 233, 26, 1)\",\"fontFlag\":true},\"radius\":100}";
 		QJsonObject styleInfoJsonObj = QJsonDocument::fromJson(styleInfoJson.toUtf8()).object();
@@ -193,7 +193,7 @@ private slots:
 		}
 	}
 
-	void test_parse_layerStyle_json() {
+	static void test_parse_layerStyle_json() {
 		QString layerStyle = "{\"scale\":0.8}";
 		QJsonObject layerStyleObj = QJsonDocument::fromJson(layerStyle.toUtf8()).object();
 		QJsonObject::const_iterator it;
