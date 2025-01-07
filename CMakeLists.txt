@@ -117,6 +117,9 @@ elseif(UNIX)
         message("release env")
         set(CMAKE_MODULE_PATH /usr/share/qgis)
         message("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+
+        message("find yaml-cpp")
+        find_package(yaml-cpp REQUIRED)
     else()
         message("debug env")
         message("NIX QGIS SOURCE DIR: $ENV{QGISSOURCE}")
@@ -133,7 +136,8 @@ elseif(UNIX)
 
 #        find_path(QGIS_3D_INCLUDE_DIR NAMES qgis_3d.h HINTS ${QGIS_INSTALL_DIR}/include/qgis)
 #        find_library(QGIS_3D_LIBRARY NAMES qgis_3d HINTS ${QGIS_LIB_PATH})
-
+        message("find yaml-cpp")
+        find_package(yaml-cpp REQUIRED)
     endif()
 
     # 检查 CMAKE_BUILD_TYPE 的值
@@ -219,9 +223,7 @@ link_directories(${QGIS_PREFIX_PATH}/lib /usr/lib/x86_64-linux-gnu ${YAML_CPP_LI
 add_executable(qgis_demo1 main.cpp
         tests/test_json.cpp
         core/utils/ColorTransformUtil.cpp
-        core/utils/ColorTransformUtil.h
-        core/qgis/app.cpp
-        core/qgis/app.h)
+        core/utils/ColorTransformUtil.h)
 add_executable(qgis_demo2
         main2.cpp
         core/utils/ColorTransformUtil.cpp

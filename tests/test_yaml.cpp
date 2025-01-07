@@ -22,7 +22,11 @@ class TestYaml : public QObject
 private slots:
 	static void test_read_name()
 	{
+#if defined(_WIN32)
 		YAML::Node config = YAML::LoadFile("D:/iProject/cpath/qgis_demo1/config/settings.yaml");
+#elif defined(__linux__)
+        YAML::Node config = YAML::LoadFile("/lyndon/iProject/cpath/qgis_demo1/config/settings.yaml");
+#endif
 
 		if (config["specification"]) {
 			std::cout << "specification in: " << config["specification"][0]["name"] << "\n";
@@ -37,7 +41,11 @@ private slots:
 
 	static void test_loop_specification()
 	{
-		YAML::Node config = YAML::LoadFile("D:/iProject/cpath/qgis_demo1/config/settings.yaml");
+#if defined(_WIN32)
+        YAML::Node config = YAML::LoadFile("D:/iProject/cpath/qgis_demo1/config/settings.yaml");
+#elif defined(__linux__)
+        YAML::Node config = YAML::LoadFile("/lyndon/iProject/cpath/qgis_demo1/config/settings.yaml");
+#endif
 
 		if (config["specification"])
 		{
@@ -56,7 +64,11 @@ private slots:
 
 	static void test_shared_ptr_specification()
 	{
-		YAML::Node config = YAML::LoadFile("D:/iProject/cpath/qgis_demo1/config/settings.yaml");
+#if defined(_WIN32)
+        YAML::Node config = YAML::LoadFile("D:/iProject/cpath/qgis_demo1/config/settings.yaml");
+#elif defined(__linux__)
+        YAML::Node config = YAML::LoadFile("/lyndon/iProject/cpath/qgis_demo1/config/settings.yaml");
+#endif
 
 		std::shared_ptr<YAML::Node> config_ptr = std::make_shared<YAML::Node>(config);
 
