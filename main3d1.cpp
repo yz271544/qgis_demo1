@@ -42,6 +42,13 @@
 #include "qgspluginlayerregistry.h"
 #include "core/qgis/style/StylePoint.h"
 #include "core/utils/FileUtil.h"
+
+#include <yaml-cpp/parser.h>
+#include <yaml-cpp/yaml.h>
+
+#include "core/qgis/layout/JwLayout.h"
+#include "core/utils/NodeToMap.h"
+
 #if defined(_WIN32)
 #include <windows.h>
 #endif
@@ -316,9 +323,36 @@ int main(int argc, char* argv[]) {
 	QgsReferencedRectangle* referenced_rectangle = new QgsReferencedRectangle(extent, project->crs());
 	project->viewSettings()->setDefaultViewExtent(*referenced_rectangle);
 
-	QString projectPath = QString().append(save_qgis_project_path).append(QGIS_PROJECT_FILE_NAME);
+	YAML::Node config = YAML::LoadFile("D:/iProject/cpath/qgis_demo1/config/settings.yaml");
+	// QMap<QString, YAML::Node>* specification_map = new QMap<QString, YAML::Node>();
+	// if (config["specification"]) {
+	// 	for (YAML::const_iterator it = config["specification"].begin(); it != config["specification"].end(); ++it) {
+	// 		QString name = QString((*it)["name"].as<std::string>().c_str());
+	// 		specification_map->insert(name, *it);
+	// 	}
+	// }
+	//
+	// // 遍历 specification_map
+	// for (auto it = specification_map->begin(); it != specification_map->end(); ++it) {
+	// 	QString key = it.key();  // 获取当前的 key
+	// 	YAML::Node value = it.value();  // 获取当前的 value
+	//
+	// 	// 检查 value 中是否存在 "local" 节点
+	// 	if (value["local"]) {
+	// 		// 获取 "local" 节点的值并打印
+	// 		QString localValue = QString(value["local"].as<std::string>().c_str());
+	// 		qDebug() << "Key:" << key << ", Local:" << localValue;
+	// 	} else {
+	// 		qDebug() << "Key:" << key << ", Local: (not found)";
+	// 	}
+	// }
 
+	QVariantMap* localConfig = NodeToMap::YamlNodeToMap(config);
+	qDebug() << "localConfig: " << localConfig;
+	// YAML::Node localConfig = config["specification"]["现场位置图"];
+	JwLayout* jwLayout = new JwLayout(project, canvas, "test", *localConfig, save_qgis_project_path);
 	// save to .qgz file
+	QString projectPath = QString().append(save_qgis_project_path).append(QGIS_PROJECT_FILE_NAME);
 	qDebug() << "projectPath:" << projectPath;
 	if (!project->write(projectPath)) {
 		qWarning() << "save projectPath to file " << projectPath << " failed!";
@@ -361,44 +395,50 @@ int main(int argc, char* argv[]) {
 	// }
 
 
-	auto layers = project->mapLayers();
-	qDebug() << "layers count:" << layers.size();
-	for (auto it = layers.constBegin(); it != layers.constEnd(); ++it) {
-		qDebug() << "Layer ID:" << it.key() << " Name:" << it.value()->name();
-		QgsVectorLayer* vectorLayer = dynamic_cast<QgsVectorLayer*>(it.value());
-		if (vectorLayer) {
-			qDebug() << "Checking relations for layer:" << vectorLayer->name();
-			//delete feature_renderer;
-			// for (int i = 0; i < vectorLayer->fields().count(); ++i) {
-			// 	qDebug() << "Field index:" << i << " Name:" << vectorLayer->fields().at(i).name();
-			// 	QList<QgsRelation> relations = vectorLayer->referencingRelations(i);
-			// 	qDebug() << "Field index:" << i << " has referencing relations count:" << relations.size();
-			// 	if (!relations.isEmpty()) {
-			// 		qDebug() << "Field index:" << i << " has referencing relations:";
-			// 		for (const QgsRelation& relation : relations) {
-			// 			qDebug() << "Relation name:" << relation.name();
-			// 			qDebug() << "Referenced layer ID:" << relation.referencedLayerId();
-			// 		}
-			// 	}
-			// }
-		}
-		qDebug() << "removeMapLayer" << it.key();
-		project->removeMapLayer(it.key());
-	}
-	/*qDebug() << "remove all layouts";
+	// auto layers = project->mapLayers();
+	// qDebug() << "layers count:" << layers.size();
+	// for (auto it = layers.constBegin(); it != layers.constEnd(); ++it) {
+	// 	qDebug() << "Layer ID:" << it.key() << " Name:" << it.value()->name();
+	// 	QgsVectorLayer* vectorLayer = dynamic_cast<QgsVectorLayer*>(it.value());
+	// 	if (vectorLayer) {
+	// 		qDebug() << "Checking relations for layer:" << vectorLayer->name();
+	// 		//delete feature_renderer;
+	// 		// for (int i = 0; i < vectorLayer->fields().count(); ++i) {
+	// 		// 	qDebug() << "Field index:" << i << " Name:" << vectorLayer->fields().at(i).name();
+	// 		// 	QList<QgsRelation> relations = vectorLayer->referencingRelations(i);
+	// 		// 	qDebug() << "Field index:" << i << " has referencing relations count:" << relations.size();
+	// 		// 	if (!relations.isEmpty()) {
+	// 		// 		qDebug() << "Field index:" << i << " has referencing relations:";
+	// 		// 		for (const QgsRelation& relation : relations) {
+	// 		// 			qDebug() << "Relation name:" << relation.name();
+	// 		// 			qDebug() << "Referenced layer ID:" << relation.referencedLayerId();
+	// 		// 		}
+	// 		// 	}
+	// 		// }
+	// 	}
+	// 	qDebug() << "removeMapLayer" << it.key();
+	// 	project->removeMapLayer(it.key());
+	// }
+
+#if !defined(_WIN32)
 	QgsLayoutManager* layout_manager = project->layoutManager();
 	layout_manager->clear();
 	qDebug() << "removeAllMapLayers";
 	project->removeAllMapLayers();
 	qDebug() << "project -> clear()";
-	project->clear();*/
+	/*project->clear();*/
+	qDebug() << "remove all layouts";
+	qDebug() << "delete project";
+	delete project;
+	qDebug() << "delete project done";
 
 	QString delete_file_test = "D:/iProject/cpath/qgis_demo1/common/project/民警.geojson";
 	//bool delete_file_status = FileUtil::delete_file_with_status(delete_file_test);
 	QFile file(delete_file_test);
+	qDebug() << "ready delete file: " << delete_file_test;
 	bool delete_file_status = file.remove();
 	qDebug() << "delete file: " << delete_file_test << " status:" << delete_file_status;
-
+#endif
 	//return app.exec();
 	return 0;
 }

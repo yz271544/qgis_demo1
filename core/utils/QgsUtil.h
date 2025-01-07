@@ -25,17 +25,17 @@
 
 class QtFontUtil {
 public:
-	static QgsTextFormat create_font(const std::string& font_family, double font_size, const std::string& font_color,
+	static QgsTextFormat* create_font(const QString& font_family, int8_t font_size, const QString& font_color,
 		bool is_bold, bool is_italic, Qgis::TextOrientation orientation, double spacing);
 };
 
 
 class QgsUtil {
 public:
-	static void show_layer_label(QgsVectorLayer* layer, const std::string& style);
+	static void show_layer_label(QgsVectorLayer* layer, const QString& style);
 
 
-	static QgsVectorLayerSimpleLabeling* get_layer_label(const std::string& style, const std::string& label_of_field_name);
+	static QgsVectorLayerSimpleLabeling* get_layer_label(const QString& style, const std::string& label_of_field_name);
 
 
 	static float d300_pixel_to_mm(float pixel_size);
