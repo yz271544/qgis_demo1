@@ -17,6 +17,13 @@ inline const char* BASE_TILE_NAME = "BaseTile";
 inline const char* MAIN_TILE_NAME = "MainTile";
 inline const char* REAL3D_TILE_NAME = "Real3DTile";
 
+// 1 英寸 = 2.54 厘米
+const double CM2INCH = 25.4;
+// 宋体 黑体 每磅宽度 毫米(mm) 1磅 = 0.352778mm ， 12号字宽度 = 12 * 0.352778
+const double SIM_PER_POUND_WIDTH = 0.352778;
+// 素数
+const int DPI = 300;
+
 #if defined(_WIN32)
 // for Windows
 inline const char* QGIS_PREFIX_PATH = "D:/iProject/cpath/OSGeo4W/apps/qgis";

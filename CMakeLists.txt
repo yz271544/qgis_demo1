@@ -246,8 +246,6 @@ add_executable(qgis_demo3d0
 add_executable(qgis_demo3d1 main3d1.cpp
         JwGeometry.cpp
         config.h
-        constants.h
-        constants.cpp
         core/qgis/style/StylePoint.cpp
         core/qgis/style/StylePoint.h
         core/qgis/payload/InputPoint.cpp

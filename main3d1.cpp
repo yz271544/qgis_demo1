@@ -457,25 +457,24 @@ int main(int argc, char* argv[]) {
 	// 	project->removeMapLayer(it.key());
 	// }
 
-#if !defined(_WIN32)
-	QgsLayoutManager* layout_manager = project->layoutManager();
-	layout_manager->clear();
-	qDebug() << "removeAllMapLayers";
-	project->removeAllMapLayers();
-	qDebug() << "project -> clear()";
-	/*project->clear();*/
-	qDebug() << "remove all layouts";
-	qDebug() << "delete project";
-	delete project;
-	qDebug() << "delete project done";
-
-	QString delete_file_test = "D:/iProject/cpath/qgis_demo1/common/project/民警.geojson";
-	//bool delete_file_status = FileUtil::delete_file_with_status(delete_file_test);
-	QFile file(delete_file_test);
-	qDebug() << "ready delete file: " << delete_file_test;
-	bool delete_file_status = file.remove();
-	qDebug() << "delete file: " << delete_file_test << " status:" << delete_file_status;
-#endif
+//#if !defined(_WIN32)
+//	layout_manager->clear();
+//	qDebug() << "removeAllMapLayers";
+//	project->removeAllMapLayers();
+//	qDebug() << "project -> clear()";
+//	/*project->clear();*/
+//	qDebug() << "remove all layouts";
+//	qDebug() << "delete project";
+//	delete project;
+//	qDebug() << "delete project done";
+//
+//	QString delete_file_test = "D:/iProject/cpath/qgis_demo1/common/project/民警.geojson";
+//	//bool delete_file_status = FileUtil::delete_file_with_status(delete_file_test);
+//	QFile file(delete_file_test);
+//	qDebug() << "ready delete file: " << delete_file_test;
+//	bool delete_file_status = file.remove();
+//	qDebug() << "delete file: " << delete_file_test << " status:" << delete_file_status;
+//#endif
 	//return app.exec();
 	return 0;
 }

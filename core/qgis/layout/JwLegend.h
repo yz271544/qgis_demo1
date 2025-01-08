@@ -4,8 +4,8 @@
 
 #ifndef JWLEGEND_H
 #define JWLEGEND_H
-#include <QgsLayoutItemLegend.h>
-#include <QgsVectorLayer.h>
+#include <qgslayoutitemlegend.h>
+#include <qgsvectorlayer.h>
 #include <qgsmaplayerlegend.h>
 #include <qgssymbollayer.h>
 #include <qgsmarkersymbol.h>
