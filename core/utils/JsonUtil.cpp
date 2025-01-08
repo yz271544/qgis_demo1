@@ -25,6 +25,8 @@ QVariantMap JsonUtil::jsonObjectToVariantMap(const QJsonObject& jsonObject) {
                     variantList.append(arrayValue.toDouble());
                 } else if (arrayValue.isString()) {
                     variantList.append(arrayValue.toString());
+                } else if (arrayValue.isObject()) {
+                    variantList.append(jsonObjectToVariantMap(arrayValue.toObject()));
                 }
             }
             variantMap[key] = variantList;

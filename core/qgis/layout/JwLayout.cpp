@@ -33,6 +33,9 @@ JwLayout::~JwLayout() {
 void JwLayout::filterMapLayers(const QVector<QString>& removeLayerNames,
                                const QVector<QString>& removeLayerPrefixes,
                                Qgs3DMapSettings* mapSettings3d) {
+    qDebug() << "filterMapLayers -> removeLayerNames: " << removeLayerNames;
+    qDebug() << "filterMapLayers -> removeLayerPrefixes: " << removeLayerPrefixes;
+
     QMap<QString, QgsMapLayer*> layers = project->mapLayers();
     QList<QgsMapLayer*> filteredLayers;
     for (QgsMapLayer* layer : layers) {
@@ -107,6 +110,7 @@ void JwLayout::setTitle(const QVariantMap& titleOfLayinfo) {
     title->setHAlign(Qt::AlignHCenter);
     title->adjustSizeToText();
     title->setTextFormat(*text_format);
+    qDebug() << "title_font_size: " << titleFontSize << " title_font_family: " << fontFamily << " title_font_color: " << fontColor << " title_letter_spacing: " << imageSpec["title_letter_spacing"].toDouble();
     title->attemptSetSceneRect(
         QRectF(imageSpec["main_left_margin"].toDouble(), 0.0,
             mapWidth,
@@ -486,7 +490,7 @@ void JwLayout::setMap(
     filterMapLayers(removeLayerNames, removeLayerPrefixes);
     layout->setReferenceMap(mapItem);
 
-    mapItem->setCrs(QgsCoordinateReferenceSystem("EPSG:4326")); // 假设 MAIN_CRS 是 EPSG:4326
+    mapItem->setCrs(QgsCoordinateReferenceSystem(project->crs()));
     mapItem->setKeepLayerSet(false);
 
     // 设置地图项在布局中的位置和大小 这里因为要用纸张横向打印，所以将纸的宽高互换
@@ -504,8 +508,11 @@ void JwLayout::setMap(
     mapItem->setFrameStrokeColor(QColor(mapFrameColor));
     mapItem->setFrameEnabled(true);
 
-    // QgsLayoutSize fixedSize(mapWidth, mapHeight, Qgis::LayoutUnit::Millimeters);
+    QgsLayoutSize fixedSize(mapWidth, mapHeight, Qgis::LayoutUnit::Millimeters);
     // mapItem->setFixedSize(fixedSize);
+    // mapItem->attemptResize(fixedSize, true);
+    // mapItem->setMinimumSize(fixedSize);
+    // mapItem->setAtlasScalingMode(QgsLayoutItemMap::AtlasScalingMode::Fixed);
     mapItem->attemptSetSceneRect(QRectF(imageSpec["main_left_margin"].toDouble(), imageSpec["main_top_margin"].toDouble(),
                                     mapWidth, mapHeight));
 
@@ -753,7 +760,7 @@ void JwLayout::addPrintLayout(const QString& layoutType, const QString& layoutNa
     }
 
     // 设置标题
-    if (layInfo.contains("title") && !layInfo["title"].toString().isEmpty()) {
+    if (layInfo.contains("title") && !layInfo["title"].toMap().isEmpty()) {
         QMap<QString, QVariant> titleVariants = layInfo["title"].toMap();
         qInfo() << "设置标题:" << titleVariants["text"].toString();
         setTitle(titleVariants);

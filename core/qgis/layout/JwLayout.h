@@ -110,6 +110,7 @@ private:
     QgsPrintLayout* layout;
     QVariantMap imageSpec;
     QgsLayoutItemMap* mapItem;
+    // QgsLayoutItem* mapItem;
     QgsLayoutItem3DMap* mapItem3d;
     Qgs3DMapSettings* mapSettings3d;
     double mapWidth;

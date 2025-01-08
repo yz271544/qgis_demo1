@@ -356,9 +356,9 @@ int main(int argc, char* argv[]) {
 	qDebug() << "localConfig: " << localConfig;
 	// YAML::Node localConfig = config["specification"]["现场位置图"];
 	QList<QVariant> specVariants = localConfig["specification"].toList();
-	qDebug() << "specVariants: " << specVariants;
+	// qDebug() << "specVariants: " << specVariants;
 	QVariantMap imageSpec = specVariants[0].toMap();
-	qDebug() << "imageSpec:" << imageSpec;
+	// qDebug() << "imageSpec:" << imageSpec;
 	JwLayout* jwLayout = new JwLayout(project, canvas, "test", imageSpec, save_qgis_project_path);
 
 	QString layout_type = "现场位置图";
@@ -366,8 +366,9 @@ int main(int argc, char* argv[]) {
 
 	QString plottingWeb = "{\"selectPath\":true,\"path\":\"健康谷正射\",\"tileIndex\":[[846789,407356],[856152,402089]],\"sceneId\":\"1847168269595754497\",\"sceneName\":\"test\",\"topicCategory\":\"\",\"geojson\":{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[111.45614558807182,40.718542891344214],[111.45614558807182,40.73911269545787],[111.51314153018527,40.73911269545787],[111.51314153018527,40.718542891344214],[111.45614558807182,40.718542891344214]]]},\"properties\":{}},\"savePath\":\"C:/Users/Administrator/Desktop\",\"sceneType\":\"01\",\"layinfo\":{\"title\":{\"text\":\"test郑州二期警务部署图\",\"position\":[],\"borderColor\":\"rgba(0,0,0,1)\",\"fillColor\":\"rgba(255,0,0,1)\",\"fontSize\":28,\"color\":\"rgba(0,0,0,1)\",\"fontBorderColor\":\"\"},\"subTitle\":{\"text\":\"右侧索引标题\",\"color\":\"rgba(0,0,0,1)\",\"fontSize\":16},\"remark\":[{\"text\":\"指挥: 这里填写指挥信息\",\"position\":[0,0,28,10],\"borderColor\":\"\",\"fillColor\":\"rgba(0,151,233,1)\",\"fontSize\":18,\"color\":\"rgba(0,0,0,1)\",\"url\":\"C:/security2.0/ToDWG/tmp/0.png\"},{\"text\":\"备注: 这里填写备注信息\",\"position\":[0,90,28,10],\"borderColor\":\"\",\"fillColor\":\"rgba(0,51,133,1)\",\"fontSize\":18,\"color\":\"rgba(0,0,0,1)\",\"url\":\"C:/security2.0/ToDWG/tmp/0.png\"}],\"north\":{\"position\":[97,0,2,8],\"rotate\":30},\"arrows\":[{\"position\":[80,80,10,2],\"rotate\":30}],\"scaleBar\":true},\"paper\":\"a3\",\"pictureUnit\":\"制图单位：xxx 制\",\"mapType\":{\"map\":true,\"electron\":false}}";
 	QJsonObject plottingWebObj = QJsonDocument::fromJson(plottingWeb.toUtf8()).object();
+	// qDebug() << "plottingWebObj: " << plottingWebObj;
 	QVariantMap plottingWebVariants = JsonUtil::jsonObjectToVariantMap(plottingWebObj);
-
+	// qDebug() << "plottingWebVariants: " << plottingWebVariants;
 	PaperSpecification availablePaper("A3");
 
 	QVector<QString> removeLayerNames = QVector<QString>();
