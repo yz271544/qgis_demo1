@@ -168,6 +168,9 @@ endif()
 
 # 生成 config.h 头文件
 configure_file(config.h.in ${CMAKE_HOME_DIRECTORY}/config.h)
+configure_file(constants.h.in ${CMAKE_HOME_DIRECTORY}/constants.h)
+configure_file(constants.cpp.in ${CMAKE_HOME_DIRECTORY}/constants.cpp)
+
 
 message("start find qgis package")
 find_package(QGIS REQUIRED)
@@ -240,6 +243,9 @@ add_executable(qgis_demo3d0
         core/utils/ColorTransformUtil.h)
 add_executable(qgis_demo3d1 main3d1.cpp
         JwGeometry.cpp
+        config.h
+        constants.h
+        constants.cpp
         core/qgis/style/StylePoint.cpp
         core/qgis/style/StylePoint.h
         core/qgis/payload/InputPoint.cpp
@@ -262,6 +268,8 @@ add_executable(qgis_demo3d1 main3d1.cpp
         core/utils/FontUtil.h
         core/utils/NodeToMap.cpp
         core/utils/NodeToMap.h
+        core/utils/JsonUtil.cpp
+        core/utils/JsonUtil.h
 )
 
 add_executable(test_main test_main.cpp
@@ -288,7 +296,9 @@ target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRA
 target_link_libraries(test_main PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Test ${GDAL_LIBRARY})
 
 # 测试json程序
-add_executable(test_json tests/test_json.cpp)
+add_executable(test_json tests/test_json.cpp
+        core/utils/JsonUtil.cpp
+        core/utils/JsonUtil.h)
 target_link_libraries(test_json Qt5::Core Qt5::Test)
 add_test(NAME JsonTest COMMAND test_json)
 

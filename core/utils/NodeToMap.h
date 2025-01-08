@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by Lyndon on 2025/1/7.
 //
 
@@ -8,10 +8,17 @@
 #include <yaml-cpp/node/node.h>
 #include <yaml-cpp/parser.h>
 #include <yaml-cpp/yaml.h>
+#include <qdebug.h>
 
 class NodeToMap {
 public:
-    static QVariantMap* YamlNodeToMap(YAML::Node config);
+    static QVariantMap mapToVariantMap(const YAML::Node& config);
+
+    static QVariant nodeToVariant(const YAML::Node& node);
+
+    static QVariantList sequenceToVariantList(const YAML::Node& node);
+
+    static QVariant scalarToVariant(const YAML::Node& node);
 };
 
 

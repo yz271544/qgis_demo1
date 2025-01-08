@@ -5,5 +5,7 @@ common/
 out/
 .vs/
 config.h
+constants.h
+constants.cpp
 .cmake/
 Testing/

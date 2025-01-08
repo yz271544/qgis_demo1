@@ -8,6 +8,7 @@
 #include <QString>
 
 #include "../../config.h"
+#include "../../constants.h"
 
 class FontUtil {
 public:

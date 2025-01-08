@@ -11,6 +11,8 @@
 #include <QString>
 #include <QtTest>
 
+#include "../../../core/utils/JsonUtil.h"
+
 #if defined(_WIN32)
 #include <windows.h>
 #endif
@@ -203,6 +205,28 @@ private slots:
 			qDebug() << key << ": " << value;
 		}
 	}
+
+	static void test_plotting_web_json_to_map()
+	{
+		QString plottingWeb = "{\"selectPath\":true,\"path\":\"健康谷正射\",\"tileIndex\":[[846789,407356],[856152,402089]],\"sceneId\":\"1847168269595754497\",\"sceneName\":\"test\",\"topicCategory\":\"\",\"geojson\":{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[111.45614558807182,40.718542891344214],[111.45614558807182,40.73911269545787],[111.51314153018527,40.73911269545787],[111.51314153018527,40.718542891344214],[111.45614558807182,40.718542891344214]]]},\"properties\":{}},\"savePath\":\"C:/Users/Administrator/Desktop\",\"sceneType\":\"01\",\"layinfo\":{\"title\":{\"text\":\"test郑州二期警务部署图\",\"position\":[],\"borderColor\":\"rgba(0,0,0,1)\",\"fillColor\":\"rgba(255,0,0,1)\",\"fontSize\":28,\"color\":\"rgba(0,0,0,1)\",\"fontBorderColor\":\"\"},\"subTitle\":{\"text\":\"右侧索引标题\",\"color\":\"rgba(0,0,0,1)\",\"fontSize\":16},\"remark\":[{\"text\":\"指挥: 这里填写指挥信息\",\"position\":[0,0,28,10],\"borderColor\":\"\",\"fillColor\":\"rgba(0,151,233,1)\",\"fontSize\":18,\"color\":\"rgba(0,0,0,1)\",\"url\":\"C:/security2.0/ToDWG/tmp/0.png\"},{\"text\":\"备注: 这里填写备注信息\",\"position\":[0,90,28,10],\"borderColor\":\"\",\"fillColor\":\"rgba(0,51,133,1)\",\"fontSize\":18,\"color\":\"rgba(0,0,0,1)\",\"url\":\"C:/security2.0/ToDWG/tmp/0.png\"}],\"north\":{\"position\":[97,0,2,8],\"rotate\":30},\"arrows\":[{\"position\":[80,80,10,2],\"rotate\":30}],\"scaleBar\":true},\"paper\":\"a3\",\"pictureUnit\":\"制图单位：xxx 制\",\"mapType\":{\"map\":true,\"electron\":false}}";
+		QJsonObject layerStyleObj = QJsonDocument::fromJson(plottingWeb.toUtf8()).object();
+		// QJsonObject::const_iterator it;
+		// for (it = layerStyleObj.begin(); it != layerStyleObj.end(); ++it) {
+		// 	QString key = it.key();
+		// 	QJsonValue value = it.value();
+		// 	qDebug() << key << ": " << value;
+		// }
+		QVariantMap variants = JsonUtil::jsonObjectToVariantMap(layerStyleObj);
+		QVariantMap::const_iterator it;
+		for (it = variants.begin(); it != variants.end(); ++it) {
+			QString key = it.key();
+			QVariant value = it.value();
+			qDebug() << key << ": " << value;
+		}
+
+
+	}
+
 
 };
 

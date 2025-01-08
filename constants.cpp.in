@@ -1,0 +1,21 @@
+//
+// Created by Lyndon on 2024/12/17.
+//
+
+#include "constants.h"
+
+#if _MSC_VER >= 1600
+#pragma execution_character_set("utf-8")
+#endif
+
+#if defined(_WIN32)
+#include <windows.h>
+#endif
+
+// 1 英寸 = 2.54 厘米
+const double CM2INCH = 25.4;
+// 宋体 黑体 每磅宽度 毫米(mm) 1磅 = 0.352778mm ， 12号字宽度 = 12 * 0.352778
+const double SIM_PER_POUND_WIDTH = 0.352778;
+// 素数
+const int DPI = 300;
+

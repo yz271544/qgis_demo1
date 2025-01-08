@@ -5,6 +5,22 @@
 #include "PaperSpecification.h"
 
 
+PaperSpecification::PaperSpecification(QString type)
+{
+    if (type == "A3") this->type = Type::A3;
+    else if (type == "A4") this->type = Type::A4;
+    else if (type == "A5") this->type = Type::A5;
+    else if (type == "B4") this->type = Type::B4;
+    else if (type == "B5") this->type = Type::B5;
+    else if (type == "A900") this->type = Type::A900;
+    else if (type == "Letter") this->type = Type::Letter;
+    else if (type == "Legal") this->type = Type::Legal;
+    else if (type == "Executive") this->type = Type::Executive;
+    else if (type == "Folio") this->type = Type::Folio;
+    else if (type == "Custom") this->type = Type::Custom;
+    else throw PaperSpecificationException("Unknown paper specification");
+}
+
 QString PaperSpecification::getPaperName() const  {
     switch (type) {
     case Type::A3: return "A3";

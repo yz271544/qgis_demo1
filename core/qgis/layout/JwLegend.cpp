@@ -12,6 +12,7 @@ QPair<double, double> JwLegend::customize(
     int32_t legendHeight,
     const QSet<QString>& filteredLegendItems)
 {
+    qDebug() << "customize legend, title:" << legendTitle;
     // Set the legend title
     legend->setTitle(legendTitle);
     // Control which layers are included in the legend
@@ -48,7 +49,7 @@ QPair<double, double> JwLegend::customize(
             filtered_legend_layer_items.insert(layer);
         }
     }
-
+    qDebug() << "filtered_legend_layer_items size: " << filtered_legend_layer_items.size();
     for (QgsMapLayer* layer : filtered_legend_layer_items)
     {
         if (layer->name() != "BASE_TILE_NAME" && layer->name() != MAIN_TILE_NAME && layer->name() != REAL3D_TILE_NAME &&

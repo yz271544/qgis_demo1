@@ -60,6 +60,8 @@ public:
     // 构造函数
     explicit PaperSpecification(Type type) : type(type) {}
 
+    explicit PaperSpecification(QString type);
+
     // 获取纸张名称
     [[nodiscard]] QString getPaperName() const;
 

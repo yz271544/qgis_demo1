@@ -1,0 +1,15 @@
+//
+// Created by Lyndon on 2024/12/17.
+//
+
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
+
+// 1 英寸 = 2.54 厘米
+extern double CM2INCH;
+// 宋体 黑体 每磅宽度 毫米(mm) 1磅 = 0.352778mm ， 12号字宽度 = 12 * 0.352778
+extern double SIM_PER_POUND_WIDTH;
+// 素数
+extern int DPI;
+
+#endif // CONSTANTS_H

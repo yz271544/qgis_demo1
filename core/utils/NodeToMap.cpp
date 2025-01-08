@@ -1,45 +1,75 @@
-//
+﻿//
 // Created by Lyndon on 2025/1/7.
 //
 
 #include "NodeToMap.h"
 
 
-QVariantMap* NodeToMap::YamlNodeToMap(YAML::Node config)
-{
-    // 将 YAML::Node 转换为 QVariantMap
-    QVariantMap* nodeMap = new QVariantMap();
-    for (YAML::const_iterator nodeIt = config.begin(); nodeIt != config.end(); ++nodeIt)
-    {
-        QString key = QString(nodeIt->first.as<std::string>().c_str());
-        QVariant value;
 
-        // 根据 YAML 节点的类型转换为 QVariant
-        if (nodeIt->second.IsScalar())
-        {
-            value = QString(nodeIt->second.as<std::string>().c_str());
-        }
-        else if (nodeIt->second.IsSequence())
-        {
-            QVariantList list;
-            for (const auto& item : nodeIt->second)
-            {
-                list.append(QString(item.as<std::string>().c_str()));
+// 辅助函数：将 YAML 的 Scalar 转换为 QVariant
+QVariant NodeToMap::scalarToVariant(const YAML::Node& node) {
+    if (node.IsScalar()) {
+        try {
+            // 对于不同的 Scalar 类型，尝试不同的转换
+            // 首先尝试转换为 bool
+            try {
+                return QVariant(node.as<bool>());
+            } catch (const YAML::BadConversion&) {
+                // 转换为 bool 失败，继续尝试下一个类型
             }
-            value = list;
-        }
-        else if (nodeIt->second.IsMap())
-        {
-            QVariantMap map;
-            for (YAML::const_iterator subIt = nodeIt->second.begin(); subIt != nodeIt->second.end(); ++subIt)
-            {
-                map[QString(subIt->first.as<std::string>().c_str())] = QString(
-                    subIt->second.as<std::string>().c_str());
+            try {
+                return QVariant(node.as<int>());
+            } catch (const YAML::BadConversion&) {
+                // 转换为 int 失败，继续尝试下一个类型
             }
-            value = map;
+            try {
+                return QVariant(node.as<double>());
+            } catch (const YAML::BadConversion&) {
+                // 转换为 double 失败，继续尝试下一个类型
+            }
+            try {
+                return QVariant(QString::fromStdString(node.as<std::string>()));
+            } catch (const YAML::BadConversion&) {
+                // 转换为 string 失败，返回一个空的 QVariant
+                return QVariant();
+            }
+        } catch (const YAML::Exception& e) {
+            qCritical() << "Error converting scalar: " << e.what();
+            throw;
         }
-
-        nodeMap[key] = value;
     }
-    return nodeMap;
+    return QVariant();
+}
+
+
+// 辅助函数：将 YAML 的 Sequence 转换为 QVariantList
+QVariantList NodeToMap::sequenceToVariantList(const YAML::Node& node) {
+    QVariantList result;
+    for (const auto& subNode : node) {
+        result.append(nodeToVariant(subNode));
+    }
+    return result;
+}
+
+
+// 辅助函数：将 YAML 的 Map 转换为 QVariantMap
+QVariantMap NodeToMap::mapToVariantMap(const YAML::Node& node) {
+    QVariantMap result;
+    for (const auto& it : node) {
+        result[QString::fromStdString(it.first.as<std::string>())] = nodeToVariant(it.second);
+    }
+    return result;
+}
+
+
+// 主要的转换函数，将 YAML 的 Node 转换为 QVariant
+QVariant NodeToMap::nodeToVariant(const YAML::Node& node) {
+    if (node.IsScalar()) {
+        return scalarToVariant(node);
+    } else if (node.IsSequence()) {
+        return QVariant(sequenceToVariantList(node));
+    } else if (node.IsMap()) {
+        return QVariant(mapToVariantMap(node));
+    }
+    return QVariant();
 }

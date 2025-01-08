@@ -24,13 +24,36 @@ class TestEnum : public QObject
 {
 	Q_OBJECT
 private slots:
-	static void test_PaperSpecification()
+	static void test_paper_specification_list()
 	{
 		auto layoutPaperList = PaperSpecification::getLayoutPaperList();
 		for (const auto& paper : layoutPaperList) {
 			qDebug() << "Paper:" << paper.getPaperName() << ", Size:"
 					 << paper.getPaperSize().first << "x" << paper.getPaperSize().second;
 		}
+	}
+
+	static void test_paper_info()
+	{
+		PaperSpecification::Type a3 = PaperSpecification::Type::A3;
+		PaperSpecification paperSpec(a3);
+
+		QString paperName = paperSpec.getPaperName();
+		QPair<int, int> paperSize = paperSpec.getPaperSize();
+
+		qDebug() << "Paper Name:" << paperName;
+		qDebug() << "Paper Size:" << paperSize.first << "x" << paperSize.second;
+	}
+
+	static void test_paper_from_string()
+	{
+		PaperSpecification* a3 = new PaperSpecification("A3");
+
+		QString paperName = a3->getPaperName();
+		QPair<int, int> paperSize = a3->getPaperSize();
+
+		qDebug() << "Paper Name:" << paperName;
+		qDebug() << "Paper Size:" << paperSize.first << "x" << paperSize.second;
 	}
 
 };

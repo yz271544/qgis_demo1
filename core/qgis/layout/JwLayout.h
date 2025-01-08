@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by Lyndon on 2025/1/7.
 //
 
@@ -92,7 +92,7 @@ public:
     void addNorthArrow(const QVariantMap& northArrowPath);
 
     void addPrintLayout(const QString& layoutType, const QString& layoutName,
-                        const QVariantMap& plottingWeb, const PaperSpecification availablePaper,
+                        const QVariantMap& plottingWeb, const PaperSpecification& availablePaper,
                         bool writeQpt = false, const QVector<QString>& removeLayerNames = QVector<QString>(),
                         const QVector<QString>& removeLayerPrefixes = QVector<QString>());
 
@@ -100,10 +100,7 @@ public:
     void updateLayoutExtent(const QString& layoutName);
     QPair<double, double> getLegendDimensions(const QString& layoutName);
 
-    void addPrintLayout(const QString& layoutType, const QString& layoutName,
-                              const QVariantMap& plottingWeb, const PaperSpecification& availablePaper,
-                              bool writeQpt, const QVector<QString>& removeLayerNames,
-                              const QVector<QString>& removeLayerPrefixes);
+
 private:
     QgsProject* project;
     QString projectDir;
