@@ -83,7 +83,8 @@ int main(int argc, char* argv[]) {
 	project->setCrs(qgscrs);
 
 	// create XYZ base layer
-	QString baseXyzUrl = "type=xyz&url=http://47.94.145.6/map/lx/{z}/{x}/{y}.png&zmax=19&zmin=0";
+	// QString baseXyzUrl = "type=xyz&url=http://47.94.145.6/map/lx/{z}/{x}/{y}.png&zmax=19&zmin=0";
+	QString baseXyzUrl = "type=xyz&url=http://172.31.100.34:38083/map/lx/{z}/{x}/{y}.png&zmax=17&zmin=0";
 	//QString baseXyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
 
 	QgsRasterLayer* baseXyzLayer = new QgsRasterLayer(baseXyzUrl, BASE_TILE_NAME, "wms");
@@ -96,7 +97,8 @@ int main(int argc, char* argv[]) {
 	qDebug() << "add base layer to project";
 
 	// create MAIN XYZ layer
-	QString urlString = "http://47.94.145.6/map/orthogonal/1847168269595754497-健康谷正射";
+	//QString urlString = "http://47.94.145.6/map/orthogonal/1847168269595754497-健康谷正射";
+	QString urlString = "http://172.31.100.34:38083/map/orthogonal/1847168269595754497-健康谷正射";
 	QString encodedOrthogonalXyzUrl = "type=xyz&url=";
 	encodedOrthogonalXyzUrl.append(urlString);
 	encodedOrthogonalXyzUrl.append("/{z}/{x}/{y}");
@@ -111,8 +113,8 @@ int main(int argc, char* argv[]) {
 	qDebug() << "add orthogonal layer to project";
 
 	// 3D Scene
-	QString realistic3d_tile_url =
-		"url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
+	// QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
+	QString realistic3d_tile_url = "url=http://172.31.100.34:38083/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
 	QgsTiledSceneLayer* tiled_scene_layer = new QgsTiledSceneLayer(realistic3d_tile_url, REAL3D_TILE_NAME, "cesiumtiles");
 	QgsTiledSceneLayer3DRenderer* qgs_tiled_scene_layer_3d_renderer = new QgsTiledSceneLayer3DRenderer();
 	qgs_tiled_scene_layer_3d_renderer->setLayer(tiled_scene_layer);
@@ -374,9 +376,14 @@ int main(int argc, char* argv[]) {
 	QVector<QString> removeLayerNames = QVector<QString>();
 	QVector<QString> removeLayerPrefixes = QVector<QString>();
 	removeLayerPrefixes.append(REAL3D_TILE_NAME);
-
 	jwLayout->addPrintLayout(QString("2d"), joined_layout_name, plottingWebVariants, availablePaper, false, removeLayerNames, removeLayerPrefixes);
 
+	// QString joined_3d_layout_name = QString(layout_type).append("-3D").append("-").append("A3");
+	// QVector<QString> remove3DLayerNames = QVector<QString>();
+	// remove3DLayerNames.append(BASE_TILE_NAME);
+	// QVector<QString> remove3DLayerPrefixes = QVector<QString>();
+	// remove3DLayerPrefixes.append(MAIN_TILE_NAME);
+	// jwLayout->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false, remove3DLayerNames, remove3DLayerPrefixes);
 
 	qDebug() << "验证布局是否存在";
 	QgsLayoutManager* layout_manager = project->layoutManager();

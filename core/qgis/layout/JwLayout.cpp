@@ -58,6 +58,11 @@ void JwLayout::filterMapLayers(const QVector<QString>& removeLayerNames,
     if (mapSettings3d) {
         mapSettings3d->setLayers(filteredLayers);
     } else if (mapItem) {
+        std::reverse(filteredLayers.begin(), filteredLayers.end());
+        for (QgsMapLayer* filtered_layer : filteredLayers)
+        {
+            qDebug() << "add layer to layout map: " << filtered_layer->name();
+        }
         mapItem->setLayers(filteredLayers);
     }
 }
@@ -508,24 +513,22 @@ void JwLayout::setMap(
     mapItem->setFrameStrokeColor(QColor(mapFrameColor));
     mapItem->setFrameEnabled(true);
 
-    QgsLayoutSize fixedSize(mapWidth, mapHeight, Qgis::LayoutUnit::Millimeters);
-    // mapItem->setFixedSize(fixedSize);
-    // mapItem->attemptResize(fixedSize, true);
-    // mapItem->setMinimumSize(fixedSize);
-    // mapItem->setAtlasScalingMode(QgsLayoutItemMap::AtlasScalingMode::Fixed);
     mapItem->attemptSetSceneRect(QRectF(imageSpec["main_left_margin"].toDouble(), imageSpec["main_top_margin"].toDouble(),
                                     mapWidth, mapHeight));
-
     mapItem->setExtent(canvas->extent());
+    QgsLayoutSize fixedSize(mapWidth, mapHeight, Qgis::LayoutUnit::Millimeters);
+    mapItem->attemptResize(fixedSize);
     layout->addLayoutItem(mapItem);
 }
 
 void JwLayout::init3DLayout(const QString& layoutName)
 {
-    layout = new QgsPrintLayout(project);
-    layout->setName(layoutName);
-    layout->setUnits(Qgis::LayoutUnit::Millimeters);
-    layout->initializeDefaults();
+    layout3d = new QgsPrintLayout(project);
+    layout3d->setName(layoutName);
+    layout3d->setUnits(Qgis::LayoutUnit::Millimeters);
+    layout3d->initializeDefaults();
+    QgsLayoutManager* layout_manager = project->layoutManager();
+    layout_manager->addLayout(layout3d);
 }
 
 void JwLayout::set3DMap(
@@ -728,14 +731,6 @@ void JwLayout::addPrintLayout(const QString& layoutType, const QString& layoutNa
     } else {
         qWarning() << "Unsupported layout type:" << layoutType;
         return;
-    }
-
-    if (layout == nullptr)
-    {
-        qDebug() << "layout is null ptr";
-    } else
-    {
-        qDebug() << "layout is not null ptr";
     }
 
     // 设置纸张类型和大小

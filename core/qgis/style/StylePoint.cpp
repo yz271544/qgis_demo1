@@ -86,8 +86,10 @@ QgsFeatureRenderer* StylePoint::get2d_rule_based_renderer(QJsonObject& font_styl
 	qDebug() << "point_size:" << point_size << " --> raster_marker_size: " << raster_marker_size;
 	rule_raster_marker->setSize(raster_marker_size);
 	rule_symbol->changeSymbolLayer(0, rule_raster_marker);
-	rule_symbol->appendSymbolLayer(rule_font_marker);
-
+	if (ENABLE_POINT_CLUSTER)
+	{
+		rule_symbol->appendSymbolLayer(rule_font_marker);
+	}
 	QgsRuleBasedRenderer::Rule* root_rule = new QgsRuleBasedRenderer::Rule(nullptr);
 	QgsRuleBasedRenderer::Rule* rule = new QgsRuleBasedRenderer::Rule(rule_symbol);
 	rule->setFilterExpression("ELSE");
