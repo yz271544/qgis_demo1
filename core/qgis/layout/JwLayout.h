@@ -11,6 +11,8 @@
 #include <QString>
 #include <QDomDocument>
 #include <QFile>
+#include <QScreen>
+#include <qgs3dmapcanvas.h>
 #include <qgsproject.h>
 #include <qgslayout.h>
 #include <qgsprintlayout.h>
@@ -39,6 +41,12 @@
 #include <qgssymbollayer.h>
 #include <qgssymbollayerwidget.h>
 #include <qgsmarkersymbollayer.h>
+#include <qgsprojectviewsettings.h>
+#include <qgsflatterraingenerator.h>
+#include <qgsprojectelevationproperties.h>
+#include <qgsterrainprovider.h>
+#include <qgspointlightsettings.h>
+#include <qgs3dmapscene.h>
 
 #include "JwLegend.h"
 #include "../../enums/PaperSpecification.h"
@@ -82,6 +90,7 @@ public:
                 double mapRotation = 0.0);
 
     void init3DLayout(const QString& layoutName);
+    void init3DCanvas();
     void set3DMap(const PaperSpecification& availablePaper, int mapFrameWidth = 1,
                   const QString& mapFrameColor = "#000000", bool isDoubleFrame = false,
                   const QVector<QString>& removeLayerNames = QVector<QString>(),
@@ -105,6 +114,7 @@ private:
     QgsProject* project;
     QString projectDir;
     QgsMapCanvas* canvas;
+    Qgs3DMapCanvas* canvas3d;
     QString sceneName;
     JwLegend* jw_legend;
     QgsPrintLayout* layout;

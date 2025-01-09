@@ -56,7 +56,9 @@ void JwLayout::filterMapLayers(const QVector<QString>& removeLayerNames,
         }
     }
     if (mapSettings3d) {
+        qDebug() << "set layers to 3d map settings";
         mapSettings3d->setLayers(filteredLayers);
+        qDebug() << "set layers to 3d map settings done";
     } else if (mapItem) {
         std::reverse(filteredLayers.begin(), filteredLayers.end());
         for (QgsMapLayer* filtered_layer : filteredLayers)
@@ -531,6 +533,12 @@ void JwLayout::init3DLayout(const QString& layoutName)
     layout_manager->addLayout(layout);
 }
 
+void JwLayout::init3DCanvas()
+{
+    canvas3d = new Qgs3DMapCanvas;
+
+}
+
 void JwLayout::set3DMap(
     const PaperSpecification& availablePaper,
     int mapFrameWidth,
@@ -542,40 +550,106 @@ void JwLayout::set3DMap(
 {
     // 创建 3D 地图设置
     mapSettings3d = new Qgs3DMapSettings();
-    mapSettings3d->setCrs(QgsCoordinateReferenceSystem("EPSG:3857"));
+    mapSettings3d->setCrs(project->crs());
+    QgsReferencedRectangle fullExtent = project->viewSettings()->fullExtent();
+    mapSettings3d->setOrigin(QgsVector3D(fullExtent.center().x(), fullExtent.center().y(), 0));
     mapSettings3d->setBackgroundColor(QColor("#ffffff"));
-    mapSettings3d->setExtent(canvas->extent());
-    mapSettings3d->setLayers(project->mapLayers().values());
-    mapSettings3d->setTerrainRenderingEnabled(true);
-    mapSettings3d->setShowExtentIn2DView(true);
-
+    mapSettings3d->setExtent(fullExtent);
     // 过滤图层
     filterMapLayers(removeLayerNames, removeLayerPrefixes, mapSettings3d);
 
+    // Qgs3DAxisSettings axis;
+    // axis.setMode( Qgs3DAxisSettings::Mode::Off );
+    // qDebug() << "mapSettings3d set3DAxisSettings";
+    // mapSettings3d->set3DAxisSettings( axis );
+    // qDebug() << "mapSettings3d setTransformContext";
+    // mapSettings3d->setTransformContext(project->transformContext());
+    // qDebug() << "mapSettings3d setPathResolver";
+    // mapSettings3d->setPathResolver(project->pathResolver());
+    // qDebug() << "mapSettings3d setMapThemeCollection";
+    // mapSettings3d->setMapThemeCollection(project->mapThemeCollection());
+
+    // qDebug() << "connect project mapSettings3d";
+    // QObject::connect( project, &QgsProject::transformContextChanged, mapSettings3d, [this]
+    //   {
+    //     mapSettings3d->setTransformContext( project->transformContext() );
+    //   } );
+
+    // QgsFlatTerrainGenerator *flatTerrain = new QgsFlatTerrainGenerator;
+    // flatTerrain->setCrs( mapSettings3d->crs() );
+    // qDebug() << "mapSettings3d setTerrainGenerator";
+    // mapSettings3d->setTerrainGenerator( flatTerrain );
+    // qDebug() << "mapSettings3d setTerrainElevationOffset";
+    // mapSettings3d->setTerrainElevationOffset(project->elevationProperties()->terrainProvider()->offset() );
+
+    // QgsPointLightSettings defaultPointLight;
+    // qDebug() << "mapSettings3d setPosition";
+    // defaultPointLight.setPosition(QgsVector3D( 0, 0, 1000 ) );
+    // qDebug() << "mapSettings3d setConstantAttenuation";
+    // defaultPointLight.setConstantAttenuation( 0 );
+    // qDebug() << "mapSettings3d setLightSources";
+    // mapSettings3d->setLightSources({defaultPointLight.clone() } );
+    // if ( QScreen *screen = QGuiApplication::primaryScreen() )
+    // {
+    //     qDebug() << "mapSettings3d setOutputDpi:" << screen->physicalDotsPerInch();
+    //     mapSettings3d->setOutputDpi( screen->physicalDotsPerInch() );
+    // }
+    // else
+    // {
+    //     qDebug() << "mapSettings3d setOutputDpi 300";
+    //     mapSettings3d->setOutputDpi( 300 );
+    // }
+
+
+    // qDebug() << "mapSettings3d setTerrainRenderingEnabled true";
+    // mapSettings3d->setTerrainRenderingEnabled(true);
+    // qDebug() << "mapSettings3d setShowExtentIn2DView true";
+    // mapSettings3d->setShowExtentIn2DView(true);
+    qDebug() << "canvas3d setMapSettings";
+    canvas3d->setMapSettings(mapSettings3d);
+    qDebug() << "canvas3d setMapSettings done";
+    QgsRectangle extent = fullExtent;
+    qDebug() << "extent scale";
+    extent.scale( 1.3 );
+    const float dist = static_cast< float >( std::max( extent.width(), extent.height() ) );
+    qDebug() << "canvas3d setViewFromTop";
+    canvas3d->setViewFromTop( extent.center(), dist * 2, 0 );
+    qDebug() << "connect canvas3d totalPendingJobsCountChanged";
+    QObject::connect( canvas3d->scene(), &Qgs3DMapScene::totalPendingJobsCountChanged, canvas3d, [this]
+    {
+      qDebug() << "pending jobs:" << canvas3d->scene()->totalPendingJobsCount();
+    } );
+    qDebug() << "canvas3d show";
+    canvas3d->show();
+
     // 创建 3D 地图项
     mapItem3d = QgsLayoutItem3DMap::create(layout);
+    qDebug() << "mapItem3d setIsTemporal";
     mapItem3d->setIsTemporal(true);
-
+    qDebug() << "mapItem3d setMapSettings";
+    mapItem3d->setMapSettings(mapSettings3d);
     // 设置地图项大小
     mapWidth = availablePaper.getPaperSize().second - imageSpec["main_left_margin"].toDouble() - imageSpec["main_right_margin"].toDouble();
     mapHeight = availablePaper.getPaperSize().first - imageSpec["main_top_margin"].toDouble() - imageSpec["main_bottom_margin"].toDouble();
-    // QgsLayoutSize fixedSize(mapWidth, mapHeight, Qgis::LayoutUnit::Millimeters);
-    // mapItem3d->setFixedSize(fixedSize);
-
     // 设置地图项位置
-    mapItem3d->attemptSetSceneRect(QRectF(imageSpec["mainLeftMargin"].toDouble(), imageSpec["main_top_margin"].toDouble(),
+    qDebug() << "设置地图项位置:" << imageSpec["main_left_margin"].toDouble() << imageSpec["main_top_margin"].toDouble() << mapWidth << mapHeight;
+    mapItem3d->attemptSetSceneRect(QRectF(imageSpec["main_left_margin"].toDouble(), imageSpec["main_top_margin"].toDouble(),
                                         mapWidth, mapHeight));
-
+    QgsLayoutSize fixedSize(mapWidth, mapHeight, Qgis::LayoutUnit::Millimeters);
+    mapItem3d->attemptResize(fixedSize);
     // 设置相机视角
+    qDebug() << "设置相机视角";
     QgsCameraPose cameraPose;
     cameraPose.setDistanceFromCenterPoint(1788.7f); // 设置相机距离
     mapItem3d->setCameraPose(cameraPose);
-
     // 设置 3D 地图设置
+    qDebug() << "设置 3D 地图设置";
     mapItem3d->setMapSettings(mapSettings3d);
 
     // 添加地图项到布局
-    layout->addLayoutItem(mapItem3d);
+    // qDebug() << "add 3d map to layout";
+    // layout->addLayoutItem(mapItem3d);
+    // qDebug() << "add 3d map to layout done";
 }
 
 
