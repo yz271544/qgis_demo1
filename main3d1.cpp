@@ -33,6 +33,7 @@
 #include <qgs3dmapcanvas.h>
 #include <qgswkbtypes.h>
 #include <qgslayoutmanager.h>
+#include <qgsmapviewsmanager.h>
 
 
 #include "config.h"
@@ -47,6 +48,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "core/qgis/layout/JwLayout.h"
+#include "core/qgis/layout/JwLayout3D.h"
 #include "core/utils/NodeToMap.h"
 #include "core/utils/JsonUtil.h"
 
@@ -116,6 +118,7 @@ int main(int argc, char* argv[]) {
 	QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
 	// QString realistic3d_tile_url = "url=http://172.31.100.34:38083/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
 	QgsTiledSceneLayer* tiled_scene_layer = new QgsTiledSceneLayer(realistic3d_tile_url, REAL3D_TILE_NAME, "cesiumtiles");
+	// tiled_scene_layer->setCrs(project->crs());
 	QgsTiledSceneLayer3DRenderer* qgs_tiled_scene_layer_3d_renderer = new QgsTiledSceneLayer3DRenderer();
 	qgs_tiled_scene_layer_3d_renderer->setLayer(tiled_scene_layer);
 	tiled_scene_layer->setRenderer3D(qgs_tiled_scene_layer_3d_renderer);
@@ -313,10 +316,11 @@ int main(int argc, char* argv[]) {
 			extent.combineExtentWith(ext);
 		}
 	}
-	qDebug() << "extent: " << extent << " width: " << extent.width() << " height: " << extent.height()
-		<< " xMinimum:" << extent.xMinimum() << " yMinimum:" << extent.yMinimum() << " xMaximum:" << extent.
-		xMaximum() << " yMaximum:" << extent.yMaximum()
-		<< " area: " << extent.area() << " perimeter: " << extent.perimeter() << " center: " << extent.center()
+	qDebug() << "extent: " << extent << " width: " << QString::number(extent.width(),'f',3) << " height: " << QString::number(extent.height(),'f',3)
+		<< " xMinimum:" << QString::number(extent.xMinimum(),'f',3) << " yMinimum:" << QString::number(extent.yMinimum(),'f',3)
+		<< " xMaximum:" << QString::number(extent.xMaximum(),'f',3) << " yMaximum:" << QString::number(extent.yMaximum(),'f',3)
+		<< " area: " << QString::number(extent.area(),'f',3) << " perimeter: " << QString::number(extent.perimeter(),'f',3)
+		<< " center -> x:" << QString::number(extent.center().x(), 'f', 3) << " y:" << QString::number(extent.center().y(), 'f', 3)
 		<< " isEmpty: " << extent.isEmpty() << " isNull: " << extent.isNull() << " isFinite: " << extent.isFinite();
 	qgs_map_settings.setLayers(b_layers);
 	qgs_map_settings.setExtent(extent, false);
@@ -361,6 +365,9 @@ int main(int argc, char* argv[]) {
 	// qDebug() << "specVariants: " << specVariants;
 	QVariantMap imageSpec = specVariants[0].toMap();
 	// qDebug() << "imageSpec:" << imageSpec;
+
+
+	qDebug() << "add 2d layout";
 	JwLayout* jwLayout = new JwLayout(project, canvas, "test", imageSpec, save_qgis_project_path);
 
 	QString layout_type = "现场位置图";
@@ -377,13 +384,22 @@ int main(int argc, char* argv[]) {
 	QVector<QString> removeLayerPrefixes = QVector<QString>();
 	removeLayerPrefixes.append(REAL3D_TILE_NAME);
 	jwLayout->addPrintLayout(QString("2d"), joined_layout_name, plottingWebVariants, availablePaper, false, removeLayerNames, removeLayerPrefixes);
+	qDebug() << "add 2d layout done";
 
+
+	qDebug() << "add 3d layout";
 	QString joined_3d_layout_name = QString(layout_type).append("-3D").append("-").append("A3");
 	QVector<QString> remove3DLayerNames = QVector<QString>();
 	remove3DLayerNames.append(BASE_TILE_NAME);
 	QVector<QString> remove3DLayerPrefixes = QVector<QString>();
 	remove3DLayerPrefixes.append(MAIN_TILE_NAME);
-	jwLayout->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false, remove3DLayerNames, remove3DLayerPrefixes);
+	qDebug() << "constructor 3d canvas";
+	Qgs3DMapCanvas* canvas3d = new Qgs3DMapCanvas();
+	qDebug() << "constructor 3d JwLayout3D";
+	JwLayout3D* jwLayout3d = new JwLayout3D(project, canvas3d, "test", imageSpec, save_qgis_project_path);
+	qDebug() << "JwLayout3D addPrintLayout";
+	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false, remove3DLayerNames, remove3DLayerPrefixes);
+	qDebug() << "add 3d layout done";
 
 	qDebug() << "验证布局是否存在";
 	QgsLayoutManager* layout_manager = project->layoutManager();

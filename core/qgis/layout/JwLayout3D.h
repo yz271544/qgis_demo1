@@ -1,9 +1,11 @@
 ﻿//
-// Created by Lyndon on 2025/1/7.
+// Created by Lyndon on 2025/1/9.
 //
 
-#ifndef JWLAYOUT_H
-#define JWLAYOUT_H
+#ifndef JWLAYOUT3D_H
+#define JWLAYOUT3D_H
+
+
 
 #include <qgis.h>
 #include <QDebug>
@@ -12,6 +14,8 @@
 #include <QDomDocument>
 #include <QFile>
 #include <QScreen>
+#include <QSplashScreen>
+
 #include <qgs3dmapcanvas.h>
 #include <qgsproject.h>
 #include <qgslayout.h>
@@ -47,18 +51,20 @@
 #include <qgsterrainprovider.h>
 #include <qgspointlightsettings.h>
 #include <qgs3dmapscene.h>
+#include <qgsmapviewsmanager.h>
+#include <qgs3dmapcanvaswidget.h>
 
 #include "JwLegend.h"
 #include "../../enums/PaperSpecification.h"
 #include "../../utils/QgsUtil.h"
 #include "../../utils/ColorTransformUtil.h"
 
-class JwLayout {
+class JwLayout3D {
 public:
-    JwLayout(QgsProject* project, QgsMapCanvas* canvas, const QString& sceneName,
+    JwLayout3D(QgsProject* project, Qgs3DMapCanvas* canvas, const QString& sceneName,
              const QVariantMap& imageSpec, const QString& projectDir);
 
-    ~JwLayout();
+    ~JwLayout3D();
 
     void filterMapLayers(const QVector<QString>& removeLayerNames = QVector<QString>(),
                          const QVector<QString>& removeLayerPrefixes = QVector<QString>(),
@@ -76,26 +82,16 @@ public:
 
     void addSignatureLabel(const QString& signatureText);
 
-    void addScaleBar(QgsLayout* layout, QgsLayoutItemMap* mapItem);
-
     void addArrowToLayout(QgsLayout* layout, const QVector<QgsPointXY>& points, const QColor& color, double width);
 
     void addArrowBasedOnFrontendParams(QgsLayout* layout, const QList<QVariant>& position, double rotate);
 
-    void init2DLayout(const QString& layoutName);
-    void setMap(const PaperSpecification& availablePaper, int mapFrameWidth = 1,
-                const QString& mapFrameColor = "#000000", bool isDoubleFrame = false,
-                const QVector<QString>& removeLayerNames = QVector<QString>(),
-                const QVector<QString>& removeLayerPrefixes = QVector<QString>(),
-                double mapRotation = 0.0);
-
-    // void init3DLayout(const QString& layoutName);
-    // void init3DCanvas();
-    // void set3DMap(const PaperSpecification& availablePaper, int mapFrameWidth = 1,
-    //               const QString& mapFrameColor = "#000000", bool isDoubleFrame = false,
-    //               const QVector<QString>& removeLayerNames = QVector<QString>(),
-    //               const QVector<QString>& removeLayerPrefixes = QVector<QString>(),
-    //               double mapRotation = 0.0);
+    void init3DLayout(const QString& layoutName);
+    void set3DMap(const PaperSpecification& availablePaper, int mapFrameWidth = 1,
+                  const QString& mapFrameColor = "#000000", bool isDoubleFrame = false,
+                  const QVector<QString>& removeLayerNames = QVector<QString>(),
+                  const QVector<QString>& removeLayerPrefixes = QVector<QString>(),
+                  double mapRotation = 0.0);
 
 
     void addNorthArrow(const QVariantMap& northArrowPath);
@@ -113,16 +109,18 @@ public:
 private:
     QgsProject* project;
     QString projectDir;
-    QgsMapCanvas* canvas;
+    Qgs3DMapCanvas* canvas3d;
     QString sceneName;
     JwLegend* jw_legend;
-    QgsPrintLayout* layout;
+    QgsLayout* layout;
     QVariantMap imageSpec;
-    QgsLayoutItemMap* mapItem;
+    QgsLayoutItem3DMap* mapItem3d;
+    Qgs3DMapSettings* mapSettings3d;
     double mapWidth;
     double mapHeight;
 };
 
 
 
-#endif //JWLAYOUT_H
+
+#endif //JWLAYOUT3D_H

@@ -53,6 +53,13 @@ if (WIN32)
     find_path(GDAL_INCLUDE_DIR NAMES gdal.h ogr_api.h gdalwarper.h cpl_conv.h cpl_string.h HINTS $ENV{QGISPROGRAMFILES}/gdal-dev/include)
     find_library(GDAL_LIBRARY NAMES gdal HINTS $ENV{QGISPROGRAMFILES}/gdal-dev/lib)
 
+    find_path(QGIS_APP_INCLUDE_DIR NAMES qgisapp.h HINTS $ENV{OSGEO4W_ROOT}/QGIS/src/app)
+    message("QGIS_APP_INCLUDE_DIR: ${QGIS_APP_INCLUDE_DIR}")
+    find_path(QGIS_APP_3D_INCLUDE_DIR NAMES qgs3dmapcanvaswidget.h HINTS $ENV{OSGEO4W_ROOT}/QGIS/src/app/3d)
+    message("QGIS_APP_3D_INCLUDE_DIR: ${QGIS_APP_3D_INCLUDE_DIR}")
+    message("find library qgis_app from: $ENV{QGISPROGRAMFILES}/qgis/bin")
+    find_library(QGIS_APP_LIBRARY NAMES qgis_app HINTS $ENV{QGISPROGRAMFILES}/qgis/bin NO_DEFAULT_PATH)
+    message("QGIS_APP_LIBRARY: ${QGIS_APP_LIBRARY}")
     message("find yaml-cpp")
     set(YAML_CPP_PATH "D:/iProject/cpath/OSGeo4W/apps/yaml-cpp")
 #    find_package(yaml-cpp REQUIRED PATHS YAML_CPP_PATH)
@@ -187,6 +194,12 @@ message("QGIS_INCLUDE_DIR: ${QGIS_INCLUDE_DIR}")
 include_directories(${QGIS_INCLUDE_DIR})
 message("QGIS_3D_INCLUDE_DIR: ${QGIS_3D_INCLUDE_DIR}")
 include_directories(${QGIS_3D_INCLUDE_DIR})
+
+message("QGIS_APP_INCLUDE_DIR: ${QGIS_APP_INCLUDE_DIR}")
+include_directories(${QGIS_APP_INCLUDE_DIR})
+message("QGIS_APP_3D_INCLUDE_DIR: ${QGIS_APP_3D_INCLUDE_DIR}")
+include_directories(${QGIS_APP_3D_INCLUDE_DIR})
+
 message("Qt5Core_INCLUDE_DIRS: ${Qt5Core_INCLUDE_DIRS}")
 include_directories(${Qt5Core_INCLUDE_DIRS})
 message("Qt5Gui_INCLUDE_DIRS: ${Qt5Gui_INCLUDE_DIRS}")
@@ -270,6 +283,39 @@ add_executable(qgis_demo3d1 main3d1.cpp
         core/utils/NodeToMap.h
         core/utils/JsonUtil.cpp
         core/utils/JsonUtil.h
+        core/qgis/layout/JwLayout3D.cpp
+        core/qgis/layout/JwLayout3D.h
+)
+
+add_executable(qgis_demo3d2 main3d2.cpp
+        JwGeometry.cpp
+        config.h
+        core/qgis/style/StylePoint.cpp
+        core/qgis/style/StylePoint.h
+        core/qgis/payload/InputPoint.cpp
+        core/qgis/payload/InputPoint.h
+        core/utils/ColorTransformUtil.cpp
+        core/utils/ColorTransformUtil.h
+        core/utils/QgsUtil.cpp
+        core/utils/QgsUtil.h
+        core/utils/FileUtil.cpp
+        core/utils/FileUtil.h
+        core/utils/ImageUtil.cpp
+        core/utils/ImageUtil.h
+        core/enums/PaperSpecification.cpp
+        core/enums/PaperSpecification.h
+        core/qgis/layout/JwLayout.cpp
+        core/qgis/layout/JwLayout.h
+        core/qgis/layout/JwLegend.cpp
+        core/qgis/layout/JwLegend.h
+        core/utils/FontUtil.cpp
+        core/utils/FontUtil.h
+        core/utils/NodeToMap.cpp
+        core/utils/NodeToMap.h
+        core/utils/JsonUtil.cpp
+        core/utils/JsonUtil.h
+        core/qgis/layout/JwLayout3D.cpp
+        core/qgis/layout/JwLayout3D.h
 )
 
 add_executable(test_main test_main.cpp
@@ -292,7 +338,8 @@ target_link_libraries(qgis_demo2 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY
 target_link_libraries(qgis_demo3 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Test ${GDAL_LIBRARY})
 target_link_libraries(qgis_demo4 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Test ${GDAL_LIBRARY})
 target_link_libraries(qgis_demo3d0 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Test ${GDAL_LIBRARY})
-target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Svg Qt5::Test ${GDAL_LIBRARY} ${YAML_CPP_LIBRARIES})
+target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} ${QGIS_APP_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Svg Qt5::Test ${GDAL_LIBRARY} ${YAML_CPP_LIBRARIES})
+target_link_libraries(qgis_demo3d2 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Svg Qt5::Test ${GDAL_LIBRARY} ${YAML_CPP_LIBRARIES})
 target_link_libraries(test_main PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Test ${GDAL_LIBRARY})
 
 # 测试json程序
