@@ -53,6 +53,9 @@
 #include <qgs3dmapscene.h>
 #include <qgsmapviewsmanager.h>
 #include <qgs3dmapcanvaswidget.h>
+#include <qgs3danimationwidget.h>
+#include <qgs3danimationsettings.h>
+#include <qgsdockablewidgethelper.h>
 
 #include "JwLegend.h"
 #include "../../enums/PaperSpecification.h"
@@ -105,6 +108,7 @@ public:
     void updateLayoutExtent(const QString& layoutName);
     QPair<double, double> getLegendDimensions(const QString& layoutName);
 
+    void write3DMapViewSettings( Qgs3DMapCanvasWidget *widget, QDomDocument &doc, QDomElement &elem3DMap );
 
 private:
     QgsProject* project;

@@ -807,7 +807,7 @@ void JwLayout3D::addPrintLayout(const QString& layoutType, const QString& layout
 
 
     project->setDirty(true);
-    Qgs3DMapCanvasWidget *widget = new Qgs3DMapCanvasWidget( name, isDocked );
+    Qgs3DMapCanvasWidget *widget = new Qgs3DMapCanvasWidget( "first3DView", false );
 
     QDomImplementation DomImplementation;
     QDomDocumentType documentType =
@@ -816,7 +816,7 @@ void JwLayout3D::addPrintLayout(const QString& layoutType, const QString& layout
     QDomDocument doc( documentType );
     QDomElement elem3DMap = doc.createElement( QStringLiteral( "view" ) );
     elem3DMap.setAttribute( QStringLiteral( "isOpen" ), 1 );
-    write3DMapViewSettings( canvasWidget, doc, elem3DMap );
+    write3DMapViewSettings( widget, doc, elem3DMap );
 
     // QgsMapViewsManager* qgs_map_views_manager = project->viewsManager();
     // qgs_map_views_manager->register3DViewSettings( layoutName, mapSettings3d );
@@ -824,4 +824,20 @@ void JwLayout3D::addPrintLayout(const QString& layoutType, const QString& layout
     // QgsMap3DViewSettings* qgs_map_3d_view_settings = qgs_map_views_manager->view3DSettings(joined_3d_layout_name);
     // project->viewsManager()->register3DViewSettings( viewName, elem3DMap );
     // project->viewsManager()->set3DViewInitiallyVisible( viewName, false );
+}
+
+void JwLayout3D::write3DMapViewSettings( Qgs3DMapCanvasWidget *widget, QDomDocument &doc, QDomElement &elem3DMap )
+{
+  QgsReadWriteContext readWriteContext;
+  readWriteContext.setPathResolver( QgsProject::instance()->pathResolver() );
+  elem3DMap.setAttribute( QStringLiteral( "name" ), widget->canvasName() );
+  QDomElement elem3DMapSettings = widget->mapCanvas3D()->mapSettings()->writeXml( doc, readWriteContext );
+  elem3DMap.appendChild( elem3DMapSettings );
+  QDomElement elemCamera = widget->mapCanvas3D()->cameraController()->writeXml( doc );
+  elem3DMap.appendChild( elemCamera );
+  QDomElement elemAnimation = widget->animationWidget()->animation().writeXml( doc );
+  elemAnimation.setAttribute( QStringLiteral( "widget-visible" ), !widget->animationWidget()->isHidden() ? 1 : 0 );
+  elem3DMap.appendChild( elemAnimation );
+
+  widget->dockableWidgetHelper()->writeXml( elem3DMap );
 }
