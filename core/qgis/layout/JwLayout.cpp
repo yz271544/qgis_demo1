@@ -523,12 +523,12 @@ void JwLayout::setMap(
 
 void JwLayout::init3DLayout(const QString& layoutName)
 {
-    layout3d = new QgsPrintLayout(project);
-    layout3d->setName(layoutName);
-    layout3d->setUnits(Qgis::LayoutUnit::Millimeters);
-    layout3d->initializeDefaults();
+    layout = new QgsPrintLayout(project);
+    layout->setName(layoutName);
+    layout->setUnits(Qgis::LayoutUnit::Millimeters);
+    layout->initializeDefaults();
     QgsLayoutManager* layout_manager = project->layoutManager();
-    layout_manager->addLayout(layout3d);
+    layout_manager->addLayout(layout);
 }
 
 void JwLayout::set3DMap(
@@ -575,7 +575,7 @@ void JwLayout::set3DMap(
     mapItem3d->setMapSettings(mapSettings3d);
 
     // 添加地图项到布局
-    layout->addLayoutItem(mapItem);
+    layout->addLayoutItem(mapItem3d);
 }
 
 

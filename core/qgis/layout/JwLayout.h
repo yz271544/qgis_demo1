@@ -108,7 +108,6 @@ private:
     QString sceneName;
     JwLegend* jw_legend;
     QgsPrintLayout* layout;
-    QgsPrintLayout* layout3d;
     QVariantMap imageSpec;
     QgsLayoutItemMap* mapItem;
     // QgsLayoutItem* mapItem;

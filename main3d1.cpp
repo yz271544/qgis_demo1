@@ -378,12 +378,12 @@ int main(int argc, char* argv[]) {
 	removeLayerPrefixes.append(REAL3D_TILE_NAME);
 	jwLayout->addPrintLayout(QString("2d"), joined_layout_name, plottingWebVariants, availablePaper, false, removeLayerNames, removeLayerPrefixes);
 
-	// QString joined_3d_layout_name = QString(layout_type).append("-3D").append("-").append("A3");
-	// QVector<QString> remove3DLayerNames = QVector<QString>();
-	// remove3DLayerNames.append(BASE_TILE_NAME);
-	// QVector<QString> remove3DLayerPrefixes = QVector<QString>();
-	// remove3DLayerPrefixes.append(MAIN_TILE_NAME);
-	// jwLayout->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false, remove3DLayerNames, remove3DLayerPrefixes);
+	QString joined_3d_layout_name = QString(layout_type).append("-3D").append("-").append("A3");
+	QVector<QString> remove3DLayerNames = QVector<QString>();
+	remove3DLayerNames.append(BASE_TILE_NAME);
+	QVector<QString> remove3DLayerPrefixes = QVector<QString>();
+	remove3DLayerPrefixes.append(MAIN_TILE_NAME);
+	jwLayout->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false, remove3DLayerNames, remove3DLayerPrefixes);
 
 	qDebug() << "验证布局是否存在";
 	QgsLayoutManager* layout_manager = project->layoutManager();
