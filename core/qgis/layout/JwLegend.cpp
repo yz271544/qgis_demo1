@@ -141,20 +141,20 @@ QPair<double, double> JwLegend::customize(
                                         /// 剔除掉 FontMarker 类型的 symbol
                                         if (symbol_layer->layerType()!= "FontMarker") {
                                             /// 这里避免崩溃，采用 clone() 方法
-                                            std::cout << "这里避免崩溃，采用 clone() 方法" << std::endl;
+                                            qDebug() << "这里避免崩溃，采用 clone() 方法";
                                             filtered_symbol_layers.append(symbol_layer->clone());
                                         }
                                     }
                                     /// 本项目中，点图例都采用可聚合+嵌入式规则渲染器，这里用 QgsMarkerSymbol 重新创建符号集
-                                    std::cout << "重新创建符号集" << std::endl;
+                                    qDebug() << "重新创建符号集";
                                     auto* filtered_marker_symbol = new QgsMarkerSymbol(filtered_symbol_layers);
                                     /// 重新设置符号项的符号
-                                    std::cout << "重新设置符号项的符号" << std::endl;
+                                    qDebug() << "重新设置符号项的符号";
                                     legend_symbol_item.setSymbol(filtered_marker_symbol);
                                     /// 创建一个符号节点
                                     // symbol_legend_node = QgsSymbolLegendNode(tr, legend_symbol_item);
                                     // symbol_legend_node.setCustomSymbol(filtered_marker_symbol);
-                                    std::cout << "设置图例节点的自定义符号" << std::endl;
+                                    qDebug() << "设置图例节点的自定义符号";
                                     QgsMapLayerLegendUtils::setLegendNodeCustomSymbol(tr, 0, filtered_marker_symbol);
                                 }
                             }
