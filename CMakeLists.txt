@@ -57,8 +57,14 @@ if (WIN32)
     message("QGIS_APP_INCLUDE_DIR: ${QGIS_APP_INCLUDE_DIR}")
     find_path(QGIS_APP_3D_INCLUDE_DIR NAMES qgs3dmapcanvaswidget.h HINTS $ENV{OSGEO4W_ROOT}/QGIS/src/app/3d)
     message("QGIS_APP_3D_INCLUDE_DIR: ${QGIS_APP_3D_INCLUDE_DIR}")
-    message("find library qgis_app from: $ENV{QGISPROGRAMFILES}/qgis/bin")
-    find_library(QGIS_APP_LIBRARY NAMES qgis_app HINTS $ENV{QGISPROGRAMFILES}/qgis/bin NO_DEFAULT_PATH)
+    message("Checking for qgis_app.dll in: $ENV{QGISPROGRAMFILES}\\qgis\\bin")
+#    find_library(QGIS_APP_LIBRARY NAMES qgis_app.dll PATHS $ENV{QGISPROGRAMFILES}\\qgis\\bin NO_DEFAULT_PATH)
+    find_file(QGIS_APP_DLL NAMES qgis_app.dll HINTS "$ENV{QGISPROGRAMFILES}\\qgis\\bin")
+    if (QGIS_APP_DLL)
+        message("Found qgis_app.dll: ${QGIS_APP_DLL}")
+    else()
+        message(FATAL_ERROR "qgis_app.dll not found")
+    endif()
     message("QGIS_APP_LIBRARY: ${QGIS_APP_LIBRARY}")
     message("find yaml-cpp")
     set(YAML_CPP_PATH "D:/iProject/cpath/OSGeo4W/apps/yaml-cpp")
@@ -245,7 +251,6 @@ link_directories(${QGIS_PREFIX_PATH}/lib /usr/lib/x86_64-linux-gnu ${YAML_CPP_LI
 #        test_main.cpp
 #        test_main.h)
 add_executable(qgis_demo1 main.cpp
-        tests/test_json.cpp
         core/utils/ColorTransformUtil.cpp
         core/utils/ColorTransformUtil.h)
 add_executable(qgis_demo2
