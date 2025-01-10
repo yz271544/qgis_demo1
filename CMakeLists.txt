@@ -193,9 +193,6 @@ endif()
 
 # 生成 config.h 头文件
 configure_file(config.h.in ${CMAKE_HOME_DIRECTORY}/config.h)
-configure_file(constants.h.in ${CMAKE_HOME_DIRECTORY}/constants.h)
-configure_file(constants.cpp.in ${CMAKE_HOME_DIRECTORY}/constants.cpp)
-
 
 message("start find qgis package")
 find_package(QGIS REQUIRED)
