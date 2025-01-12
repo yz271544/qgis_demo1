@@ -7,9 +7,9 @@
 
 
 // 构造函数
-JwLayout3D::JwLayout3D(QgsProject *project, Qgs3DMapCanvas *canvas3d, const QString &sceneName,
+JwLayout3D::JwLayout3D(QgsProject *project, QgsMapCanvas* canvas2d, Qgs3DMapCanvas *canvas3d, const QString &sceneName,
                        const QVariantMap &imageSpec, const QString &projectDir)
-        : project(project), canvas3d(canvas3d), sceneName(sceneName), imageSpec(imageSpec), projectDir(projectDir),
+        : project(project), canvas2d(canvas2d), canvas3d(canvas3d), sceneName(sceneName), imageSpec(imageSpec), projectDir(projectDir),
           layout(nullptr), mapSettings3d(nullptr), mapWidth(0), mapHeight(0) {
     QString legendTitle = imageSpec["legend_title"].toString();
     this->jw_legend = new JwLegend(legendTitle, project);
@@ -462,46 +462,114 @@ void JwLayout3D::set3DMap(
         const QVector<QString> &removeLayerNames,
         const QVector<QString> &removeLayerPrefixes,
         double mapRotation) {
+
+    QgsSettings settings;
     // 创建 3D 地图设置
     mapSettings3d = new Qgs3DMapSettings();
     mapSettings3d->setCrs(project->crs());
     // 过滤图层
     filterMapLayers(removeLayerNames, removeLayerPrefixes, mapSettings3d);
-    mapSettings3d->setBackgroundColor(QColor("#ffffff"));
+    // mapSettings3d->setBackgroundColor(QColor("#ffffff"));
 
-    QgsReferencedRectangle fullExtent = project->viewSettings()->fullExtent();
+    const QgsReferencedRectangle projectExtent = project->viewSettings()->fullExtent();
+    const QgsRectangle fullExtent = Qgs3DUtils::tryReprojectExtent2D( projectExtent, projectExtent.crs(), mapSettings3d->crs(), project->transformContext() );
+    //QgsReferencedRectangle fullExtent = project->viewSettings()->fullExtent();
     mapSettings3d->setOrigin(QgsVector3D(fullExtent.center().x(), fullExtent.center().y(), 0));
-    mapSettings3d->setExtent(fullExtent);
 
-    Qgs3DAxisSettings axis;
-    axis.setMode(Qgs3DAxisSettings::Mode::Off);
-    qDebug() << "mapSettings3d set3DAxisSettings";
-    mapSettings3d->set3DAxisSettings(axis);
-    qDebug() << "mapSettings3d setTransformContext";
-    mapSettings3d->setTransformContext(project->transformContext());
-    qDebug() << "mapSettings3d setPathResolver";
-    mapSettings3d->setPathResolver(project->pathResolver());
-    qDebug() << "mapSettings3d setMapThemeCollection";
-    mapSettings3d->setMapThemeCollection(project->mapThemeCollection());
+    mapSettings3d->setSelectionColor( canvas2d->selectionColor() );
+    mapSettings3d->setBackgroundColor( canvas2d->canvasColor() );
+    mapSettings3d->setLayers( canvas2d->layers( true ) );
+    mapSettings3d->setTemporalRange( canvas2d->temporalRange() );
 
-    qDebug() << "connect project mapSettings3d";
-    QObject::connect(project, &QgsProject::transformContextChanged, mapSettings3d, [this] {
-        mapSettings3d->setTransformContext(project->transformContext());
-    });
+    const Qgis::NavigationMode defaultNavMode = settings.enumValue( QStringLiteral( "map3d/defaultNavigation" ), Qgis::NavigationMode::TerrainBased, QgsSettings::App );
+    mapSettings3d->setCameraNavigationMode( defaultNavMode );
 
-    QgsFlatTerrainGenerator *flatTerrain = new QgsFlatTerrainGenerator;
-    QString crs = "EPSG:4979";
-    QgsCoordinateReferenceSystem scene3dcrs;
-    scene3dcrs.createFromString(crs);
-#if _QGIS_VERSION_INT >= 34100
-    flatTerrain->setCrs( scene3dcrs, project->transformContext() );
-#else
-    flatTerrain->setCrs(scene3dcrs);
-#endif
-    qDebug() << "mapSettings3d setTerrainGenerator";
-    mapSettings3d->setTerrainGenerator(flatTerrain);
-    qDebug() << "mapSettings3d setTerrainElevationOffset";
-    mapSettings3d->setTerrainElevationOffset(project->elevationProperties()->terrainProvider()->offset());
+    mapSettings3d->setCameraMovementSpeed( settings.value( QStringLiteral( "map3d/defaultMovementSpeed" ), 5, QgsSettings::App ).toDouble() );
+    const Qt3DRender::QCameraLens::ProjectionType defaultProjection = settings.enumValue( QStringLiteral( "map3d/defaultProjection" ), Qt3DRender::QCameraLens::PerspectiveProjection, QgsSettings::App );
+    mapSettings3d->setProjectionType( defaultProjection );
+    mapSettings3d->setFieldOfView( settings.value( QStringLiteral( "map3d/defaultFieldOfView" ), 45, QgsSettings::App ).toInt() );
+
+    mapSettings3d->setTransformContext( QgsProject::instance()->transformContext() );
+    mapSettings3d->setPathResolver( QgsProject::instance()->pathResolver() );
+    mapSettings3d->setMapThemeCollection( QgsProject::instance()->mapThemeCollection() );
+
+    mapSettings3d->configureTerrainFromProject( QgsProject::instance()->elevationProperties(), fullExtent );
+
+    // new scenes default to a single directional light
+    mapSettings3d->setLightSources( QList<QgsLightSource *>() << new QgsDirectionalLightSettings() );
+    mapSettings3d->setOutputDpi( QGuiApplication::primaryScreen()->logicalDotsPerInch() );
+    mapSettings3d->setRendererUsage( Qgis::RendererUsage::View );
+
+    QObject::connect( project, &QgsProject::transformContextChanged, mapSettings3d, [this] {
+        mapSettings3d->setTransformContext( project->transformContext() );
+    } );
+
+    Qgs3DMapCanvasWidget *canvasWidget = new Qgs3DMapCanvasWidget("MapView3D1", true);
+
+    canvasWidget->setMapSettings(mapSettings3d);
+    const QgsRectangle canvasExtent = Qgs3DUtils::tryReprojectExtent2D( canvas2d->extent(), canvas2d->mapSettings().destinationCrs(), mapSettings3d->crs(), project->transformContext() );
+    float dist = static_cast<float>(std::max(canvasExtent.width(), canvasExtent.height()));
+    canvasWidget->mapCanvas3D()->setViewFromTop(canvasExtent.center(), dist, static_cast<float>(canvas2d->rotation()));
+
+    const Qgis::VerticalAxisInversion axisInversion = settings.enumValue( QStringLiteral( "map3d/axisInversion" ), Qgis::VerticalAxisInversion::WhenDragging, QgsSettings::App );
+    if (canvasWidget->mapCanvas3D()->cameraController()) {
+        canvasWidget->mapCanvas3D()->cameraController()->setVerticalAxisInversion( axisInversion );
+    }
+
+    QDomImplementation DomImplementation;
+    QDomDocumentType documentType = DomImplementation.createDocumentType(
+        QStringLiteral("qgis"), QStringLiteral("http://mrcc.com/qgis.dtd"), QStringLiteral("SYSTEM")
+    );
+
+    QDomDocument doc(documentType);
+
+    QDomElement elem3DMap = doc.createElement(QStringLiteral("view"));
+    elem3DMap.setAttribute(QStringLiteral("isOpen"), 1);
+
+    write3DMapViewSettings(canvasWidget, doc, elem3DMap);
+
+    QgsMapViewsManager * prjViewsManager = project->viewsManager();
+    prjViewsManager->register3DViewSettings("MapView3D1", elem3DMap);
+    prjViewsManager->set3DViewInitiallyVisible("MapView3D1", true);
+
+    canvasWidget->mapCanvas3D();
+
+
+
+
+
+
+    //mapSettings3d->setExtent(fullExtent);
+
+//    Qgs3DAxisSettings axis;
+//    axis.setMode(Qgs3DAxisSettings::Mode::Off);
+//    qDebug() << "mapSettings3d set3DAxisSettings";
+//    mapSettings3d->set3DAxisSettings(axis);
+//    qDebug() << "mapSettings3d setTransformContext";
+//    mapSettings3d->setTransformContext(project->transformContext());
+//    qDebug() << "mapSettings3d setPathResolver";
+//    mapSettings3d->setPathResolver(project->pathResolver());
+//    qDebug() << "mapSettings3d setMapThemeCollection";
+//    mapSettings3d->setMapThemeCollection(project->mapThemeCollection());
+//
+//    qDebug() << "connect project mapSettings3d";
+//    QObject::connect(project, &QgsProject::transformContextChanged, mapSettings3d, [this] {
+//        mapSettings3d->setTransformContext(project->transformContext());
+//    });
+//
+//    QgsFlatTerrainGenerator *flatTerrain = new QgsFlatTerrainGenerator;
+//    QString crs = "EPSG:4979";
+//    QgsCoordinateReferenceSystem scene3dcrs;
+//    scene3dcrs.createFromString(crs);
+//#if _QGIS_VERSION_INT >= 34100
+//    flatTerrain->setCrs( scene3dcrs, project->transformContext() );
+//#else
+//    flatTerrain->setCrs(scene3dcrs);
+//#endif
+//    qDebug() << "mapSettings3d setTerrainGenerator";
+//    mapSettings3d->setTerrainGenerator(flatTerrain);
+//    qDebug() << "mapSettings3d setTerrainElevationOffset";
+//    mapSettings3d->setTerrainElevationOffset(project->elevationProperties()->terrainProvider()->offset());
 
     // QgsPointLightSettings defaultPointLight;
     // qDebug() << "mapSettings3d setPosition";
@@ -526,22 +594,22 @@ void JwLayout3D::set3DMap(
     // mapSettings3d->setTerrainRenderingEnabled(true);
     // qDebug() << "mapSettings3d setShowExtentIn2DView true";
     // mapSettings3d->setShowExtentIn2DView(true);
-    qDebug() << "canvas3d setMapSettings";
-    canvas3d->setMapSettings(mapSettings3d);
-    qDebug() << "canvas3d setMapSettings done";
-    QgsRectangle extent = fullExtent;
-    qDebug() << "extent scale";
-    extent.scale(1.3);
-    const float dist = static_cast< float >( std::max(extent.width(), extent.height()));
-    qDebug() << "canvas3d setViewFromTop";
-    canvas3d->setViewFromTop(extent.center(), dist * 2, 0);
-    qDebug() << "connect canvas3d totalPendingJobsCountChanged";
-    QObject::connect(canvas3d->scene(), &Qgs3DMapScene::totalPendingJobsCountChanged, canvas3d, [this] {
-        qDebug() << "pending jobs:" << canvas3d->scene()->totalPendingJobsCount();
-    });
-    qDebug() << "canvas3d show";
-    canvas3d->show();
-
+//    qDebug() << "canvas3d setMapSettings";
+//    canvas3d->setMapSettings(mapSettings3d);
+//    qDebug() << "canvas3d setMapSettings done";
+//    QgsRectangle extent = fullExtent;
+//    qDebug() << "extent scale";
+//    extent.scale(1.3);
+//    const float dist = static_cast< float >( std::max(extent.width(), extent.height()));
+//    qDebug() << "canvas3d setViewFromTop";
+//    canvas3d->setViewFromTop(extent.center(), dist * 2, 0);
+//    qDebug() << "connect canvas3d totalPendingJobsCountChanged";
+//    QObject::connect(canvas3d->scene(), &Qgs3DMapScene::totalPendingJobsCountChanged, canvas3d, [this] {
+//        qDebug() << "pending jobs:" << canvas3d->scene()->totalPendingJobsCount();
+//    });
+//    qDebug() << "canvas3d show";
+//    canvas3d->show();
+//
     // 创建 3D 地图项
     //mapItem3d = QgsLayoutItem3DMap::create(layout);
     mapItem3d = new QgsLayoutItem3DMap(layout);

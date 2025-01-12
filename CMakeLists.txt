@@ -189,6 +189,7 @@ elseif(UNIX)
             Xml
             Svg
             Multimedia
+            3DRender
             Test
     )
     find_package(Qt5Keychain CONFIG REQUIRED)
@@ -237,6 +238,8 @@ message("Qt5Xml_INCLUDE_DIRS: ${Qt5Xml_INCLUDE_DIRS}")
 include_directories(${Qt5Xml_INCLUDE_DIRS})
 message("Qt5Svg_INCLUDE_DIRS: ${Qt5Svg_INCLUDE_DIRS}")
 include_directories(${Qt5Svg_INCLUDE_DIRS})
+message("Qt53DRender_INCLUDE_DIRS: ${Qt53DRender_INCLUDE_DIRS}")
+include_directories(${Qt53DRender_INCLUDE_DIRS})
 
 
 message("GDAL_INCLUDE_DIR: ${GDAL_INCLUDE_DIR}")
@@ -366,7 +369,7 @@ target_link_libraries(qgis_demo3 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY
 target_link_libraries(qgis_demo4 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Test ${GDAL_LIBRARY})
 target_link_libraries(qgis_demo3d0 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Test ${GDAL_LIBRARY})
 if($ENV{ENABLE_APP})
-    target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} ${QGIS_APP_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Svg Qt5::Test ${GDAL_LIBRARY} ${YAML_CPP_LIBRARIES})
+    target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} ${QGIS_APP_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Svg Qt5::3DRender Qt5::Test ${GDAL_LIBRARY} ${YAML_CPP_LIBRARIES})
 else()
     target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Svg Qt5::Test ${GDAL_LIBRARY} ${YAML_CPP_LIBRARIES})
     endif()

@@ -15,6 +15,7 @@
 #include <QFile>
 #include <QScreen>
 #include <QSplashScreen>
+#include <QStringLiteral>
 
 #include <qgs3dmapcanvas.h>
 #include <qgsproject.h>
@@ -53,7 +54,11 @@
 #include <qgs3dmapscene.h>
 #include <qgsmapviewsmanager.h>
 #include <qgsconfig.h>
+#include <qgs3dutils.h>
+#include <qgssettings.h>
+#include <qgsdirectionallightsettings.h>
 #ifdef ENABLE_APP
+#include <qobjectuniqueptr.h>
 #include <qgs3dmapcanvaswidget.h>
 #include <qgs3danimationwidget.h>
 #include <qgs3danimationsettings.h>
@@ -68,7 +73,7 @@
 
 class JwLayout3D {
 public:
-    JwLayout3D(QgsProject* project, Qgs3DMapCanvas* canvas, const QString& sceneName,
+    JwLayout3D(QgsProject* project, QgsMapCanvas* canvas2d, Qgs3DMapCanvas* canvas, const QString& sceneName,
              const QVariantMap& imageSpec, const QString& projectDir);
 
     ~JwLayout3D();
@@ -120,6 +125,7 @@ public:
 private:
     QgsProject* project;
     QString projectDir;
+    QgsMapCanvas* canvas2d;
     Qgs3DMapCanvas* canvas3d;
     QString sceneName;
     JwLegend* jw_legend;

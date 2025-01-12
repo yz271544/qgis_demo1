@@ -396,7 +396,7 @@ int main(int argc, char* argv[]) {
 	qDebug() << "constructor 3d canvas";
 	Qgs3DMapCanvas* canvas3d = new Qgs3DMapCanvas();
 	qDebug() << "constructor 3d JwLayout3D";
-	JwLayout3D* jwLayout3d = new JwLayout3D(project, canvas3d, "test", imageSpec, save_qgis_project_path);
+	JwLayout3D* jwLayout3d = new JwLayout3D(project, canvas, canvas3d, "test", imageSpec, save_qgis_project_path);
 	qDebug() << "JwLayout3D addPrintLayout";
 	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false, remove3DLayerNames, remove3DLayerPrefixes);
 	qDebug() << "add 3d layout done";
