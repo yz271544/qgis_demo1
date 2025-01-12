@@ -470,73 +470,85 @@ void JwLayout3D::set3DMap(
     // 过滤图层
     filterMapLayers(removeLayerNames, removeLayerPrefixes, mapSettings3d);
     // mapSettings3d->setBackgroundColor(QColor("#ffffff"));
-
+    qDebug() << "filtered map layers";
     const QgsReferencedRectangle projectExtent = project->viewSettings()->fullExtent();
     const QgsRectangle fullExtent = Qgs3DUtils::tryReprojectExtent2D( projectExtent, projectExtent.crs(), mapSettings3d->crs(), project->transformContext() );
     //QgsReferencedRectangle fullExtent = project->viewSettings()->fullExtent();
     mapSettings3d->setOrigin(QgsVector3D(fullExtent.center().x(), fullExtent.center().y(), 0));
-
+    qDebug() << "set origin: " << mapSettings3d->origin().toString();
     mapSettings3d->setSelectionColor( canvas2d->selectionColor() );
+    qDebug() << "set selection color: " << mapSettings3d->selectionColor();
     mapSettings3d->setBackgroundColor( canvas2d->canvasColor() );
-    mapSettings3d->setLayers( canvas2d->layers( true ) );
+    qDebug() << "set backgroupdColor: " << mapSettings3d->backgroundColor();
+    //mapSettings3d->setLayers( canvas2d->layers( true ) );
     mapSettings3d->setTemporalRange( canvas2d->temporalRange() );
-
+    qDebug() << "set temporal range:" << mapSettings3d->temporalRange().isEmpty();
     const Qgis::NavigationMode defaultNavMode = settings.enumValue( QStringLiteral( "map3d/defaultNavigation" ), Qgis::NavigationMode::TerrainBased, QgsSettings::App );
     mapSettings3d->setCameraNavigationMode( defaultNavMode );
-
+    qDebug() << "set camera navigation mode: " << mapSettings3d->cameraNavigationMode();
     mapSettings3d->setCameraMovementSpeed( settings.value( QStringLiteral( "map3d/defaultMovementSpeed" ), 5, QgsSettings::App ).toDouble() );
+    qDebug() << "set camera movement speed: " << mapSettings3d->cameraMovementSpeed();
     const Qt3DRender::QCameraLens::ProjectionType defaultProjection = settings.enumValue( QStringLiteral( "map3d/defaultProjection" ), Qt3DRender::QCameraLens::PerspectiveProjection, QgsSettings::App );
     mapSettings3d->setProjectionType( defaultProjection );
+    qDebug() << "set project type: " << mapSettings3d->projectionType();
     mapSettings3d->setFieldOfView( settings.value( QStringLiteral( "map3d/defaultFieldOfView" ), 45, QgsSettings::App ).toInt() );
-
+    qDebug() << "set field of view: " << mapSettings3d->fieldOfView();
     mapSettings3d->setTransformContext( QgsProject::instance()->transformContext() );
+    qDebug() << "set transform context";
     mapSettings3d->setPathResolver( QgsProject::instance()->pathResolver() );
+    qDebug() << "set path resolver";
     mapSettings3d->setMapThemeCollection( QgsProject::instance()->mapThemeCollection() );
-
+    qDebug() << "set map theme collection:" << mapSettings3d->mapThemeCollection();
     mapSettings3d->configureTerrainFromProject( QgsProject::instance()->elevationProperties(), fullExtent );
-
+    qDebug() << "configure terrain from project:" << mapSettings3d->terrainGenerator();
     // new scenes default to a single directional light
     mapSettings3d->setLightSources( QList<QgsLightSource *>() << new QgsDirectionalLightSettings() );
+    qDebug() << "set light sources:" << mapSettings3d->lightSources();
     mapSettings3d->setOutputDpi( QGuiApplication::primaryScreen()->logicalDotsPerInch() );
+    qDebug() << "set output dpi:" << mapSettings3d->outputDpi();
     mapSettings3d->setRendererUsage( Qgis::RendererUsage::View );
+    qDebug() << "set renderer usage:" << mapSettings3d->rendererUsage();
 
     QObject::connect( project, &QgsProject::transformContextChanged, mapSettings3d, [this] {
         mapSettings3d->setTransformContext( project->transformContext() );
     } );
-
-    Qgs3DMapCanvasWidget *canvasWidget = new Qgs3DMapCanvasWidget("MapView3D1", true);
-
+    qDebug() << "connect project transform context changed";
+    Qgs3DMapCanvasWidget *canvasWidget = new Qgs3DMapCanvasWidget("MapView3D1", false);
+    qDebug() << "create 3D map canvas widget";
     canvasWidget->setMapSettings(mapSettings3d);
+    qDebug() << "set map settings:" << canvasWidget->mapCanvas3D()->mapSettings();
     const QgsRectangle canvasExtent = Qgs3DUtils::tryReprojectExtent2D( canvas2d->extent(), canvas2d->mapSettings().destinationCrs(), mapSettings3d->crs(), project->transformContext() );
     float dist = static_cast<float>(std::max(canvasExtent.width(), canvasExtent.height()));
     canvasWidget->mapCanvas3D()->setViewFromTop(canvasExtent.center(), dist, static_cast<float>(canvas2d->rotation()));
+    qDebug() << "set view from top:" << canvasExtent.center() << dist << canvas2d->rotation();
 
     const Qgis::VerticalAxisInversion axisInversion = settings.enumValue( QStringLiteral( "map3d/axisInversion" ), Qgis::VerticalAxisInversion::WhenDragging, QgsSettings::App );
     if (canvasWidget->mapCanvas3D()->cameraController()) {
         canvasWidget->mapCanvas3D()->cameraController()->setVerticalAxisInversion( axisInversion );
     }
+    qDebug() << "set vertical axis inversion:" << axisInversion;
 
     QDomImplementation DomImplementation;
     QDomDocumentType documentType = DomImplementation.createDocumentType(
         QStringLiteral("qgis"), QStringLiteral("http://mrcc.com/qgis.dtd"), QStringLiteral("SYSTEM")
     );
+    qDebug() << "create QDomDocument:" << documentType.name();
 
     QDomDocument doc(documentType);
 
     QDomElement elem3DMap = doc.createElement(QStringLiteral("view"));
     elem3DMap.setAttribute(QStringLiteral("isOpen"), 1);
+    qDebug() << "create QDomElement:" << elem3DMap.tagName();
 
     write3DMapViewSettings(canvasWidget, doc, elem3DMap);
+    qDebug() << "write 3D map view settings";
 
     QgsMapViewsManager * prjViewsManager = project->viewsManager();
     prjViewsManager->register3DViewSettings("MapView3D1", elem3DMap);
+    qDebug() << "register 3D view settings";
     prjViewsManager->set3DViewInitiallyVisible("MapView3D1", true);
-
-    canvasWidget->mapCanvas3D();
-
-
-
-
+    qDebug() << "set 3D view initially visible";
+    canvas3d = canvasWidget->mapCanvas3D();
 
 
     //mapSettings3d->setExtent(fullExtent);
