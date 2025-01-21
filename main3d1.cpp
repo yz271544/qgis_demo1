@@ -34,7 +34,8 @@
 #include <qgswkbtypes.h>
 #include <qgslayoutmanager.h>
 #include <qgsmapviewsmanager.h>
-
+#include <qgsoffscreen3dengine.h>
+#include <qgs3dutils.h>
 
 #include "config.h"
 #include "core/qgis/payload/InputPoint.h"
@@ -87,8 +88,8 @@ int main(int argc, char* argv[]) {
 	project->setCrs(qgscrs);
 
 	// create XYZ base layer
-	QString baseXyzUrl = "type=xyz&url=http://47.94.145.6/map/lx/{z}/{x}/{y}.png&zmax=19&zmin=0";
-	// QString baseXyzUrl = "type=xyz&url=http://172.31.100.34:38083/map/lx/{z}/{x}/{y}.png&zmax=17&zmin=0";
+	// QString baseXyzUrl = "type=xyz&url=http://47.94.145.6/map/lx/{z}/{x}/{y}.png&zmax=19&zmin=0";
+	QString baseXyzUrl = "type=xyz&url=http://172.31.100.34:38083/map/lx/{z}/{x}/{y}.png&zmax=17&zmin=0";
 	//QString baseXyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
 
 	QgsRasterLayer* baseXyzLayer = new QgsRasterLayer(baseXyzUrl, BASE_TILE_NAME, "wms");
@@ -101,8 +102,8 @@ int main(int argc, char* argv[]) {
 	qDebug() << "add base layer to project";
 
 	// create MAIN XYZ layer
-	QString urlString = "http://47.94.145.6/map/orthogonal/1847168269595754497-健康谷正射";
-	// QString urlString = "http://172.31.100.34:38083/map/orthogonal/1847168269595754497-健康谷正射";
+	// QString urlString = "http://47.94.145.6/map/orthogonal/1847168269595754497-健康谷正射";
+	QString urlString = "http://172.31.100.34:38083/map/orthogonal/1847168269595754497-健康谷正射";
 	QString encodedOrthogonalXyzUrl = "type=xyz&url=";
 	encodedOrthogonalXyzUrl.append(urlString);
 	encodedOrthogonalXyzUrl.append("/{z}/{x}/{y}");
@@ -117,8 +118,8 @@ int main(int argc, char* argv[]) {
 	qDebug() << "add orthogonal layer to project";
 
 	// 3D Scene
-	QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
-	// QString realistic3d_tile_url = "url=http://172.31.100.34:38083/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
+	// QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
+	QString realistic3d_tile_url = "url=http://172.31.100.34:38083/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
 	QgsTiledSceneLayer* tiled_scene_layer = new QgsTiledSceneLayer(realistic3d_tile_url, REAL3D_TILE_NAME, "cesiumtiles");
 	// tiled_scene_layer->setCrs(project->crs());
 	QgsTiledSceneLayer3DRenderer* qgs_tiled_scene_layer_3d_renderer = new QgsTiledSceneLayer3DRenderer();
@@ -389,6 +390,8 @@ int main(int argc, char* argv[]) {
 	qDebug() << "add 2d layout done";
 
 
+
+
 	qDebug() << "add 3d layout";
 	QString joined_3d_layout_name = QString(layout_type).append("-3D").append("-").append("A3");
 	QVector<QString> remove3DLayerNames = QVector<QString>();
@@ -399,8 +402,23 @@ int main(int argc, char* argv[]) {
 	Qgs3DMapCanvas* canvas3d = new Qgs3DMapCanvas();
 	qDebug() << "constructor 3d JwLayout3D";
 	JwLayout3D* jwLayout3d = new JwLayout3D(project, canvas, canvas3d, "test", imageSpec, save_qgis_project_path);
+
+	QgsOffscreen3DEngine* qgs_offscreen_3d_engine = new QgsOffscreen3DEngine();
+	qgs_offscreen_3d_engine->setRenderCaptureEnabled(true);
+	qDebug() << "construct the QgsOffscreen3DEngine";
+	Qgs3DMapSettings* qgs_3d_map_settings = jwLayout3d->get3DMapSettings(remove3DLayerNames, remove3DLayerPrefixes);
+	qDebug() << "construct the Qgs3DMapSettings";
+	Qgs3DMapScene* qgs_3d_map_scene = new Qgs3DMapScene(*qgs_3d_map_settings, qgs_offscreen_3d_engine);
+	qDebug() << "construct the Qgs3DMapScene";
+	QImage capture_scene_image = Qgs3DUtils::captureSceneImage(*qgs_offscreen_3d_engine, qgs_3d_map_scene);
+	qDebug() << "capture_scene_image size:" << capture_scene_image.size();
+	QString capture_scene_image_path = QString().append(save_qgis_project_path).append("/").append("capture_scene_image.png");
+	qDebug() << "capture_scene_image_path: " << capture_scene_image_path;
+	bool capture_image_status = capture_scene_image.save(capture_scene_image_path);
+	qDebug() << "save capture_scene_image: " << capture_image_status;
+
 	qDebug() << "JwLayout3D addPrintLayout";
-	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false, remove3DLayerNames, remove3DLayerPrefixes);
+	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false);
 	qDebug() << "add 3d layout done";
 
 	qDebug() << "验证布局是否存在";

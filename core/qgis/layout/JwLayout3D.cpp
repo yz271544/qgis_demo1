@@ -462,16 +462,10 @@ void JwLayout3D::init3DLayout(const QString &layoutName) {
     layout_manager->addLayout(layout);
 }
 
-
-void JwLayout3D::set3DMap(
-        const PaperSpecification &availablePaper,
-        int mapFrameWidth,
-        const QString &mapFrameColor,
-        bool isDoubleFrame,
-        const QVector<QString> &removeLayerNames,
-        const QVector<QString> &removeLayerPrefixes,
-        double mapRotation) {
-
+Qgs3DMapSettings* JwLayout3D::get3DMapSettings(
+const QVector<QString> &removeLayerNames,
+const QVector<QString> &removeLayerPrefixes
+) {
     QgsSettings settings;
     // 创建 3D 地图设置
     mapSettings3d = new Qgs3DMapSettings();
@@ -522,8 +516,16 @@ void JwLayout3D::set3DMap(
         mapSettings3d->setTransformContext( project->transformContext() );
     } );
     qDebug() << "connect project transform context changed";
+    mapSettings3d->setBackgroundColor(QColor("#ffffff"));
+    return mapSettings3d;
+}
 
-
+void JwLayout3D::set3DMap(
+        const PaperSpecification &availablePaper,
+        int mapFrameWidth,
+        const QString &mapFrameColor,
+        bool isDoubleFrame,
+        double mapRotation) {
     QDomImplementation DomImplementation;
     QDomDocumentType documentType = DomImplementation.createDocumentType(
         QStringLiteral("qgis"), QStringLiteral("http://mrcc.com/qgis.dtd"), QStringLiteral("SYSTEM")
@@ -610,7 +612,6 @@ void JwLayout3D::set3DMap(
     // 创建 3D 地图项
     //mapItem3d = QgsLayoutItem3DMap::create(layout);
     mapItem3d = new QgsLayoutItem3DMap(layout);
-    mapSettings3d->setBackgroundColor(QColor("#ffffff"));
     // qDebug() << "mapItem3d setIsTemporal";
     // mapItem3d->setIsTemporal(true);
     qDebug() << "mapItem3d setMapSettings";
@@ -781,8 +782,7 @@ QPair<double, double> JwLayout3D::getLegendDimensions(const QString &layoutName)
 
 void JwLayout3D::addPrintLayout(const QString &layoutType, const QString &layoutName,
                                 const QVariantMap &plottingWeb, const PaperSpecification &availablePaper,
-                                bool writeQpt, const QVector<QString> &removeLayerNames,
-                                const QVector<QString> &removeLayerPrefixes) {
+                                bool writeQpt) {
     // 初始化布局
     qDebug() << "初始化3d布局";
     init3DLayout(layoutName);
@@ -805,8 +805,7 @@ void JwLayout3D::addPrintLayout(const QString &layoutType, const QString &layout
 
     // 设置地图
     qInfo() << "Added 3D map to layout";
-    set3DMap(availablePaper, mapFrameWidth, mapFrameColor, mapDoubleFrame, removeLayerNames, removeLayerPrefixes,
-             mapRotation);
+    set3DMap(availablePaper, mapFrameWidth, mapFrameColor, mapDoubleFrame, mapRotation);
 
     // 设置标题
     if (layInfo.contains("title") && !layInfo["title"].toMap().isEmpty()) {

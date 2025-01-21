@@ -92,19 +92,26 @@ public:
     void addArrowBasedOnFrontendParams(QgsLayout* layout, const QList<QVariant>& position, double rotate);
 
     void init3DLayout(const QString& layoutName);
-    void set3DMap(const PaperSpecification& availablePaper, int mapFrameWidth = 1,
-                  const QString& mapFrameColor = "#000000", bool isDoubleFrame = false,
-                  const QVector<QString>& removeLayerNames = QVector<QString>(),
-                  const QVector<QString>& removeLayerPrefixes = QVector<QString>(),
-                  double mapRotation = 0.0);
+
+    Qgs3DMapSettings* get3DMapSettings(
+        const QVector<QString> &removeLayerNames,
+        const QVector<QString> &removeLayerPrefixes
+    );
+
+    void set3DMap(
+        const PaperSpecification& availablePaper,
+        int mapFrameWidth = 1,
+        const QString& mapFrameColor = "#000000",
+        bool isDoubleFrame = false,
+        double mapRotation = 0.0
+    );
 
 
     void addNorthArrow(const QVariantMap& northArrowPath);
 
     void addPrintLayout(const QString& layoutType, const QString& layoutName,
                         const QVariantMap& plottingWeb, const PaperSpecification& availablePaper,
-                        bool writeQpt = false, const QVector<QString>& removeLayerNames = QVector<QString>(),
-                        const QVector<QString>& removeLayerPrefixes = QVector<QString>());
+                        bool writeQpt = false);
 
     void loadQptTemplate(const QString& qptFilePath, const QString& layoutTemplateName);
     void updateLayoutExtent(const QString& layoutName);
