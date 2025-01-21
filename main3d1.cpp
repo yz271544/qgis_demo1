@@ -420,9 +420,9 @@ int main(int argc, char* argv[]) {
 	qDebug() << "save image path: " << capture_scene_image_path;
 	// 创建辅助对象并捕获图像
 	ImageCaptureHelper* helper = new ImageCaptureHelper(qgs_offscreen_3d_engine, qgs_3d_map_scene, capture_scene_image_path);
-	qDebug() << "start capture image";
+	qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " start capture image";
 	helper->captureImage();
-	qDebug() << "capture image done";
+	qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << "capture image done";
 
 	// QImage capture_scene_image = Qgs3DUtils::captureSceneImage(*qgs_offscreen_3d_engine, qgs_3d_map_scene);
 	// qDebug() << "capture_scene_image size:" << capture_scene_image.size();
