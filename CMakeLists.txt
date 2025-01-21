@@ -256,7 +256,8 @@ link_directories(${QGIS_PREFIX_PATH}/lib /usr/lib/x86_64-linux-gnu ${YAML_CPP_LI
 #        test_main.h)
 add_executable(qgis_demo1 main.cpp
         core/utils/ColorTransformUtil.cpp
-        core/utils/ColorTransformUtil.h)
+        core/utils/ColorTransformUtil.h
+        )
 add_executable(qgis_demo2
         main2.cpp
         core/utils/ColorTransformUtil.cpp
@@ -302,6 +303,8 @@ add_executable(qgis_demo3d1 main3d1.cpp
         core/utils/JsonUtil.h
         core/qgis/layout/JwLayout3D.cpp
         core/qgis/layout/JwLayout3D.h
+        core/qgis/d3/ImageCaptureHelper.cpp
+        core/qgis/d3/ImageCaptureHelper.h
 )
 
 add_executable(qgis_demo3d2 main3d2.cpp

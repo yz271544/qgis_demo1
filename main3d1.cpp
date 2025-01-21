@@ -89,8 +89,8 @@ int main(int argc, char* argv[]) {
 
 	// create XYZ base layer
 	// QString baseXyzUrl = "type=xyz&url=http://47.94.145.6/map/lx/{z}/{x}/{y}.png&zmax=19&zmin=0";
-	QString baseXyzUrl = "type=xyz&url=http://172.31.100.34:38083/map/lx/{z}/{x}/{y}.png&zmax=17&zmin=0";
-	//QString baseXyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
+	// QString baseXyzUrl = "type=xyz&url=http://172.31.100.34:38083/map/lx/{z}/{x}/{y}.png&zmax=17&zmin=0";
+	QString baseXyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
 
 	QgsRasterLayer* baseXyzLayer = new QgsRasterLayer(baseXyzUrl, BASE_TILE_NAME, "wms");
 	if (!baseXyzLayer->isValid()) {
@@ -102,8 +102,8 @@ int main(int argc, char* argv[]) {
 	qDebug() << "add base layer to project";
 
 	// create MAIN XYZ layer
-	// QString urlString = "http://47.94.145.6/map/orthogonal/1847168269595754497-健康谷正射";
-	QString urlString = "http://172.31.100.34:38083/map/orthogonal/1847168269595754497-健康谷正射";
+	QString urlString = "http://47.94.145.6/map/orthogonal/1847168269595754497-健康谷正射";
+	// QString urlString = "http://172.31.100.34:38083/map/orthogonal/1847168269595754497-健康谷正射";
 	QString encodedOrthogonalXyzUrl = "type=xyz&url=";
 	encodedOrthogonalXyzUrl.append(urlString);
 	encodedOrthogonalXyzUrl.append("/{z}/{x}/{y}");
@@ -118,8 +118,8 @@ int main(int argc, char* argv[]) {
 	qDebug() << "add orthogonal layer to project";
 
 	// 3D Scene
-	// QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
-	QString realistic3d_tile_url = "url=http://172.31.100.34:38083/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
+	QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
+	// QString realistic3d_tile_url = "url=http://172.31.100.34:38083/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
 	QgsTiledSceneLayer* tiled_scene_layer = new QgsTiledSceneLayer(realistic3d_tile_url, REAL3D_TILE_NAME, "cesiumtiles");
 	// tiled_scene_layer->setCrs(project->crs());
 	QgsTiledSceneLayer3DRenderer* qgs_tiled_scene_layer_3d_renderer = new QgsTiledSceneLayer3DRenderer();
@@ -404,7 +404,10 @@ int main(int argc, char* argv[]) {
 	JwLayout3D* jwLayout3d = new JwLayout3D(project, canvas, canvas3d, "test", imageSpec, save_qgis_project_path);
 
 	QgsOffscreen3DEngine* qgs_offscreen_3d_engine = new QgsOffscreen3DEngine();
+	qgs_offscreen_3d_engine->setSize(QSize( 4960, 3507 ));
+	qgs_offscreen_3d_engine->setFrustumCullingEnabled(true);
 	qgs_offscreen_3d_engine->setRenderCaptureEnabled(true);
+	qgs_offscreen_3d_engine->requestCaptureImage();
 	qDebug() << "construct the QgsOffscreen3DEngine";
 	Qgs3DMapSettings* qgs_3d_map_settings = jwLayout3d->get3DMapSettings(remove3DLayerNames, remove3DLayerPrefixes);
 	qDebug() << "construct the Qgs3DMapSettings";
