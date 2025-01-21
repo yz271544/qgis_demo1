@@ -18,6 +18,9 @@ public:
 
     void captureImage();
 
+signals:
+    void imageSaved();
+
 private slots:
     void onImageCaptured(const QImage& image)
     {

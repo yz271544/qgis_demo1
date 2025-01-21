@@ -4,6 +4,8 @@
 
 #include "ImageCaptureHelper.h"
 
+#include <QEventLoop>
+
 
 ImageCaptureHelper::ImageCaptureHelper(QgsOffscreen3DEngine* engine, Qgs3DMapScene* scene, const QString& savePath)
         : m_engine(engine), m_scene(scene), m_savePath(savePath)
@@ -16,4 +18,8 @@ void ImageCaptureHelper::captureImage()
 {
     // 请求捕获图像
     m_engine->requestCaptureImage();
+    // 使用事件循环等待图像捕获完成
+    QEventLoop loop;
+    connect(this, &ImageCaptureHelper::imageSaved, &loop, &QEventLoop::quit);
+    loop.exec();
 }
