@@ -52,6 +52,7 @@
 #include "core/qgis/layout/JwLayout3D.h"
 #include "core/utils/NodeToMap.h"
 #include "core/utils/JsonUtil.h"
+#include "core/qgis/d3/ImageCaptureHelper.h"
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -413,12 +414,22 @@ int main(int argc, char* argv[]) {
 	qDebug() << "construct the Qgs3DMapSettings";
 	Qgs3DMapScene* qgs_3d_map_scene = new Qgs3DMapScene(*qgs_3d_map_settings, qgs_offscreen_3d_engine);
 	qDebug() << "construct the Qgs3DMapScene";
-	QImage capture_scene_image = Qgs3DUtils::captureSceneImage(*qgs_offscreen_3d_engine, qgs_3d_map_scene);
-	qDebug() << "capture_scene_image size:" << capture_scene_image.size();
+
+	// 设置保存路径
 	QString capture_scene_image_path = QString().append(save_qgis_project_path).append("/").append("capture_scene_image.png");
-	qDebug() << "capture_scene_image_path: " << capture_scene_image_path;
-	bool capture_image_status = capture_scene_image.save(capture_scene_image_path);
-	qDebug() << "save capture_scene_image: " << capture_image_status;
+	qDebug() << "save image path: " << capture_scene_image_path;
+	// 创建辅助对象并捕获图像
+	ImageCaptureHelper* helper = new ImageCaptureHelper(qgs_offscreen_3d_engine, qgs_3d_map_scene, capture_scene_image_path);
+	qDebug() << "start capture image";
+	helper->captureImage();
+	qDebug() << "capture image done";
+
+	// QImage capture_scene_image = Qgs3DUtils::captureSceneImage(*qgs_offscreen_3d_engine, qgs_3d_map_scene);
+	// qDebug() << "capture_scene_image size:" << capture_scene_image.size();
+	// QString capture_scene_image_path = QString().append(save_qgis_project_path).append("/").append("capture_scene_image.png");
+	// qDebug() << "capture_scene_image_path: " << capture_scene_image_path;
+	// bool capture_image_status = capture_scene_image.save(capture_scene_image_path);
+	// qDebug() << "save capture_scene_image: " << capture_image_status;
 
 	qDebug() << "JwLayout3D addPrintLayout";
 	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false);

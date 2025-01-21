@@ -4,7 +4,9 @@
 
 #ifndef IMAGECAPTUREHELPER_H
 #define IMAGECAPTUREHELPER_H
-
+#include <qgs3dmapscene.h>
+#include <qgsoffscreen3dengine.h>
+#include <QObject>
 
 
 class ImageCaptureHelper : public QObject
@@ -12,18 +14,9 @@ class ImageCaptureHelper : public QObject
     Q_OBJECT
 
 public:
-    ImageCaptureHelper(QgsOffscreen3DEngine* engine, Qgs3DMapScene* scene, const QString& savePath)
-        : m_engine(engine), m_scene(scene), m_savePath(savePath)
-    {
-        // 连接 imageCaptured 信号
-        connect(m_engine, &QgsOffscreen3DEngine::imageCaptured, this, &ImageCaptureHelper::onImageCaptured);
-    }
+    ImageCaptureHelper(QgsOffscreen3DEngine* engine, Qgs3DMapScene* scene, const QString& savePath);
 
-    void captureImage()
-    {
-        // 请求捕获图像
-        m_engine->requestCaptureImage();
-    }
+    void captureImage();
 
 private slots:
     void onImageCaptured(const QImage& image)
