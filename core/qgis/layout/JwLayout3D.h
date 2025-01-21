@@ -57,13 +57,6 @@
 #include <qgs3dutils.h>
 #include <qgssettings.h>
 #include <qgsdirectionallightsettings.h>
-#ifdef ENABLE_APP
-#include <qobjectuniqueptr.h>
-#include <qgs3dmapcanvaswidget.h>
-#include <qgs3danimationwidget.h>
-#include <qgs3danimationsettings.h>
-#include <qgsdockablewidgethelper.h>
-#endif
 
 //#include <qgis/app/3d/qgs3dmapcanvaswidget.h>
 #include "JwLegend.h"

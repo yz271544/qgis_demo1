@@ -4,9 +4,6 @@
 
 #include "JwLayout.h"
 
-
-
-
 // 构造函数
 JwLayout::JwLayout(QgsProject* project, QgsMapCanvas* canvas, const QString& sceneName,
                    const QVariantMap& imageSpec, const QString& projectDir)

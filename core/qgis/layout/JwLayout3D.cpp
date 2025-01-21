@@ -516,22 +516,7 @@ void JwLayout3D::set3DMap(
     } );
     qDebug() << "connect project transform context changed";
 
-#ifdef ENABLE_APP
-    Qgs3DMapCanvasWidget *canvasWidget = new Qgs3DMapCanvasWidget("MapView3D1", false);
-    qDebug() << "create 3D map canvas widget";
-    canvasWidget->setMapSettings(mapSettings3d);
-    qDebug() << "set map settings:" << canvasWidget->mapCanvas3D()->mapSettings();
-    const QgsRectangle canvasExtent = Qgs3DUtils::tryReprojectExtent2D( canvas2d->extent(), canvas2d->mapSettings().destinationCrs(), mapSettings3d->crs(), project->transformContext() );
-    float dist = static_cast<float>(std::max(canvasExtent.width(), canvasExtent.height()));
-    canvasWidget->mapCanvas3D()->setViewFromTop(canvasExtent.center(), dist, static_cast<float>(canvas2d->rotation()));
-    qDebug() << "set view from top:" << canvasExtent.center() << dist << canvas2d->rotation();
 
-    const Qgis::VerticalAxisInversion axisInversion = settings.enumValue( QStringLiteral( "map3d/axisInversion" ), Qgis::VerticalAxisInversion::WhenDragging, QgsSettings::App );
-    if (canvasWidget->mapCanvas3D()->cameraController()) {
-        canvasWidget->mapCanvas3D()->cameraController()->setVerticalAxisInversion( axisInversion );
-    }
-    qDebug() << "set vertical axis inversion:" << axisInversion;
-#endif
     QDomImplementation DomImplementation;
     QDomDocumentType documentType = DomImplementation.createDocumentType(
         QStringLiteral("qgis"), QStringLiteral("http://mrcc.com/qgis.dtd"), QStringLiteral("SYSTEM")
@@ -543,17 +528,6 @@ void JwLayout3D::set3DMap(
     QDomElement elem3DMap = doc.createElement(QStringLiteral("view"));
     elem3DMap.setAttribute(QStringLiteral("isOpen"), 1);
     qDebug() << "create QDomElement:" << elem3DMap.tagName();
-#ifdef ENABLE_APP
-    write3DMapViewSettings(canvasWidget, doc, elem3DMap);
-    qDebug() << "write 3D map view settings";
-
-    QgsMapViewsManager * prjViewsManager = project->viewsManager();
-    prjViewsManager->register3DViewSettings("MapView3D1", elem3DMap);
-    qDebug() << "register 3D view settings";
-    prjViewsManager->set3DViewInitiallyVisible("MapView3D1", true);
-    qDebug() << "set 3D view initially visible";
-    canvas3d = canvasWidget->mapCanvas3D();
-#endif
 
     //mapSettings3d->setExtent(fullExtent);
 
@@ -911,43 +885,3 @@ void JwLayout3D::addPrintLayout(const QString &layoutType, const QString &layout
         qDebug() << "Saved layout as QPT template:" << qptFilePath;
     }
 }
-
-#ifdef ENABLE_APP
-void JwLayout3D::create3DMapCanvasWidget(QString nameOf3dView) {
-    project->setDirty(true);
-    Qgs3DMapCanvasWidget *widget = new Qgs3DMapCanvasWidget(nameOf3dView, false);
-
-    QDomImplementation DomImplementation;
-    QDomDocumentType documentType =
-            DomImplementation.createDocumentType(
-                    QStringLiteral("qgis"), QStringLiteral("http://mrcc.com/qgis.dtd"), QStringLiteral("SYSTEM"));
-    QDomDocument doc(documentType);
-    QDomElement elem3DMap = doc.createElement(QStringLiteral("view"));
-    elem3DMap.setAttribute(QStringLiteral("isOpen"), 1);
-    write3DMapViewSettings(widget, doc, elem3DMap);
-
-    // QgsMapViewsManager* qgs_map_views_manager = project->viewsManager();
-    // qgs_map_views_manager->register3DViewSettings( layoutName, mapSettings3d );
-    // qgs_map_views_manager->set3DViewInitiallyVisible(layoutName, true);
-    // QgsMap3DViewSettings* qgs_map_3d_view_settings = qgs_map_views_manager->view3DSettings(joined_3d_layout_name);
-    // project->viewsManager()->register3DViewSettings( viewName, elem3DMap );
-    // project->viewsManager()->set3DViewInitiallyVisible( viewName, false );
-}
-
-void JwLayout3D::write3DMapViewSettings(Qgs3DMapCanvasWidget *widget, QDomDocument &doc, QDomElement &elem3DMap) {
-    QgsReadWriteContext readWriteContext;
-    readWriteContext.setPathResolver(QgsProject::instance()->pathResolver());
-    elem3DMap.setAttribute(QStringLiteral("name"), widget->canvasName());
-    QDomElement elem3DMapSettings = widget->mapCanvas3D()->mapSettings()->writeXml(doc, readWriteContext);
-    elem3DMap.appendChild(elem3DMapSettings);
-    QDomElement elemCamera = widget->mapCanvas3D()->cameraController()->writeXml(doc);
-    elem3DMap.appendChild(elemCamera);
-    Qgs3DAnimationWidget* animation3dWidget = widget->animationWidget();
-    Qgs3DAnimationSettings animationSettings = animation3dWidget->animation();
-    QDomElement elemAnimation = animationSettings.writeXml(doc);
-    elemAnimation.setAttribute(QStringLiteral("widget-visible"), !widget->animationWidget()->isHidden() ? 1 : 0);
-    elem3DMap.appendChild(elemAnimation);
-
-    widget->dockableWidgetHelper()->writeXml(elem3DMap);
-}
-#endif

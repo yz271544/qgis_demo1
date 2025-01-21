@@ -58,6 +58,7 @@
 
 
 int main(int argc, char* argv[]) {
+	qDebug() << "qgis printer server";
 #if defined(_WIN32)
 	// 设置控制台输出为UTF - 8
 	SetConsoleOutputCP(CP_UTF8);
