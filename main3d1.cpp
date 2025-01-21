@@ -47,6 +47,8 @@
 
 #include <yaml-cpp/parser.h>
 #include <yaml-cpp/yaml.h>
+#include <QOffscreenSurface>
+#include <QOpenGLContext>
 
 #include "core/qgis/layout/JwLayout.h"
 #include "core/qgis/layout/JwLayout3D.h"
@@ -76,6 +78,31 @@ int main(int argc, char* argv[]) {
 	QgsApplication::init();
 	QgsApplication::initQgis();
 	Qgs3D::initialize();
+
+    // 设置 OpenGL 表面格式
+    QSurfaceFormat format;
+    format.setVersion(4, 1);  // 设置 OpenGL 版本
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    QSurfaceFormat::setDefaultFormat(format);
+
+    // 创建离屏表面
+    QOffscreenSurface surface;
+    surface.setFormat(format);
+    surface.create();
+
+    // 创建 OpenGL 上下文
+    QOpenGLContext context;
+    context.setFormat(format);
+    if (!context.create()) {
+        qWarning() << "Failed to create OpenGL context";
+        return -1;
+    }
+
+    // 使上下文成为当前上下文
+    if (!context.makeCurrent(&surface)) {
+        qWarning() << "Failed to make OpenGL context current";
+        return -1;
+    }
 
 	qDebug() << "Plugin path: " << QgsApplication::pluginPath();
 	QString save_qgis_project_path = QString(QGIS_PROJECT_PATH);
@@ -400,7 +427,9 @@ int main(int argc, char* argv[]) {
 	QVector<QString> remove3DLayerPrefixes = QVector<QString>();
 	remove3DLayerPrefixes.append(MAIN_TILE_NAME);
 	qDebug() << "constructor 3d canvas";
+    // 初始化 Qgs3DMapCanvas
 	Qgs3DMapCanvas* canvas3d = new Qgs3DMapCanvas();
+    canvas3d->show(); // 即使是无头模式，也需要调用 show() 来初始化 OpenGL 上下文
 	qDebug() << "constructor 3d JwLayout3D";
 	JwLayout3D* jwLayout3d = new JwLayout3D(project, canvas, canvas3d, "test", imageSpec, save_qgis_project_path);
 
@@ -417,12 +446,12 @@ int main(int argc, char* argv[]) {
     engine.setRootEntity( scene );
 	qDebug() << "construct the Qgs3DMapScene";
 
-//    QgsCameraController* canvas3dCameraController = canvas3d->cameraController();
-//    QgsVector3D canvasPoint3d = canvas3dCameraController->lookingAtPoint();
-//    qDebug() << "canvas3d camera lookingAtPoint: x:" << canvasPoint3d.x() << " y:" << canvasPoint3d.y() << " z:" << canvasPoint3d.z();
-//    QgsCameraPose canvasCamerePose = canvas3dCameraController->cameraPose();
-//    qDebug() << "canvas3d camera cameraPose: x:" << canvasCamerePose.centerPoint().x() << " y:" << canvasCamerePose.centerPoint().y() << " z:" << canvasCamerePose.centerPoint().z()
-//             << " pitchAngle:" << canvasCamerePose.pitchAngle() << " headingAngle:" << canvasCamerePose.headingAngle() << " distanceFromCenterPoint:" << canvasCamerePose.distanceFromCenterPoint();
+    QgsCameraController* canvas3dCameraController = canvas3d->cameraController();
+    QgsVector3D canvasPoint3d = canvas3dCameraController->lookingAtPoint();
+    qDebug() << "canvas3d camera lookingAtPoint: x:" << canvasPoint3d.x() << " y:" << canvasPoint3d.y() << " z:" << canvasPoint3d.z();
+    QgsCameraPose canvasCamerePose = canvas3dCameraController->cameraPose();
+    qDebug() << "canvas3d camera cameraPose: x:" << canvasCamerePose.centerPoint().x() << " y:" << canvasCamerePose.centerPoint().y() << " z:" << canvasCamerePose.centerPoint().z()
+             << " pitchAngle:" << canvasCamerePose.pitchAngle() << " headingAngle:" << canvasCamerePose.headingAngle() << " distanceFromCenterPoint:" << canvasCamerePose.distanceFromCenterPoint();
 
     QgsCameraController* cameraController = scene->cameraController();
     QgsVector3D point3d = cameraController->lookingAtPoint();
@@ -563,6 +592,10 @@ int main(int argc, char* argv[]) {
 //	bool delete_file_status = file.remove();
 //	qDebug() << "delete file: " << delete_file_test << " status:" << delete_file_status;
 //#endif
+
+    // 释放上下文
+    context.doneCurrent();
+
 	//return app.exec();
 	return 0;
 }

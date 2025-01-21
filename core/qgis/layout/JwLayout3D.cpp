@@ -550,13 +550,14 @@ void JwLayout3D::set3DCanvas(QgsRectangle fullExtent) {
     qDebug() << "extent scale " << 1.3 << " center x: " << center.x() << " y:" << center.y();
     const float dist = static_cast< float >( std::max(extent.width(), extent.height()));
     qDebug() << "dist: " << dist;
+
     /*
      * QOpenGLFunctions created with non-current context
 ASSERT: "QOpenGLFunctions::isInitialized(d_ptr)" in file /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h, line 858
      * */
     canvas3d->setMapSettings(mapSettings3d);
     //qDebug() << "canvas3d setViewFromTop";
-    //canvas3d->setViewFromTop(extent.center(), dist * 2, 0);
+    canvas3d->setViewFromTop(extent.center(), dist * 2, 0);
 //    QObject::connect( canvas3d->scene(), &Qgs3DMapScene::totalPendingJobsCountChanged, canvas3d, [canvas3d]
 //    {
 //        qDebug() << "pending jobs:" << canvas3d->scene()->totalPendingJobsCount();
