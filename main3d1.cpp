@@ -422,7 +422,7 @@ int main(int argc, char* argv[]) {
 	ImageCaptureHelper* helper = new ImageCaptureHelper(qgs_offscreen_3d_engine, qgs_3d_map_scene, capture_scene_image_path);
 	qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " start capture image";
 	helper->captureImage();
-	qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << "capture image done";
+	qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " capture image done";
 
 	// QImage capture_scene_image = Qgs3DUtils::captureSceneImage(*qgs_offscreen_3d_engine, qgs_3d_map_scene);
 	// qDebug() << "capture_scene_image size:" << capture_scene_image.size();
