@@ -98,6 +98,8 @@ public:
         const QVector<QString> &removeLayerPrefixes
     );
 
+    void set3DCanvas(QgsRectangle fullExtent);
+
     void set3DMap(
         const PaperSpecification& availablePaper,
         int mapFrameWidth = 1,

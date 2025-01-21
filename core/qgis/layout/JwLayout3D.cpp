@@ -472,6 +472,18 @@ const QVector<QString> &removeLayerPrefixes
     mapSettings3d->setCrs(project->crs());
     // 过滤图层
     filterMapLayers(removeLayerNames, removeLayerPrefixes, mapSettings3d);
+
+    QgsFlatTerrainGenerator *flatTerrain = new QgsFlatTerrainGenerator;
+#if _QGIS_VERSION_INT >= 34100
+    flatTerrain->setCrs( mapSettings3d->crs(), project->transformContext() );
+#else
+    flatTerrain->setCrs( mapSettings3d->crs() );
+#endif
+    mapSettings3d->setTerrainGenerator( flatTerrain );
+    mapSettings3d->setTerrainElevationOffset( project->elevationProperties()->terrainProvider()->offset() );
+    /*QgsAbstractTerrainSettings terrainSettings;
+    terrainSettings.setElevationOffset(project->elevationProperties()->terrainProvider()->offset());
+    mapSettings3d->setTerrainSettings(terrainSettings);*/
     // mapSettings3d->setBackgroundColor(QColor("#ffffff"));
     qDebug() << "filtered map layers";
     const QgsReferencedRectangle projectExtent = project->viewSettings()->fullExtent();
@@ -505,9 +517,17 @@ const QVector<QString> &removeLayerPrefixes
     mapSettings3d->configureTerrainFromProject( QgsProject::instance()->elevationProperties(), fullExtent );
     qDebug() << "configure terrain from project:" << mapSettings3d->terrainGenerator();
     // new scenes default to a single directional light
-    mapSettings3d->setLightSources( QList<QgsLightSource *>() << new QgsDirectionalLightSettings() );
+    QgsPointLightSettings defaultPointLight;
+    QgsRectangle extent = fullExtent;
+    QgsPointXY center = extent.center();
+    defaultPointLight.setPosition( QgsVector3D( center.x(), center.y(), 1000 ) );
+    defaultPointLight.setConstantAttenuation( 0 );
+    mapSettings3d->setLightSources({defaultPointLight.clone()});
+//    QgsDirectionalLightSettings* directionalLightSettings = new QgsDirectionalLightSettings();
+//    mapSettings3d->setLightSources( QList<QgsLightSource *>() << directionalLightSettings );
     qDebug() << "set light sources:" << mapSettings3d->lightSources();
-    mapSettings3d->setOutputDpi( QGuiApplication::primaryScreen()->logicalDotsPerInch() );
+//    mapSettings3d->setOutputDpi( QGuiApplication::primaryScreen()->logicalDotsPerInch() );
+    mapSettings3d->setOutputDpi(300);
     qDebug() << "set output dpi:" << mapSettings3d->outputDpi();
     mapSettings3d->setRendererUsage( Qgis::RendererUsage::View );
     qDebug() << "set renderer usage:" << mapSettings3d->rendererUsage();
@@ -517,7 +537,32 @@ const QVector<QString> &removeLayerPrefixes
     } );
     qDebug() << "connect project transform context changed";
     mapSettings3d->setBackgroundColor(QColor("#ffffff"));
+
+    set3DCanvas(fullExtent);
+
     return mapSettings3d;
+}
+
+void JwLayout3D::set3DCanvas(QgsRectangle fullExtent) {
+    QgsRectangle extent = fullExtent;
+    QgsPointXY center = extent.center();
+    extent.scale(1.3);
+    qDebug() << "extent scale " << 1.3 << " center x: " << center.x() << " y:" << center.y();
+    const float dist = static_cast< float >( std::max(extent.width(), extent.height()));
+    qDebug() << "dist: " << dist;
+    /*
+     * QOpenGLFunctions created with non-current context
+ASSERT: "QOpenGLFunctions::isInitialized(d_ptr)" in file /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h, line 858
+     * */
+    canvas3d->setMapSettings(mapSettings3d);
+    //qDebug() << "canvas3d setViewFromTop";
+    //canvas3d->setViewFromTop(extent.center(), dist * 2, 0);
+//    QObject::connect( canvas3d->scene(), &Qgs3DMapScene::totalPendingJobsCountChanged, canvas3d, [canvas3d]
+//    {
+//        qDebug() << "pending jobs:" << canvas3d->scene()->totalPendingJobsCount();
+//    } );
+
+    //qDebug() << "pending jobs:" << canvas3d->scene()->totalPendingJobsCount();
 }
 
 void JwLayout3D::set3DMap(
