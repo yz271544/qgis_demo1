@@ -443,16 +443,23 @@ void JwLayout3D::addArrowBasedOnFrontendParams(QgsLayout *layout, const QList<QV
 }
 
 void JwLayout3D::init3DLayout(const QString &layoutName) {
-    layout = new QgsLayout(project);
-    // layout->setName(layoutName);
-    qDebug() << "layout setObjectName" << layoutName;
-    layout->setObjectName(layoutName);
-    layout->setUnits(Qgis::LayoutUnit::Millimeters);
-    qDebug() << "initializeDefaults";
-    layout->initializeDefaults();
-    qDebug() << "initializeDefaults done";
+    // layout = new QgsLayout(project);
+    // // layout->setName(layoutName);
+    // qDebug() << "layout setObjectName" << layoutName;
+    // layout->setObjectName(layoutName);
+    // layout->setUnits(Qgis::LayoutUnit::Millimeters);
+    // qDebug() << "initializeDefaults";
+    // layout->initializeDefaults();
+    // qDebug() << "initializeDefaults done";
     // QgsLayoutManager* layout_manager = project->layoutManager();
     // layout_manager->addLayout(layout);
+
+    layout = new QgsPrintLayout(project);
+    layout->setName(layoutName);
+    layout->setUnits(Qgis::LayoutUnit::Millimeters);
+    layout->initializeDefaults();
+    QgsLayoutManager* layout_manager = project->layoutManager();
+    layout_manager->addLayout(layout);
 }
 
 

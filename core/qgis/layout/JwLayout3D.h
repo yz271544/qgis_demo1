@@ -122,7 +122,8 @@ private:
     Qgs3DMapCanvas* canvas3d;
     QString sceneName;
     JwLegend* jw_legend;
-    QgsLayout* layout;
+    // QgsLayout* layout;
+    QgsPrintLayout* layout;
     QVariantMap imageSpec;
     QgsLayoutItem3DMap* mapItem3d;
     Qgs3DMapSettings* mapSettings3d;
