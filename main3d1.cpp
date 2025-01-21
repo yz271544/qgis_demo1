@@ -9,7 +9,7 @@
 #include <QIODevice>
 
 #include <complex>
-#include <execution>
+// #include <execution>
 #include <QCoreApplication>
 #include <QTextCodec>
 #include <QUrl>
@@ -67,6 +67,7 @@ int main(int argc, char* argv[]) {
 
 	// init QGIS app
 	QgsApplication app(argc, argv, true);
+	qDebug() << "QGIS_PREFIX_PATH: " << QGIS_PREFIX_PATH;
 	QgsApplication::setPrefixPath(QGIS_PREFIX_PATH, true);
 	//QgsApplication::setPrefixPath("/usr", true);
 	QgsApplication::init();

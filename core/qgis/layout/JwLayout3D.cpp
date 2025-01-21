@@ -2,7 +2,9 @@
 // Created by Lyndon on 2025/1/9.
 //
 
+#ifdef ENABLE_APP
 #include <qgs3dmapcanvaswidget.h>
+#endif
 #include "JwLayout3D.h"
 
 
@@ -513,6 +515,8 @@ void JwLayout3D::set3DMap(
         mapSettings3d->setTransformContext( project->transformContext() );
     } );
     qDebug() << "connect project transform context changed";
+
+#ifdef ENABLE_APP
     Qgs3DMapCanvasWidget *canvasWidget = new Qgs3DMapCanvasWidget("MapView3D1", false);
     qDebug() << "create 3D map canvas widget";
     canvasWidget->setMapSettings(mapSettings3d);
@@ -527,7 +531,7 @@ void JwLayout3D::set3DMap(
         canvasWidget->mapCanvas3D()->cameraController()->setVerticalAxisInversion( axisInversion );
     }
     qDebug() << "set vertical axis inversion:" << axisInversion;
-
+#endif
     QDomImplementation DomImplementation;
     QDomDocumentType documentType = DomImplementation.createDocumentType(
         QStringLiteral("qgis"), QStringLiteral("http://mrcc.com/qgis.dtd"), QStringLiteral("SYSTEM")
@@ -539,7 +543,7 @@ void JwLayout3D::set3DMap(
     QDomElement elem3DMap = doc.createElement(QStringLiteral("view"));
     elem3DMap.setAttribute(QStringLiteral("isOpen"), 1);
     qDebug() << "create QDomElement:" << elem3DMap.tagName();
-
+#ifdef ENABLE_APP
     write3DMapViewSettings(canvasWidget, doc, elem3DMap);
     qDebug() << "write 3D map view settings";
 
@@ -549,7 +553,7 @@ void JwLayout3D::set3DMap(
     prjViewsManager->set3DViewInitiallyVisible("MapView3D1", true);
     qDebug() << "set 3D view initially visible";
     canvas3d = canvasWidget->mapCanvas3D();
-
+#endif
 
     //mapSettings3d->setExtent(fullExtent);
 

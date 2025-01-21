@@ -19,13 +19,22 @@ if (WIN32)
         # Ensure consistent runtime library settings
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
     endif()
     message("Win32 Searching for QGIS in $ENV{QGISPROGRAMFILES}/qgis")
     # 设置QGIS库的路径
     set(QGIS_PREFIX_PATH $ENV{QGISPROGRAMFILES}/qgis)
+    message("QGIS_PREFIX_PATH: ${QGIS_PREFIX_PATH}")
     set(QGIS_DIR $ENV{QGISPROGRAMFILES}/qgis)
+    message("QGIS_DIR: ${QGIS_DIR}")
     set(QGIS_INCLUDE_DIR ${QGIS_DIR}/include)
+    message("QGIS_INCLUDE_DIR: ${QGIS_INCLUDE_DIR}")
     set(QGIS_LIB_PATH ${QGIS_DIR}/lib)
+    message("QGIS_LIB_PATH: ${QGIS_LIB_PATH}")
+    set(QT5_BIN_DIR "D:/iProject/cpath/OSGeo4W/apps/Qt5/bin")
+    set(ENV{PATH} "$ENV{PATH};${QT5_BIN_DIR}")
     set(QT5_CMAKE_DIR D:/iProject/cpath/OSGeo4W/apps/Qt5/lib/cmake/Qt5)
     message("QT5_CMAKE_DIR: ${QT5_CMAKE_DIR}")
     set(QT5_DIR D:/iProject/cpath/OSGeo4W/apps/Qt5/lib)
@@ -70,6 +79,7 @@ if (WIN32)
     set(YAML_CPP_PATH "D:/iProject/cpath/OSGeo4W/apps/yaml-cpp")
 #    find_package(yaml-cpp REQUIRED PATHS YAML_CPP_PATH)
 
+    message("CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         find_path(YAML_CPP_INCLUDE_DIR
                 NAMES
@@ -238,21 +248,25 @@ message("Qt5Xml_INCLUDE_DIRS: ${Qt5Xml_INCLUDE_DIRS}")
 include_directories(${Qt5Xml_INCLUDE_DIRS})
 message("Qt5Svg_INCLUDE_DIRS: ${Qt5Svg_INCLUDE_DIRS}")
 include_directories(${Qt5Svg_INCLUDE_DIRS})
+
+find_path(Qt53DRender_INCLUDE_DIRS
+    NAMES qt3drender_global.h
+    HINTS ${CMAKE_PREFIX_PATH}/include/Qt3DRender
+)
 message("Qt53DRender_INCLUDE_DIRS: ${Qt53DRender_INCLUDE_DIRS}")
 include_directories(${Qt53DRender_INCLUDE_DIRS})
 
+find_library(Qt53DRender_LIBRARY
+    NAMES Qt53DRender
+    HINTS ${CMAKE_PREFIX_PATH}/lib
+)
+
+message("Qt53DRender_LIBRARY: ${Qt53DRender_LIBRARY}")
 
 message("GDAL_INCLUDE_DIR: ${GDAL_INCLUDE_DIR}")
 include_directories(${GDAL_INCLUDE_DIR})
 
 include_directories(${YAML_CPP_INCLUDE_DIR} ${YAML_CPP_NODE_INCLUDE_DIR} ${YAML_CPP_CONTRIB_INCLUDE_DIR})
-
-
-if (WIN32)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
-else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-endif()
 
 # Add library directories
 link_directories(${QGIS_PREFIX_PATH}/lib /usr/lib/x86_64-linux-gnu ${YAML_CPP_LIBRARIES} ${YAML_CPP_NODE_DETAIL_INCLUDE_DIR})
@@ -371,8 +385,8 @@ target_link_libraries(qgis_demo3d0 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRA
 if($ENV{ENABLE_APP})
     target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} ${QGIS_APP_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Svg Qt5::3DRender Qt5::Test ${GDAL_LIBRARY} ${YAML_CPP_LIBRARIES})
 else()
-    target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Svg Qt5::Test ${GDAL_LIBRARY} ${YAML_CPP_LIBRARIES})
-    endif()
+    target_link_libraries(qgis_demo3d1 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Svg Qt5::Test ${Qt53DRender_LIBRARY} ${GDAL_LIBRARY} ${YAML_CPP_LIBRARIES})
+endif()
 target_link_libraries(qgis_demo3d2 PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Svg Qt5::Test ${GDAL_LIBRARY} ${YAML_CPP_LIBRARIES})
 target_link_libraries(test_main PRIVATE ${QGIS_CORE_LIBRARY} ${QGIS_GUI_LIBRARY} ${QGIS_3D_LIBRARY} Qt5::Core Qt5::Gui Qt5::Qml Qt5::Quick Qt5::Widgets Qt5::Xml Qt5::Test ${GDAL_LIBRARY})
 
