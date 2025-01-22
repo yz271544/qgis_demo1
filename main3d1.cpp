@@ -37,6 +37,11 @@
 #include <qgsoffscreen3dengine.h>
 #include <qgs3dutils.h>
 
+#include <yaml-cpp/parser.h>
+#include <yaml-cpp/yaml.h>
+#include <QOffscreenSurface>
+#include <QOpenGLContext>
+
 #include "config.h"
 #include "core/qgis/payload/InputPoint.h"
 #include "core/utils/QgsUtil.h"
@@ -45,10 +50,6 @@
 #include "core/qgis/style/StylePoint.h"
 #include "core/utils/FileUtil.h"
 
-#include <yaml-cpp/parser.h>
-#include <yaml-cpp/yaml.h>
-#include <QOffscreenSurface>
-#include <QOpenGLContext>
 
 #include "core/qgis/layout/JwLayout.h"
 #include "core/qgis/layout/JwLayout3D.h"
