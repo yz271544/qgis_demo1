@@ -449,7 +449,7 @@ int main(int argc, char* argv[]) {
     QgsCameraController* cameraController = scene->cameraController();
     QgsVector3D centerPoint = QgsVector3D(extent.center().x(), extent.center().y(), 0); // 设置场景中心点
     float distance = extent.width() * 1.5; // 根据场景范围调整相机距离
-    cameraController->setLookingAtPoint(centerPoint, distance, 0, 0);
+    cameraController->setLookingAtPoint(centerPoint, distance, 45, 30);
     QgsCameraPose cameraPost;
     cameraPost.setCenterPoint(centerPoint);
     cameraPost.setDistanceFromCenterPoint(distance);
@@ -468,7 +468,7 @@ int main(int argc, char* argv[]) {
     << " headingAngle:" << camerePose.headingAngle()
     << " distanceFromCenterPoint:" << camerePose.distanceFromCenterPoint();
 
-    canvas3dCameraController->setLookingAtPoint(centerPoint, distance, 0, 0);
+    canvas3dCameraController->setLookingAtPoint(centerPoint, distance, 45, 30);
     canvas3dCameraController->setCameraPose(camerePose);
     QgsVector3D canvasPoint3d = canvas3dCameraController->lookingAtPoint();
     qDebug() << "canvas3d camera lookingAtPoint: x:" << canvasPoint3d.x() << " y:" << canvasPoint3d.y() << " z:" << canvasPoint3d.z();
@@ -486,20 +486,20 @@ int main(int argc, char* argv[]) {
 
     Qgs3DUtils::captureSceneImage( engine, scene );
 
-    QImage img = Qgs3DUtils::captureSceneImage( engine, scene );
-    bool capture_image_status = img.save( capture_scene_image_path );
-    qDebug() << "save capture_scene_image: " << capture_image_status;
-
+//    QImage img = Qgs3DUtils::captureSceneImage( engine, scene );
+//    bool capture_image_status = img.save( capture_scene_image_path );
+//    qDebug() << "save capture_scene_image: " << capture_image_status;
 
     // 等待场景渲染完成
-//    QObject::connect(scene, &Qgs3DMapScene::sceneStateChanged, [scene, &engine, capture_scene_image_path]() {
-//        if (scene->sceneState() == Qgs3DMapScene::Ready) {
-//            qDebug() << "Scene is ready, capturing image...";
-//            QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
-//            bool capture_image_status = img.save(capture_scene_image_path);
-//            qDebug() << "Save capture_scene_image: " << capture_image_status;
-//        }
-//    });
+    QObject::connect(scene, &Qgs3DMapScene::sceneStateChanged, [scene, &engine, capture_scene_image_path]() {
+        if (scene->sceneState() == Qgs3DMapScene::Ready) {
+            qDebug() << "Scene is ready, capturing image...";
+            QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
+            bool capture_image_status = img.save(capture_scene_image_path);
+            qDebug() << "Save capture_scene_image: " << capture_image_status;
+        }
+    });
+
 
 
 
