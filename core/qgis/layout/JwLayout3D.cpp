@@ -937,3 +937,21 @@ void JwLayout3D::addPrintLayout(const QString &layoutType, const QString &layout
         qDebug() << "Saved layout as QPT template:" << qptFilePath;
     }
 }
+
+void JwLayout3D::exportLayoutToImage(const QString &outputFilePath) {
+    // 创建布局导出器
+    QgsLayoutExporter exporter(layout);
+
+    // 设置导出选项
+    QgsLayoutExporter::ImageExportSettings settings;
+    settings.dpi = 300; // 设置DPI
+
+    // 导出为PNG图片
+    QgsLayoutExporter::ExportResult result = exporter.exportToImage(outputFilePath, settings);
+
+    if (result == QgsLayoutExporter::Success) {
+        qDebug() << "Layout exported successfully to:" << outputFilePath;
+    } else {
+        qWarning() << "Failed to export layout to:" << outputFilePath;
+    }
+}
