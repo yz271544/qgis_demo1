@@ -56,7 +56,7 @@ if (WIN32)
     set(HAS_KDE_QT5_PDF_TRANSFORM_FIX FALSE CACHE BOOL "Using KDE's Qt 5.15 fork with the PDF brush transform fix")
     set(HAS_KDE_QT5_SMALL_CAPS_FIX FALSE CACHE BOOL "Using KDE's Qt 5.15 fork with the QFont::SmallCaps fix")
     set(HAS_KDE_QT5_FONT_STRETCH_FIX FALSE CACHE BOOL "Using KDE's Qt 5.15 fork with the QFont stretch fix")
-    find_package(Qt5 COMPONENTS Core Gui Qml Quick Widgets Xml Svg Multimedia Test REQUIRED)
+    find_package(Qt5 COMPONENTS Core Gui Qml Quick Widgets Xml Svg Multimedia Test 3DCore PrintSupport REQUIRED)
     find_package(Qt5Keychain CONFIG REQUIRED)
 
     find_path(GDAL_INCLUDE_DIR NAMES gdal.h ogr_api.h gdalwarper.h cpl_conv.h cpl_string.h HINTS $ENV{QGISPROGRAMFILES}/gdal-dev/include)
