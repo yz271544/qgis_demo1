@@ -538,6 +538,7 @@ const QVector<QString> &removeLayerPrefixes
     qDebug() << "connect project transform context changed";
     mapSettings3d->setBackgroundColor(QColor("#ffffff"));
 
+    mapSettings3d->setExtent(fullExtent);
     set3DCanvas(fullExtent);
 
     return mapSettings3d;
