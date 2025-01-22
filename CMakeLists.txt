@@ -313,6 +313,8 @@ add_executable(qgis_demo3d1 main3d1.cpp
         core/qgis/layout/JwLayout3D.h
         core/qgis/d3/ImageCaptureHelper.cpp
         core/qgis/d3/ImageCaptureHelper.h
+        core/qgis/d3/CameraUtil.cpp
+        core/qgis/d3/CameraUtil.h
 )
 
 add_executable(qgis_demo3d2 main3d2.cpp

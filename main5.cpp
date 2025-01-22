@@ -1,4 +1,4 @@
-//
+﻿//
 // Created by etl on 1/22/25.
 //
 #if _MSC_VER >= 1600
@@ -52,11 +52,13 @@
 #include <yaml-cpp/yaml.h>
 
 
-
 int main(int argc, char *argv[])
 {
+    const char* QGIS_PREFIX_PATH = "/lyndon/iProject/cpath/QGIS/output";
     // 初始化QGIS应用（无头模式）
     QgsApplication app(argc, argv, true);
+    qDebug() << "QGIS_PREFIX_PATH: " << QGIS_PREFIX_PATH;
+    QgsApplication::setPrefixPath(QGIS_PREFIX_PATH, true);
     QgsApplication::init();
     QgsApplication::initQgis();
 
@@ -87,10 +89,14 @@ int main(int argc, char *argv[])
     QString crs = "EPSG:3857";
     QgsCoordinateReferenceSystem qgscrs;
     qgscrs.createFromString(crs);
+    if (!qgscrs.isValid()) {
+        qWarning() << "Invalid CRS: EPSG:3857";
+        return -1;
+    }
     project->setCrs(qgscrs);
 
     // 加载3D数据图层
-    QgsVectorLayer* layer = new QgsVectorLayer("/lyndon/iProject/cpath/qgis_demo1/common/input/dem/太原/太原市DEM.tif", "3D Layer", "ogr");
+    QgsVectorLayer* layer = new QgsVectorLayer("/lyndon/iProject/cpath/qgis_demo1/common/input/dem/ty/太原市DEM.tif", "3D Layer", "gdal");
     if (!layer->isValid()) {
         qWarning("Failed to load layer!");
         return 1;

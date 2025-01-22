@@ -56,6 +56,7 @@
 #include "core/utils/NodeToMap.h"
 #include "core/utils/JsonUtil.h"
 #include "core/qgis/d3/ImageCaptureHelper.h"
+#include "core/qgis/d3/CameraUtil.h"
 
 #if defined(_WIN32)
 #include <windows.h>
@@ -448,38 +449,15 @@ int main(int argc, char* argv[]) {
     QgsCameraController* canvas3dCameraController = canvas3d->cameraController();
 
     QgsCameraController* cameraController = scene->cameraController();
-    QgsVector3D centerPoint = QgsVector3D(extent.center().x(), extent.center().y(), 0); // 设置场景中心点
-    float distance = extent.width() * 1.5; // 根据场景范围调整相机距离
-    cameraController->setLookingAtPoint(centerPoint, distance, 45, 30);
-    QgsCameraPose cameraPost;
-    cameraPost.setCenterPoint(centerPoint);
-    cameraPost.setDistanceFromCenterPoint(distance);
-    cameraPost.setPitchAngle(0);
-    cameraPost.setHeadingAngle(0);
-    cameraController->setCameraPose(cameraPost); // 设置相机姿态
-    QgsVector3D sceneLookingAtPoint3d = cameraController->lookingAtPoint();
-    qDebug() << "scene camera lookingAtPoint: x:" << QString::number(sceneLookingAtPoint3d.x(), 'f', 10)
-    << " y:" << QString::number(sceneLookingAtPoint3d.y(), 'f', 10)
-    << " z:" << QString::number(sceneLookingAtPoint3d.z(), 'f', 10);
-    QgsCameraPose camerePose = cameraController->cameraPose();
-    qDebug() << "scene camera cameraPose: x:" << QString::number(camerePose.centerPoint().x() , 'f', 10)
-    << " y:" << QString::number(camerePose.centerPoint().y() , 'f', 10)
-    << " z:" << QString::number(camerePose.centerPoint().z(), 'f', 10)
-    << " pitchAngle:" << camerePose.pitchAngle()
-    << " headingAngle:" << camerePose.headingAngle()
-    << " distanceFromCenterPoint:" << camerePose.distanceFromCenterPoint();
 
-    canvas3dCameraController->setLookingAtPoint(centerPoint, distance, 45, 30);
-    canvas3dCameraController->setCameraPose(camerePose);
-    QgsVector3D canvasPoint3d = canvas3dCameraController->lookingAtPoint();
-    qDebug() << "canvas3d camera lookingAtPoint: x:" << canvasPoint3d.x() << " y:" << canvasPoint3d.y() << " z:" << canvasPoint3d.z();
-    QgsCameraPose canvasCamerePose = canvas3dCameraController->cameraPose();
-    qDebug() << "canvas3d camera cameraPose: x:" << QString::number(canvasCamerePose.centerPoint().x(), 'f', 10)
-    << " y:" << QString::number(canvasCamerePose.centerPoint().y(), 'f', 10)
-    << " z:" << QString::number(canvasCamerePose.centerPoint().z(), 'f', 10)
-    << " pitchAngle:" << canvasCamerePose.pitchAngle()
-    << " headingAngle:" << canvasCamerePose.headingAngle()
-    << " distanceFromCenterPoint:" << canvasCamerePose.distanceFromCenterPoint();
+    qDebug() << "before modify camera controller scene state:" << scene->sceneState();
+    qDebug() << "before modify camera controller pending jobs:" << scene->totalPendingJobsCount();
+    qDebug() << "scene CameraController info";
+    CameraUtil::LookingAtInfo(cameraController);
+    CameraUtil::PoseInfo(cameraController);
+    qDebug() << "canvas3d CameraController info";
+    CameraUtil::LookingAtInfo(canvas3dCameraController);
+    CameraUtil::PoseInfo(canvas3dCameraController);
 
     // 设置保存路径
 	QString capture_scene_image_path = QString().append(save_qgis_project_path).append("/").append("capture_scene_image.png");
@@ -492,9 +470,31 @@ int main(int argc, char* argv[]) {
 //    qDebug() << "save capture_scene_image: " << capture_image_status;
 
     // 等待场景渲染完成
-    QObject::connect(scene, &Qgs3DMapScene::sceneStateChanged, [scene, &engine, capture_scene_image_path]() {
-        if (scene->sceneState() == Qgs3DMapScene::Ready) {
+    QObject::connect(scene, &Qgs3DMapScene::sceneStateChanged, [scene, &engine, capture_scene_image_path, cameraController, canvas3dCameraController, extent]() {
+        //if (scene->sceneState() == Qgs3DMapScene::Ready) {
+        if (scene->totalPendingJobsCount() == 0) {
+            qDebug() << "No pending jobs, capturing image...";
             qDebug() << "Scene is ready, capturing image...";
+
+            qDebug() << "after modify camera controller scene state:" << scene->sceneState();
+            qDebug() << "after modify camera controller pending jobs:" << scene->totalPendingJobsCount();
+
+            QgsVector3D lookAtCenterPoint = QgsVector3D(-102.771, 0.000488281, 186.03);
+
+            float distance = extent.width() * 1.5; // 根据场景范围调整相机距离
+            qDebug() << "distance: " << distance << " extent.width(): " << extent.width();
+            cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 0, 0);
+
+            QgsCameraPose cameraPose;
+            QgsVector3D cameraPostPoint = QgsVector3D(-102.771, 7869.04, 213.498);
+            cameraPose.setCenterPoint(cameraPostPoint);
+            cameraPose.setDistanceFromCenterPoint(distance);
+            cameraPose.setPitchAngle(0);
+            cameraPose.setHeadingAngle(0);
+
+            cameraController->setCameraPose(cameraPose);
+            canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 0, 0);
+            canvas3dCameraController->setCameraPose(cameraPose);
             QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
             bool capture_image_status = img.save(capture_scene_image_path);
             qDebug() << "Save capture_scene_image: " << capture_image_status;
