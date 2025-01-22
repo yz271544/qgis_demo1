@@ -418,8 +418,6 @@ int main(int argc, char* argv[]) {
 	qDebug() << "add 2d layout done";
 
 
-
-
 	qDebug() << "add 3d layout";
 	QString joined_3d_layout_name = QString(layout_type).append("-3D").append("-").append("A3");
 	QVector<QString> remove3DLayerNames = QVector<QString>();
@@ -467,7 +465,7 @@ int main(int argc, char* argv[]) {
     Qgs3DUtils::captureSceneImage( engine, scene );
 
     QImage img = Qgs3DUtils::captureSceneImage( engine, scene );
-    bool capture_image_status = img.save( capture_scene_image_path );
+    bool capture_image_status = img.save( capture_scene_image_path, 0, 100 );
     qDebug() << "save capture_scene_image: " << capture_image_status;
 //	// 创建辅助对象并捕获图像
 //	ImageCaptureHelper* helper = new ImageCaptureHelper(engine, qgs_3d_map_scene, capture_scene_image_path);
@@ -494,6 +492,16 @@ int main(int argc, char* argv[]) {
 	qDebug() << "JwLayout3D addPrintLayout";
 	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false);
 	qDebug() << "add 3d layout done";
+
+    QString d3_png_scene_image_path = QString().append(save_qgis_project_path).append("/").append("d3_png_scene_image_path.png");
+    qDebug() << "d3_png_scene_image_path: " << d3_png_scene_image_path;
+//    jwLayout3d->exportLayoutToImage(d3_png_scene_image_path);
+//    QObject::connect(canvas3d->scene(), &Qgs3DMapScene::totalPendingJobsCountChanged, this, [this]() {
+//        if (canvas3d->scene()->totalPendingJobsCount() == 0) {
+//            // 所有渲染任务完成，可以导出布局
+//            jwLayout3d->exportLayoutToImage(d3_png_scene_image_path);
+//        }
+//    });
 
 	qDebug() << "验证布局是否存在";
 	QgsLayoutManager* layout_manager = project->layoutManager();

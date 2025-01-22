@@ -186,6 +186,7 @@ elseif(UNIX)
             Svg
             Multimedia
             3DRender
+            PrintSupport
             Test
     )
     find_package(Qt5Keychain CONFIG REQUIRED)
@@ -228,6 +229,9 @@ message("Qt5Xml_INCLUDE_DIRS: ${Qt5Xml_INCLUDE_DIRS}")
 include_directories(${Qt5Xml_INCLUDE_DIRS})
 message("Qt5Svg_INCLUDE_DIRS: ${Qt5Svg_INCLUDE_DIRS}")
 include_directories(${Qt5Svg_INCLUDE_DIRS})
+message("Qt5PrintSupport_INCLUDE_DIRS: ${Qt5PrintSupport_INCLUDE_DIRS}")
+include_directories(${Qt5PrintSupport_INCLUDE_DIRS})
+
 
 find_path(Qt53DRender_INCLUDE_DIRS
     NAMES qt3drender_global.h

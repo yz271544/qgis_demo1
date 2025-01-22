@@ -356,6 +356,9 @@ void JwLayout3D::addSignatureLabel(const QString &signatureText) {
 
 void
 JwLayout3D::addArrowToLayout(QgsLayout *layout, const QVector<QgsPointXY> &points, const QColor &color, double width) {
+    if (points.isEmpty()) {
+        return;
+    }
     // 将 QgsPointXY 转换为 QPolygonF
     QPolygonF polygon;
     for (const QgsPointXY &point: points) {
@@ -947,6 +950,7 @@ void JwLayout3D::exportLayoutToImage(const QString &outputFilePath) {
     QgsLayoutExporter::ImageExportSettings settings;
     settings.dpi = 300; // 设置DPI
 
+    qDebug() << "export to image: " << outputFilePath;
     // 导出为PNG图片
     QgsLayoutExporter::ExportResult result = exporter.exportToImage(outputFilePath, settings);
 
