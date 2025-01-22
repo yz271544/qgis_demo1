@@ -492,6 +492,8 @@ const QVector<QString> &removeLayerPrefixes
     const QgsReferencedRectangle projectExtent = project->viewSettings()->fullExtent();
     const QgsRectangle fullExtent = Qgs3DUtils::tryReprojectExtent2D( projectExtent, projectExtent.crs(), mapSettings3d->crs(), project->transformContext() );
     //QgsReferencedRectangle fullExtent = project->viewSettings()->fullExtent();
+    qDebug() << "get3DMapSettings fullExtent:";
+    CameraUtil::ExtentInfo(fullExtent);
     mapSettings3d->setOrigin(QgsVector3D(fullExtent.center().x(), fullExtent.center().y(), 0));
     qDebug() << "set origin: " << mapSettings3d->origin().toString();
     mapSettings3d->setSelectionColor( canvas2d->selectionColor() );
@@ -542,16 +544,21 @@ const QVector<QString> &removeLayerPrefixes
     mapSettings3d->setBackgroundColor(QColor("#ffffff"));
 
     mapSettings3d->setExtent(fullExtent);
-    set3DCanvas(fullExtent);
+    //set3DCanvas(fullExtent);
 
     return mapSettings3d;
 }
 
-void JwLayout3D::set3DCanvas(QgsRectangle fullExtent) {
+void JwLayout3D::set3DCanvas() {
+    const QgsReferencedRectangle projectExtent = project->viewSettings()->fullExtent();
+    const QgsRectangle fullExtent = Qgs3DUtils::tryReprojectExtent2D( projectExtent, projectExtent.crs(), mapSettings3d->crs(), project->transformContext() );
+
     QgsRectangle extent = fullExtent;
+    qDebug() << "set3DCanvas fullExtent:";
+    CameraUtil::ExtentInfo(extent);
     QgsPointXY center = extent.center();
-    extent.scale(1.3);
-    qDebug() << "extent scale " << 1.3 << " center x: " << center.x() << " y:" << center.y();
+    extent.scale(1);
+    qDebug() << "extent scale " << 1 << " center x: " << center.x() << " y:" << center.y();
     const float dist = static_cast< float >( std::max(extent.width(), extent.height()));
     qDebug() << "dist: " << dist;
 

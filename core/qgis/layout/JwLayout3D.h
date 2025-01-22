@@ -64,6 +64,7 @@
 #include "../../enums/PaperSpecification.h"
 #include "../../utils/QgsUtil.h"
 #include "../../utils/ColorTransformUtil.h"
+#include "../d3/CameraUtil.h"
 
 class JwLayout3D {
 public:
@@ -99,7 +100,7 @@ public:
         const QVector<QString> &removeLayerPrefixes
     );
 
-    void set3DCanvas(QgsRectangle fullExtent);
+    void set3DCanvas();
 
     void set3DMap(
         const PaperSpecification& availablePaper,

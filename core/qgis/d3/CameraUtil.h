@@ -5,6 +5,7 @@
 #ifndef QGIS_DEMO1_CAMERAUTIL_H
 #define QGIS_DEMO1_CAMERAUTIL_H
 
+#include <qgsrectangle.h>
 #include <qlogging.h>
 #include <qgscameracontroller.h>
 
@@ -13,6 +14,8 @@ public:
     static void LookingAtInfo(QgsCameraController* cameraController);
 
     static void PoseInfo(QgsCameraController* cameraController);
+
+    static void ExtentInfo(QgsRectangle extent);
 };
 
 

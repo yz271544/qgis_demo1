@@ -441,6 +441,7 @@ int main(int argc, char* argv[]) {
     qDebug() << "construct the QgsOffscreen3DEngine";
     Qgs3DMapSettings* map_settings_3d = jwLayout3d->get3DMapSettings(remove3DLayerNames, remove3DLayerPrefixes);
 
+    jwLayout3d->set3DCanvas();
     qDebug() << "construct the Qgs3DMapSettings";
     Qgs3DMapScene* scene = new Qgs3DMapScene(*map_settings_3d, &engine);
     engine.setRootEntity( scene );
@@ -472,28 +473,30 @@ int main(int argc, char* argv[]) {
 	if (scene->sceneState() == Qgs3DMapScene::Ready && scene->totalPendingJobsCount() == 0) {
 		qDebug() << "Scene is ready, capturing image...";
 
-        QgsVector3D lookAtCenterPoint = QgsVector3D(90.8, 1052.3, 243.8);
+        QgsVector3D lookAtCenterPoint = QgsVector3D(223.9, 1030.5, 220.7);
 
         //float distance = extent.width() * 1.5; // 根据场景范围调整相机距离
-        float distance = 1247.0;
+        float distance = 1857.9;
         qDebug() << "distance: " << distance << " extent.width(): " << extent.width();
-        cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 0, 0);
+        cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 36.2, 0);
 
         QgsCameraPose cameraPose;
-        QgsVector3D cameraPostPoint = QgsVector3D(90.8, 1052.3, 243.8);
+        QgsVector3D cameraPostPoint = QgsVector3D(223.9, 1030.5, 220.7);
         cameraPose.setCenterPoint(cameraPostPoint);
         cameraPose.setDistanceFromCenterPoint(distance);
-        cameraPose.setPitchAngle(38.9);
-        cameraPose.setHeadingAngle(28.6);
+        cameraPose.setPitchAngle(36.2);
+        cameraPose.setHeadingAngle(20.0);
 
         cameraController->setCameraPose(cameraPose);
-        canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 0, 0);
+        canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 36.2, 0);
         canvas3dCameraController->setCameraPose(cameraPose);
 
         CameraUtil::LookingAtInfo(cameraController);
         CameraUtil::PoseInfo(cameraController);
         CameraUtil::LookingAtInfo(canvas3dCameraController);
         CameraUtil::PoseInfo(canvas3dCameraController);
+        qDebug() << "extent: ";
+        CameraUtil::ExtentInfo(extent);
 
 		QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
 		bool capture_image_status = img.save(capture_scene_image_path);
@@ -510,21 +513,21 @@ int main(int argc, char* argv[]) {
 				qDebug() << "after modify camera controller scene state:" << scene->sceneState();
 				qDebug() << "after modify camera controller pending jobs:" << scene->totalPendingJobsCount();
 
-				QgsVector3D lookAtCenterPoint = QgsVector3D(-102.771, 0.000488281, 186.03);
+				QgsVector3D lookAtCenterPoint = QgsVector3D(223.9, 1030.5, 220.7);
 
 				float distance = extent.width() * 1.5; // 根据场景范围调整相机距离
 				qDebug() << "distance: " << distance << " extent.width(): " << extent.width();
-				cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 0, 0);
+				cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 36.2, 0);
 
 				QgsCameraPose cameraPose;
-				QgsVector3D cameraPostPoint = QgsVector3D(-102.771, 7869.04, 213.498);
+				QgsVector3D cameraPostPoint = QgsVector3D(223.9, 1030.5, 220.7);
 				cameraPose.setCenterPoint(cameraPostPoint);
 				cameraPose.setDistanceFromCenterPoint(distance);
-				cameraPose.setPitchAngle(0);
-				cameraPose.setHeadingAngle(0);
+				cameraPose.setPitchAngle(36.2);
+				cameraPose.setHeadingAngle(20.0);
 
 				cameraController->setCameraPose(cameraPose);
-				canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 0, 0);
+				canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 36.2, 0);
 				canvas3dCameraController->setCameraPose(cameraPose);
 				QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
 				bool capture_image_status = img.save(capture_scene_image_path);

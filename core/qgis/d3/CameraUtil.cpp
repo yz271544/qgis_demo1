@@ -20,3 +20,12 @@ void CameraUtil::PoseInfo(QgsCameraController *cameraController) {
              << " headingAngle:" << cameraPose.headingAngle()
              << " distanceFromCenterPoint:" << cameraPose.distanceFromCenterPoint();
 }
+
+void CameraUtil::ExtentInfo(QgsRectangle extent) {
+    qDebug() << "extent: " << extent << " width: " << QString::number(extent.width(),'f',3) << " height: " << QString::number(extent.height(),'f',3)
+             << " xMinimum:" << QString::number(extent.xMinimum(),'f',3) << " yMinimum:" << QString::number(extent.yMinimum(),'f',3)
+             << " xMaximum:" << QString::number(extent.xMaximum(),'f',3) << " yMaximum:" << QString::number(extent.yMaximum(),'f',3)
+             << " area: " << QString::number(extent.area(),'f',3) << " perimeter: " << QString::number(extent.perimeter(),'f',3)
+             << " center -> x:" << QString::number(extent.center().x(), 'f', 3) << " y:" << QString::number(extent.center().y(), 'f', 3)
+             << " isEmpty: " << extent.isEmpty() << " isNull: " << extent.isNull() << " isFinite: " << extent.isFinite();
+}
