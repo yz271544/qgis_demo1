@@ -57,6 +57,7 @@
 #include <qgs3dutils.h>
 #include <qgssettings.h>
 #include <qgsdirectionallightsettings.h>
+#include <qgslayoutexporter.h>
 
 //#include <qgis/app/3d/qgs3dmapcanvaswidget.h>
 #include "JwLegend.h"
@@ -118,6 +119,8 @@ public:
     void loadQptTemplate(const QString& qptFilePath, const QString& layoutTemplateName);
     void updateLayoutExtent(const QString& layoutName);
     QPair<double, double> getLegendDimensions(const QString& layoutName);
+
+    void exportLayoutToImage(const QString &outputFilePath);
 
 #ifdef ENABLE_APP
     void create3DMapCanvasWidget(QString view3dName);
