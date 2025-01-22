@@ -469,37 +469,45 @@ int main(int argc, char* argv[]) {
 //    bool capture_image_status = img.save( capture_scene_image_path );
 //    qDebug() << "save capture_scene_image: " << capture_image_status;
 
-    // 等待场景渲染完成
-    QObject::connect(scene, &Qgs3DMapScene::sceneStateChanged, [scene, &engine, capture_scene_image_path, cameraController, canvas3dCameraController, extent]() {
-        //if (scene->sceneState() == Qgs3DMapScene::Ready) {
-        if (scene->totalPendingJobsCount() == 0) {
-            qDebug() << "No pending jobs, capturing image...";
-            qDebug() << "Scene is ready, capturing image...";
+	if (scene->sceneState() == Qgs3DMapScene::Ready && scene->totalPendingJobsCount() == 0) {
+		qDebug() << "Scene is ready, capturing image...";
+		QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
+		bool capture_image_status = img.save(capture_scene_image_path);
+		qDebug() << "Save capture_scene_image: " << capture_image_status;
+	} else
+	{
+		// 等待场景渲染完成
+		QObject::connect(scene, &Qgs3DMapScene::sceneStateChanged, [scene, &engine, capture_scene_image_path, cameraController, canvas3dCameraController, extent]() {
+			//if (scene->sceneState() == Qgs3DMapScene::Ready) {
+			if (scene->totalPendingJobsCount() == 0) {
+				qDebug() << "No pending jobs, capturing image...";
+				qDebug() << "Scene is ready, capturing image...";
 
-            qDebug() << "after modify camera controller scene state:" << scene->sceneState();
-            qDebug() << "after modify camera controller pending jobs:" << scene->totalPendingJobsCount();
+				qDebug() << "after modify camera controller scene state:" << scene->sceneState();
+				qDebug() << "after modify camera controller pending jobs:" << scene->totalPendingJobsCount();
 
-            QgsVector3D lookAtCenterPoint = QgsVector3D(-102.771, 0.000488281, 186.03);
+				QgsVector3D lookAtCenterPoint = QgsVector3D(-102.771, 0.000488281, 186.03);
 
-            float distance = extent.width() * 1.5; // 根据场景范围调整相机距离
-            qDebug() << "distance: " << distance << " extent.width(): " << extent.width();
-            cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 0, 0);
+				float distance = extent.width() * 1.5; // 根据场景范围调整相机距离
+				qDebug() << "distance: " << distance << " extent.width(): " << extent.width();
+				cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 0, 0);
 
-            QgsCameraPose cameraPose;
-            QgsVector3D cameraPostPoint = QgsVector3D(-102.771, 7869.04, 213.498);
-            cameraPose.setCenterPoint(cameraPostPoint);
-            cameraPose.setDistanceFromCenterPoint(distance);
-            cameraPose.setPitchAngle(0);
-            cameraPose.setHeadingAngle(0);
+				QgsCameraPose cameraPose;
+				QgsVector3D cameraPostPoint = QgsVector3D(-102.771, 7869.04, 213.498);
+				cameraPose.setCenterPoint(cameraPostPoint);
+				cameraPose.setDistanceFromCenterPoint(distance);
+				cameraPose.setPitchAngle(0);
+				cameraPose.setHeadingAngle(0);
 
-            cameraController->setCameraPose(cameraPose);
-            canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 0, 0);
-            canvas3dCameraController->setCameraPose(cameraPose);
-            QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
-            bool capture_image_status = img.save(capture_scene_image_path);
-            qDebug() << "Save capture_scene_image: " << capture_image_status;
-        }
-    });
+				cameraController->setCameraPose(cameraPose);
+				canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 0, 0);
+				canvas3dCameraController->setCameraPose(cameraPose);
+				QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
+				bool capture_image_status = img.save(capture_scene_image_path);
+				qDebug() << "Save capture_scene_image: " << capture_image_status;
+			}
+		});
+	}
 
 
 
