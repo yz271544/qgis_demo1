@@ -453,6 +453,8 @@ int main(int argc, char* argv[]) {
     QgsCameraPose cameraPost;
     cameraPost.setCenterPoint(centerPoint);
     cameraPost.setDistanceFromCenterPoint(distance);
+    cameraPost.setPitchAngle(0);
+    cameraPost.setHeadingAngle(0);
     cameraController->setCameraPose(cameraPost); // 设置相机姿态
     QgsVector3D sceneLookingAtPoint3d = cameraController->lookingAtPoint();
     qDebug() << "scene camera lookingAtPoint: x:" << QString::number(sceneLookingAtPoint3d.x(), 'f', 10)
@@ -485,7 +487,7 @@ int main(int argc, char* argv[]) {
     Qgs3DUtils::captureSceneImage( engine, scene );
 
     QImage img = Qgs3DUtils::captureSceneImage( engine, scene );
-    bool capture_image_status = img.save( capture_scene_image_path, 0, 100 );
+    bool capture_image_status = img.save( capture_scene_image_path );
     qDebug() << "save capture_scene_image: " << capture_image_status;
 
 
