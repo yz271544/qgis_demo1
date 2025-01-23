@@ -16,6 +16,8 @@ public:
     static void PoseInfo(QgsCameraController* cameraController);
 
     static void ExtentInfo(QgsRectangle extent);
+
+    static void TrapezoidInfo(QVector<QgsPointXY> verticesOfTrapezoid);
 };
 
 

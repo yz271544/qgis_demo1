@@ -513,6 +513,12 @@ const QVector<QString> &removeLayerPrefixes
     qDebug() << "set project type: " << mapSettings3d->projectionType();
     mapSettings3d->setFieldOfView( settings.value( QStringLiteral( "map3d/defaultFieldOfView" ), 45, QgsSettings::App ).toInt() );
     qDebug() << "set field of view: " << mapSettings3d->fieldOfView();
+
+    Qgs3DAxisSettings axis;
+    axis.setMode(Qgs3DAxisSettings::Mode::Crs);
+    qDebug() << "mapSettings3d set3DAxisSettings";
+    mapSettings3d->set3DAxisSettings(axis);
+
     mapSettings3d->setTransformContext( QgsProject::instance()->transformContext() );
     qDebug() << "set transform context";
     mapSettings3d->setPathResolver( QgsProject::instance()->pathResolver() );
@@ -558,7 +564,7 @@ void JwLayout3D::set3DCanvas() {
     CameraUtil::ExtentInfo(extent);
     QgsPointXY center = extent.center();
     extent.scale(1);
-    qDebug() << "extent scale " << 1 << " center x: " << center.x() << " y:" << center.y();
+    qDebug() << "extent scale " << 1 << " center x: " << QString::number(center.x(), 'f', 10) << " y:" << QString::number(center.y(), 'f', 10);
     const float dist = static_cast< float >( std::max(extent.width(), extent.height()));
     qDebug() << "dist: " << dist;
 

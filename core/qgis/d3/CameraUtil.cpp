@@ -29,3 +29,11 @@ void CameraUtil::ExtentInfo(QgsRectangle extent) {
              << " center -> x:" << QString::number(extent.center().x(), 'f', 3) << " y:" << QString::number(extent.center().y(), 'f', 3)
              << " isEmpty: " << extent.isEmpty() << " isNull: " << extent.isNull() << " isFinite: " << extent.isFinite();
 }
+
+void CameraUtil::TrapezoidInfo(QVector<QgsPointXY> verticesOfTrapezoid) {
+    for (int i = 0; i < verticesOfTrapezoid.size(); i++) {
+        QgsPointXY point = verticesOfTrapezoid.at(i);
+        qDebug() << "verticesOfTrapezoid[" << i << "]: x:" << QString::number(point.x(), 'f', 10)
+                 << " y:" << QString::number(point.y(), 'f', 10);
+    }
+}
