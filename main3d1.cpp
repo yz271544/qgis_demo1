@@ -468,47 +468,43 @@ int main(int argc, char* argv[]) {
 	QString capture_scene_image_path = QString().append(save_qgis_project_path).append("/").append("capture_scene_image.png");
 	qDebug() << "save image path: " << capture_scene_image_path;
 
-    Qgs3DUtils::captureSceneImage( engine, scene );
+    /*QImage img = Qgs3DUtils::captureSceneImage( engine, scene );
+    bool capture_image_status = img.save( capture_scene_image_path );
+    qDebug() << "save capture_scene_image: " << capture_image_status;*/
 
-//    QImage img = Qgs3DUtils::captureSceneImage( engine, scene );
-//    bool capture_image_status = img.save( capture_scene_image_path );
-//    qDebug() << "save capture_scene_image: " << capture_image_status;
+    Qgs3DUtils::captureSceneImage( engine, scene ); // 保存截图 init
+	if (scene->sceneState() == Qgs3DMapScene::Ready && scene->totalPendingJobsCount() == 0) {
+		qDebug() << "Scene is ready, capturing image...";
 
-//	if (scene->sceneState() == Qgs3DMapScene::Ready && scene->totalPendingJobsCount() == 0) {
-//		qDebug() << "Scene is ready, capturing image...";
-//
-//        QgsVector3D lookAtCenterPoint = QgsVector3D(100, 500, 220.0);
-//
-//        float distance = extent.width() / 1.2; // 根据场景范围调整相机距离
-//        //float distance = 1857.9;
-//        qDebug() << "distance: " << distance << " extent.width(): " << extent.width();
-//        cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 38.0, 20.0);
-//
-//        QgsCameraPose cameraPose;
-//        QgsVector3D cameraPostPoint = QgsVector3D(100, 500, 220.0);
-//        cameraPose.setCenterPoint(cameraPostPoint);
-//        cameraPose.setDistanceFromCenterPoint(distance);
-//        cameraPose.setPitchAngle(38.0);
-//        cameraPose.setHeadingAngle(20.0);
-//
-//        cameraController->setCameraPose(cameraPose);
-//        canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 38.0, 20.0);
-//        canvas3dCameraController->setCameraPose(cameraPose);
-//
-//        CameraUtil::LookingAtInfo(cameraController);
-//        CameraUtil::PoseInfo(cameraController);
-//        CameraUtil::LookingAtInfo(canvas3dCameraController);
-//        CameraUtil::PoseInfo(canvas3dCameraController);
-//        qDebug() << "extent: ";
-//        CameraUtil::ExtentInfo(extent);
-//
-//		QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
-//		bool capture_image_status = img.save(capture_scene_image_path);
-//		qDebug() << "Save capture_scene_image: " << capture_image_status;
-//	}
+        QgsVector3D lookAtCenterPoint = QgsVector3D(100, 500, 220.0);
 
+        float distance = extent.width() / 1.2; // 根据场景范围调整相机距离
+        //float distance = 1857.9;
+        qDebug() << "distance: " << distance << " extent.width(): " << extent.width();
+        cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 38.0, 20.0);
 
+        QgsCameraPose cameraPose;
+        QgsVector3D cameraPostPoint = QgsVector3D(100, 500, 220.0);
+        cameraPose.setCenterPoint(cameraPostPoint);
+        cameraPose.setDistanceFromCenterPoint(distance);
+        cameraPose.setPitchAngle(38.0);
+        cameraPose.setHeadingAngle(20.0);
 
+        cameraController->setCameraPose(cameraPose);
+        canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 38.0, 20.0);
+        canvas3dCameraController->setCameraPose(cameraPose);
+
+        CameraUtil::LookingAtInfo(cameraController);
+        CameraUtil::PoseInfo(cameraController);
+        CameraUtil::LookingAtInfo(canvas3dCameraController);
+        CameraUtil::PoseInfo(canvas3dCameraController);
+        qDebug() << "extent: ";
+        CameraUtil::ExtentInfo(extent);
+
+		QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
+		bool capture_image_status = img.save(capture_scene_image_path);
+		qDebug() << "Save capture_scene_image: " << capture_image_status;
+	}
 
 //	// 创建辅助对象并捕获图像
 //	ImageCaptureHelper* helper = new ImageCaptureHelper(engine, qgs_3d_map_scene, capture_scene_image_path);
@@ -532,13 +528,13 @@ int main(int argc, char* argv[]) {
 	// bool capture_image_status = capture_scene_image.save(capture_scene_image_path);
 	// qDebug() << "save capture_scene_image: " << capture_image_status;
 
-	qDebug() << "JwLayout3D addPrintLayout";
-	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false);
-	qDebug() << "add 3d layout done";
-
-    QString d3_scene_png = QString().append(save_qgis_project_path).append("/").append("d3_scene_png.png");
-    qDebug() << "d3_scene_png: " << d3_scene_png;
-    jwLayout3d->exportLayoutToImage(d3_scene_png);
+//	qDebug() << "JwLayout3D addPrintLayout";
+//	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false);
+//	qDebug() << "add 3d layout done";
+//
+//    QString d3_scene_png = QString().append(save_qgis_project_path).append("/").append("d3_scene_png.png");
+//    qDebug() << "d3_scene_png: " << d3_scene_png;
+//    jwLayout3d->exportLayoutToImage(d3_scene_png);
 
 //    QString d3_scene_pdf = QString().append(save_qgis_project_path).append("/").append("d3_scene.pdf");
 //    qDebug() << "d3_scene_pdf: " << d3_scene_pdf;

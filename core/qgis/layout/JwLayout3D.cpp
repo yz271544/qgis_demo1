@@ -601,77 +601,6 @@ void JwLayout3D::set3DMap(
     elem3DMap.setAttribute(QStringLiteral("isOpen"), 1);
     qDebug() << "create QDomElement:" << elem3DMap.tagName();
 
-    //mapSettings3d->setExtent(fullExtent);
-
-//    Qgs3DAxisSettings axis;
-//    axis.setMode(Qgs3DAxisSettings::Mode::Off);
-//    qDebug() << "mapSettings3d set3DAxisSettings";
-//    mapSettings3d->set3DAxisSettings(axis);
-//    qDebug() << "mapSettings3d setTransformContext";
-//    mapSettings3d->setTransformContext(project->transformContext());
-//    qDebug() << "mapSettings3d setPathResolver";
-//    mapSettings3d->setPathResolver(project->pathResolver());
-//    qDebug() << "mapSettings3d setMapThemeCollection";
-//    mapSettings3d->setMapThemeCollection(project->mapThemeCollection());
-//
-//    qDebug() << "connect project mapSettings3d";
-//    QObject::connect(project, &QgsProject::transformContextChanged, mapSettings3d, [this] {
-//        mapSettings3d->setTransformContext(project->transformContext());
-//    });
-//
-//    QgsFlatTerrainGenerator *flatTerrain = new QgsFlatTerrainGenerator;
-//    QString crs = "EPSG:4979";
-//    QgsCoordinateReferenceSystem scene3dcrs;
-//    scene3dcrs.createFromString(crs);
-//#if _QGIS_VERSION_INT >= 34100
-//    flatTerrain->setCrs( scene3dcrs, project->transformContext() );
-//#else
-//    flatTerrain->setCrs(scene3dcrs);
-//#endif
-//    qDebug() << "mapSettings3d setTerrainGenerator";
-//    mapSettings3d->setTerrainGenerator(flatTerrain);
-//    qDebug() << "mapSettings3d setTerrainElevationOffset";
-//    mapSettings3d->setTerrainElevationOffset(project->elevationProperties()->terrainProvider()->offset());
-
-    // QgsPointLightSettings defaultPointLight;
-    // qDebug() << "mapSettings3d setPosition";
-    // defaultPointLight.setPosition(QgsVector3D( 0, 0, 1000 ) );
-    // qDebug() << "mapSettings3d setConstantAttenuation";
-    // defaultPointLight.setConstantAttenuation( 0 );
-    // qDebug() << "mapSettings3d setLightSources";
-    // mapSettings3d->setLightSources({defaultPointLight.clone() } );
-    // if ( QScreen *screen = QGuiApplication::primaryScreen() )
-    // {
-    //     qDebug() << "mapSettings3d setOutputDpi:" << screen->physicalDotsPerInch();
-    //     mapSettings3d->setOutputDpi( screen->physicalDotsPerInch() );
-    // }
-    // else
-    // {
-    //     qDebug() << "mapSettings3d setOutputDpi 300";
-    //     mapSettings3d->setOutputDpi( 300 );
-    // }
-
-
-    // qDebug() << "mapSettings3d setTerrainRenderingEnabled true";
-    // mapSettings3d->setTerrainRenderingEnabled(true);
-    // qDebug() << "mapSettings3d setShowExtentIn2DView true";
-    // mapSettings3d->setShowExtentIn2DView(true);
-//    qDebug() << "canvas3d setMapSettings";
-//    canvas3d->setMapSettings(mapSettings3d);
-//    qDebug() << "canvas3d setMapSettings done";
-//    QgsRectangle extent = fullExtent;
-//    qDebug() << "extent scale";
-//    extent.scale(1.3);
-//    const float dist = static_cast< float >( std::max(extent.width(), extent.height()));
-//    qDebug() << "canvas3d setViewFromTop";
-//    canvas3d->setViewFromTop(extent.center(), dist * 2, 0);
-//    qDebug() << "connect canvas3d totalPendingJobsCountChanged";
-//    QObject::connect(canvas3d->scene(), &Qgs3DMapScene::totalPendingJobsCountChanged, canvas3d, [this] {
-//        qDebug() << "pending jobs:" << canvas3d->scene()->totalPendingJobsCount();
-//    });
-//    qDebug() << "canvas3d show";
-//    canvas3d->show();
-//
     // 创建 3D 地图项
     //mapItem3d = QgsLayoutItem3DMap::create(layout);
     mapItem3d = new QgsLayoutItem3DMap(layout);
@@ -693,7 +622,7 @@ void JwLayout3D::set3DMap(
     // QgsLayoutSize fixedSize(mapWidth, mapHeight, Qgis::LayoutUnit::Millimeters);
     // mapItem3d->attemptResize(fixedSize);
     // 设置相机视角
-    qDebug() << "设置相机视角";
+//    qDebug() << "设置相机视角";
     // QgsCameraPose cameraPose;
     // cameraPose.setDistanceFromCenterPoint(1788.7f); // 设置相机距离
     // mapItem3d->setCameraPose(cameraPose);
