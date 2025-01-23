@@ -123,6 +123,8 @@ public:
 
     void exportLayoutToImage(const QString &outputFilePath);
 
+    void exportLayoutToPdf(const QString &outputFilePath);
+
 #ifdef ENABLE_APP
     void create3DMapCanvasWidget(QString view3dName);
     void write3DMapViewSettings( Qgs3DMapCanvasWidget *widget, QDomDocument &doc, QDomElement &elem3DMap );

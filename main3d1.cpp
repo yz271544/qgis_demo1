@@ -474,71 +474,38 @@ int main(int argc, char* argv[]) {
 //    bool capture_image_status = img.save( capture_scene_image_path );
 //    qDebug() << "save capture_scene_image: " << capture_image_status;
 
-	if (scene->sceneState() == Qgs3DMapScene::Ready && scene->totalPendingJobsCount() == 0) {
-		qDebug() << "Scene is ready, capturing image...";
-
-        QgsVector3D lookAtCenterPoint = QgsVector3D(223.9, 1030.5, 220.7);
-
-        float distance = extent.width() / 1.2; // 根据场景范围调整相机距离
-        //float distance = 1857.9;
-        qDebug() << "distance: " << distance << " extent.width(): " << extent.width();
-        cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 36.2, 20.0);
-
-        QgsCameraPose cameraPose;
-        QgsVector3D cameraPostPoint = QgsVector3D(223.9, 1030.5, 220.7);
-        cameraPose.setCenterPoint(cameraPostPoint);
-        cameraPose.setDistanceFromCenterPoint(distance);
-        cameraPose.setPitchAngle(36.2);
-        cameraPose.setHeadingAngle(20.0);
-
-        cameraController->setCameraPose(cameraPose);
-        canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 36.2, 20.0);
-        canvas3dCameraController->setCameraPose(cameraPose);
-
-        CameraUtil::LookingAtInfo(cameraController);
-        CameraUtil::PoseInfo(cameraController);
-        CameraUtil::LookingAtInfo(canvas3dCameraController);
-        CameraUtil::PoseInfo(canvas3dCameraController);
-        qDebug() << "extent: ";
-        CameraUtil::ExtentInfo(extent);
-
-		QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
-		bool capture_image_status = img.save(capture_scene_image_path);
-		qDebug() << "Save capture_scene_image: " << capture_image_status;
-	} else
-	{
-		// 等待场景渲染完成
-		QObject::connect(scene, &Qgs3DMapScene::sceneStateChanged, [scene, &engine, capture_scene_image_path, cameraController, canvas3dCameraController, extent]() {
-			//if (scene->sceneState() == Qgs3DMapScene::Ready) {
-			if (scene->totalPendingJobsCount() == 0) {
-				qDebug() << "No pending jobs, capturing image...";
-				qDebug() << "Scene is ready, capturing image...";
-
-				qDebug() << "after modify camera controller scene state:" << scene->sceneState();
-				qDebug() << "after modify camera controller pending jobs:" << scene->totalPendingJobsCount();
-
-				QgsVector3D lookAtCenterPoint = QgsVector3D(223.9, 1030.5, 220.7);
-
-				float distance = extent.width() / 1.2; // 根据场景范围调整相机距离
-				qDebug() << "distance: " << distance << " extent.width(): " << extent.width();
-				cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 36.2, 20.0);
-
-				QgsCameraPose cameraPose;
-				QgsVector3D cameraPostPoint = QgsVector3D(223.9, 1030.5, 220.7);
-				cameraPose.setCenterPoint(cameraPostPoint);
-				cameraPose.setDistanceFromCenterPoint(distance);
-				cameraPose.setPitchAngle(36.2);
-				cameraPose.setHeadingAngle(20.0);
-
-				cameraController->setCameraPose(cameraPose);
-				canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 36.2, 20.0);
-				canvas3dCameraController->setCameraPose(cameraPose);
-				QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
-				bool capture_image_status = img.save(capture_scene_image_path);
-				qDebug() << "Save capture_scene_image: " << capture_image_status;
-			}
-		});
-	}
+//	if (scene->sceneState() == Qgs3DMapScene::Ready && scene->totalPendingJobsCount() == 0) {
+//		qDebug() << "Scene is ready, capturing image...";
+//
+//        QgsVector3D lookAtCenterPoint = QgsVector3D(100, 500, 220.0);
+//
+//        float distance = extent.width() / 1.2; // 根据场景范围调整相机距离
+//        //float distance = 1857.9;
+//        qDebug() << "distance: " << distance << " extent.width(): " << extent.width();
+//        cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 38.0, 20.0);
+//
+//        QgsCameraPose cameraPose;
+//        QgsVector3D cameraPostPoint = QgsVector3D(100, 500, 220.0);
+//        cameraPose.setCenterPoint(cameraPostPoint);
+//        cameraPose.setDistanceFromCenterPoint(distance);
+//        cameraPose.setPitchAngle(38.0);
+//        cameraPose.setHeadingAngle(20.0);
+//
+//        cameraController->setCameraPose(cameraPose);
+//        canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 38.0, 20.0);
+//        canvas3dCameraController->setCameraPose(cameraPose);
+//
+//        CameraUtil::LookingAtInfo(cameraController);
+//        CameraUtil::PoseInfo(cameraController);
+//        CameraUtil::LookingAtInfo(canvas3dCameraController);
+//        CameraUtil::PoseInfo(canvas3dCameraController);
+//        qDebug() << "extent: ";
+//        CameraUtil::ExtentInfo(extent);
+//
+//		QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
+//		bool capture_image_status = img.save(capture_scene_image_path);
+//		qDebug() << "Save capture_scene_image: " << capture_image_status;
+//	}
 
 
 
@@ -569,15 +536,13 @@ int main(int argc, char* argv[]) {
 	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false);
 	qDebug() << "add 3d layout done";
 
-    QString d3_png_scene_image_path = QString().append(save_qgis_project_path).append("/").append("d3_png_scene_image_path.png");
-    qDebug() << "d3_png_scene_image_path: " << d3_png_scene_image_path;
-//    jwLayout3d->exportLayoutToImage(d3_png_scene_image_path);
-//    QObject::connect(canvas3d->scene(), &Qgs3DMapScene::totalPendingJobsCountChanged, this, [this]() {
-//        if (canvas3d->scene()->totalPendingJobsCount() == 0) {
-//            // 所有渲染任务完成，可以导出布局
-//            jwLayout3d->exportLayoutToImage(d3_png_scene_image_path);
-//        }
-//    });
+    QString d3_scene_png = QString().append(save_qgis_project_path).append("/").append("d3_scene_png.png");
+    qDebug() << "d3_scene_png: " << d3_scene_png;
+    jwLayout3d->exportLayoutToImage(d3_scene_png);
+
+//    QString d3_scene_pdf = QString().append(save_qgis_project_path).append("/").append("d3_scene.pdf");
+//    qDebug() << "d3_scene_pdf: " << d3_scene_pdf;
+//    jwLayout3d->exportLayoutToPdf(d3_scene_pdf);
 
 	qDebug() << "验证布局是否存在";
 	QgsLayoutManager* layout_manager = project->layoutManager();

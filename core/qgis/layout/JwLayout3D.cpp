@@ -956,16 +956,53 @@ void JwLayout3D::addPrintLayout(const QString &layoutType, const QString &layout
 }
 
 void JwLayout3D::exportLayoutToImage(const QString &outputFilePath) {
+    QgsLayoutPageCollection* pageCollection = layout->pageCollection();
+    int pageCount = pageCollection->pageCount();
+    qDebug() << "pageCount: " << pageCount;
+    bool should = pageCollection->shouldExportPage(0);
+    qDebug() << "should: " << should;
+
+    QgsLayoutRenderContext& renderContext = layout->renderContext();
+    QVector<qreal> scales;
+    scales << 1.2;
+    scales << 1.0;
+    renderContext.setPredefinedScales(scales);
+    QVector<qreal> predefinedScales = renderContext.predefinedScales();
+    for (const auto &item: predefinedScales){
+        qDebug() << "predefinedScales: " << item;
+    }
+
     // 创建布局导出器
     QgsLayoutExporter exporter(layout);
 
     // 设置导出选项
     QgsLayoutExporter::ImageExportSettings settings;
     settings.dpi = 300; // 设置DPI
+    settings.flags |= QgsLayoutRenderContext::FlagAntialiasing; // 启用抗锯齿
 
     qDebug() << "export to image: " << outputFilePath;
     // 导出为PNG图片
     QgsLayoutExporter::ExportResult result = exporter.exportToImage(outputFilePath, settings);
+
+    if (result == QgsLayoutExporter::Success) {
+        qDebug() << "Layout exported successfully to:" << outputFilePath;
+    } else {
+        qWarning() << "Failed to export layout to:" << outputFilePath;
+    }
+}
+
+void JwLayout3D::exportLayoutToPdf(const QString &outputFilePath) {
+    // 创建布局导出器
+    QgsLayoutExporter exporter(layout);
+
+    // 设置导出选项
+    QgsLayoutExporter::PdfExportSettings settings;
+    settings.dpi = 300; // 设置DPI
+    settings.flags |= QgsLayoutRenderContext::FlagAntialiasing; // 启用抗锯齿
+
+    qDebug() << "export to image: " << outputFilePath;
+    // 导出为PNG图片
+    QgsLayoutExporter::ExportResult result = exporter.exportToPdf(outputFilePath, settings);
 
     if (result == QgsLayoutExporter::Success) {
         qDebug() << "Layout exported successfully to:" << outputFilePath;
