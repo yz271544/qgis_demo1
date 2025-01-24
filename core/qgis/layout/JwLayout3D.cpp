@@ -562,25 +562,10 @@ void JwLayout3D::set3DCanvas() {
     QgsRectangle extent = fullExtent;
     qDebug() << "set3DCanvas fullExtent:";
     CameraUtil::ExtentInfo(extent);
-//    QgsPointXY center = extent.center();
-//    extent.scale(1);
-//    qDebug() << "extent scale " << 1 << " center x: " << QString::number(center.x(), 'f', 10) << " y:" << QString::number(center.y(), 'f', 10);
-//    const float dist = static_cast< float >( std::max(extent.width(), extent.height()));
-//    qDebug() << "dist: " << dist;
 
-    /*
-     * QOpenGLFunctions created with non-current context
-ASSERT: "QOpenGLFunctions::isInitialized(d_ptr)" in file /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h, line 858
-     * */
-
-//    mapSettings3d->settingsChanged();
     qDebug() << "JwLayout3D::set3DCanvas setMapSettings";
     canvas3d->setMapSettings(mapSettings3d);
-//    canvas3d->camera();
-//    canvas3d->viewFrustum2DExtent();
-//    canvas3d->resetView();
-    //qDebug() << "canvas3d setViewFromTop";
-//    canvas3d->setViewFromTop(extent.center(), dist * 2, 0);
+
     QgsVector3D lookAtCenterPoint = QgsVector3D(100, 500, 220.0);
     QgsPointXY center(lookAtCenterPoint.x(), lookAtCenterPoint.y());
     float distance = extent.width() / 1.2; // 根据场景范围调整相机距离
@@ -588,14 +573,6 @@ ASSERT: "QOpenGLFunctions::isInitialized(d_ptr)" in file /usr/include/x86_64-lin
     float yaw = 20.0;
     canvas3d->setViewFromTop(center, distance, 0);
     canvas3d->cameraController()->setLookingAtPoint(lookAtCenterPoint, distance, pitch , yaw);
-//    QObject::connect( canvas3d->scene(), &Qgs3DMapScene::totalPendingJobsCountChanged, canvas3d, [canvas3d]
-//    {
-//        qDebug() << "pending jobs:" << canvas3d->scene()->totalPendingJobsCount();
-//    } );
-
-    //qDebug() << "pending jobs:" << canvas3d->scene()->totalPendingJobsCount();
-//    mapSettings3d->settingsChanged();
-//    canvas3d->setMapSettings(mapSettings3d);
 }
 
 void JwLayout3D::set3DMap(
@@ -636,6 +613,10 @@ void JwLayout3D::set3DMap(
 
     mapItem3d->setMapSettings(mapSettings3d);
 
+    Qgs3DAxisSettings axis;
+    axis.setMode(Qgs3DAxisSettings::Mode::Crs);
+    qDebug() << "mapSettings3d set3DAxisSettings";
+    mapSettings3d->set3DAxisSettings(axis);
 
     QgsCameraPose cameraPose;
     cameraPose.setCenterPoint(lookAtCenterPoint);

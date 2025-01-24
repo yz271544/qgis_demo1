@@ -441,101 +441,11 @@ int main(int argc, char* argv[]) {
     qDebug() << "construct the QgsOffscreen3DEngine";
     jwLayout3d->get3DMapSettings(remove3DLayerNames, remove3DLayerPrefixes);
     jwLayout3d->set3DCanvas();
-//    qDebug() << "construct the Qgs3DMapSettings";
-//    Qgs3DMapScene* scene = new Qgs3DMapScene(*map_settings_3d, &engine);
-//    engine.setRootEntity( scene );
-//	qDebug() << "construct the Qgs3DMapScene";
-//    QVector<QgsPointXY> verticesOfTrapezoid = scene->viewFrustum2DExtent();
-//    CameraUtil::TrapezoidInfo(verticesOfTrapezoid);
-//
-//    scene->viewZoomFull();
-//
-//    QgsCameraController* canvas3dCameraController = canvas3d->cameraController();
-//
-//    QgsCameraController* cameraController = scene->cameraController();
 
-//    qDebug() << "before modify camera controller scene state:" << scene->sceneState();
-//    qDebug() << "before modify camera controller pending jobs:" << scene->totalPendingJobsCount();
-//    qDebug() << "scene CameraController info";
-//    CameraUtil::LookingAtInfo(cameraController);
-//    CameraUtil::PoseInfo(cameraController);
-//    qDebug() << "canvas3d CameraController info";
-//    CameraUtil::LookingAtInfo(canvas3dCameraController);
-//    CameraUtil::PoseInfo(canvas3dCameraController);
 
     // 设置保存路径
 	QString capture_scene_image_path = QString().append(save_qgis_project_path).append("/").append("capture_scene_image.png");
 	qDebug() << "save image path: " << capture_scene_image_path;
-
-//    canvas3d->saveAsImage(capture_scene_image_path, "png");
-//
-//    // 监听渲染完成信号
-//    QObject::connect(canvas3d, &QgsOffscreen3DEngine::imageCaptured, [=](const QImage& image) {
-//        qDebug() << "Image captured successfully!";
-//        // 可以在这里处理捕获的图像
-//    });
-//
-//    // 使用定时器延迟捕获，确保场景加载完成
-//    QTimer::singleShot(30000,  [=]() {
-//        // 延迟 1 秒后调用 saveAsImage
-//        canvas3d->saveAsImage(capture_scene_image_path, "png");
-//    });
-
-//    Qgs3DUtils::captureSceneImage( engine, scene ); // 保存截图 init
-//	if (scene->sceneState() == Qgs3DMapScene::Ready && scene->totalPendingJobsCount() == 0) {
-//		qDebug() << "Scene is ready, capturing image...";
-//
-//        QgsVector3D lookAtCenterPoint = QgsVector3D(100, 500, 220.0);
-//
-//        float distance = extent.width() / 1.2; // 根据场景范围调整相机距离
-//        //float distance = 1857.9;
-//        qDebug() << "distance: " << distance << " extent.width(): " << extent.width();
-//        cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 38.0, 20.0);
-//
-//        QgsCameraPose cameraPose;
-//        QgsVector3D cameraPostPoint = QgsVector3D(100, 500, 220.0);
-//        cameraPose.setCenterPoint(cameraPostPoint);
-//        cameraPose.setDistanceFromCenterPoint(distance);
-//        cameraPose.setPitchAngle(38.0);
-//        cameraPose.setHeadingAngle(20.0);
-//
-//        cameraController->setCameraPose(cameraPose);
-//        canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 38.0, 20.0);
-//        canvas3dCameraController->setCameraPose(cameraPose);
-//
-//        CameraUtil::LookingAtInfo(cameraController);
-//        CameraUtil::PoseInfo(cameraController);
-//        CameraUtil::LookingAtInfo(canvas3dCameraController);
-//        CameraUtil::PoseInfo(canvas3dCameraController);
-//        qDebug() << "extent: ";
-//        CameraUtil::ExtentInfo(extent);
-//
-//		QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
-//		bool capture_image_status = img.save(capture_scene_image_path);
-//		qDebug() << "Save capture_scene_image: " << capture_image_status;
-//	}
-
-//	// 创建辅助对象并捕获图像
-//	ImageCaptureHelper* helper = new ImageCaptureHelper(engine, qgs_3d_map_scene, capture_scene_image_path);
-
-//	QObject::connect(qgs_3d_map_scene, &Qgs3DMapScene::sceneStateChanged, [helper, qgs_3d_map_scene]() {
-//		if (qgs_3d_map_scene->sceneState() == Qgs3DMapScene::Ready) {
-//			qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " start capture image";
-//			helper->captureImage();
-//			qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " capture image done";
-//		}
-//	});
-
-	// qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " start capture image";
-	// helper->captureImage();
-	// qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " capture image done";
-
-	// QImage capture_scene_image = Qgs3DUtils::captureSceneImage(*qgs_offscreen_3d_engine, qgs_3d_map_scene);
-	// qDebug() << "capture_scene_image size:" << capture_scene_image.size();
-	// QString capture_scene_image_path = QString().append(save_qgis_project_path).append("/").append("capture_scene_image.png");
-	// qDebug() << "capture_scene_image_path: " << capture_scene_image_path;
-	// bool capture_image_status = capture_scene_image.save(capture_scene_image_path);
-	// qDebug() << "save capture_scene_image: " << capture_image_status;
 
 	qDebug() << "JwLayout3D addPrintLayout";
 	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false);
@@ -568,18 +478,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	qDebug() << "save projectPath:" << projectPath << "successes";
-
-	// 清理关系
-	// qDebug() << "清理关系";
-	// QgsRelationManager* relationManager = project->relationManager();
-	// if (relationManager) {
-	// 	QMap<QString, QgsRelation> qgs_relations = relationManager->relations();
-	// 	qDebug() << " relation count: " << qgs_relations.count();
-	// 	for (auto it = qgs_relations.constBegin(); it != qgs_relations.constEnd(); ++it) {
-	// 		qDebug() << "Relation ID:" << it.key() << " Name:" << it.value().name();
-	// 		relationManager->removeRelation(it.key());
-	// 	}
-	// }
 
 	// 清理布局
 	// qDebug() << "清理布局";
