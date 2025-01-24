@@ -563,7 +563,7 @@ void JwLayout3D::set3DCanvas() {
     qDebug() << "set3DCanvas fullExtent:";
     CameraUtil::ExtentInfo(extent);
 
-    qDebug() << "JwLayout3D::set3DCanvas setMapSettings";
+    qDebug() << "JwLayout3D::set3DCanvas";
     canvas3d->setMapSettings(mapSettings3d);
 
     QgsVector3D lookAtCenterPoint = QgsVector3D(100, 500, 220.0);
@@ -598,7 +598,7 @@ void JwLayout3D::set3DMap(
     mapItem3d = new QgsLayoutItem3DMap(layout);
     // qDebug() << "mapItem3d setIsTemporal";
     // mapItem3d->setIsTemporal(true);
-    qDebug() << "mapItem3d setMapSettings";
+    qDebug() << "mapItem3d";
     QgsVector3D lookAtCenterPoint = QgsVector3D(100, 500, 220.0);
     QgsPointXY center(lookAtCenterPoint.x(), lookAtCenterPoint.y());
     const QgsReferencedRectangle projectExtent = project->viewSettings()->fullExtent();
@@ -623,7 +623,7 @@ void JwLayout3D::set3DMap(
     cameraPose.setDistanceFromCenterPoint(distance);
     cameraPose.setPitchAngle(pitch);
     cameraPose.setHeadingAngle(yaw);
-
+    // set camera pose for layout
     mapItem3d->setCameraPose(cameraPose);
     // 设置地图项大小
     mapWidth = availablePaper.getPaperSize().second - imageSpec["main_left_margin"].toDouble() -
