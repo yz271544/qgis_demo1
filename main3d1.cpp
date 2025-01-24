@@ -439,8 +439,7 @@ int main(int argc, char* argv[]) {
 //	engine->setRenderCaptureEnabled(true);
 //	engine->requestCaptureImage();
     qDebug() << "construct the QgsOffscreen3DEngine";
-    Qgs3DMapSettings* map_settings_3d = jwLayout3d->get3DMapSettings(remove3DLayerNames, remove3DLayerPrefixes);
-
+    jwLayout3d->get3DMapSettings(remove3DLayerNames, remove3DLayerPrefixes);
     jwLayout3d->set3DCanvas();
 //    qDebug() << "construct the Qgs3DMapSettings";
 //    Qgs3DMapScene* scene = new Qgs3DMapScene(*map_settings_3d, &engine);
@@ -468,7 +467,19 @@ int main(int argc, char* argv[]) {
 	QString capture_scene_image_path = QString().append(save_qgis_project_path).append("/").append("capture_scene_image.png");
 	qDebug() << "save image path: " << capture_scene_image_path;
 
-    canvas3d->saveAsImage(capture_scene_image_path, "png");
+//    canvas3d->saveAsImage(capture_scene_image_path, "png");
+//
+//    // 监听渲染完成信号
+//    QObject::connect(canvas3d, &QgsOffscreen3DEngine::imageCaptured, [=](const QImage& image) {
+//        qDebug() << "Image captured successfully!";
+//        // 可以在这里处理捕获的图像
+//    });
+//
+//    // 使用定时器延迟捕获，确保场景加载完成
+//    QTimer::singleShot(30000,  [=]() {
+//        // 延迟 1 秒后调用 saveAsImage
+//        canvas3d->saveAsImage(capture_scene_image_path, "png");
+//    });
 
 //    Qgs3DUtils::captureSceneImage( engine, scene ); // 保存截图 init
 //	if (scene->sceneState() == Qgs3DMapScene::Ready && scene->totalPendingJobsCount() == 0) {
@@ -526,17 +537,17 @@ int main(int argc, char* argv[]) {
 	// bool capture_image_status = capture_scene_image.save(capture_scene_image_path);
 	// qDebug() << "save capture_scene_image: " << capture_image_status;
 
-//	qDebug() << "JwLayout3D addPrintLayout";
-//	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false);
-//	qDebug() << "add 3d layout done";
+	qDebug() << "JwLayout3D addPrintLayout";
+	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false);
+	qDebug() << "add 3d layout done";
 //
-//    QString d3_scene_png = QString().append(save_qgis_project_path).append("/").append("d3_scene_png.png");
-//    qDebug() << "d3_scene_png: " << d3_scene_png;
-//    jwLayout3d->exportLayoutToImage(d3_scene_png);
+    QString d3_scene_png = QString().append(save_qgis_project_path).append("/").append("d3_scene.png");
+    qDebug() << "d3_scene_png: " << d3_scene_png;
+    jwLayout3d->exportLayoutToImage(d3_scene_png);
 
-//    QString d3_scene_pdf = QString().append(save_qgis_project_path).append("/").append("d3_scene.pdf");
-//    qDebug() << "d3_scene_pdf: " << d3_scene_pdf;
-//    jwLayout3d->exportLayoutToPdf(d3_scene_pdf);
+    QString d3_scene_pdf = QString().append(save_qgis_project_path).append("/").append("d3_scene.pdf");
+    qDebug() << "d3_scene_pdf: " << d3_scene_pdf;
+    jwLayout3d->exportLayoutToPdf(d3_scene_pdf);
 
 	qDebug() << "验证布局是否存在";
 	QgsLayoutManager* layout_manager = project->layoutManager();

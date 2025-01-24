@@ -572,9 +572,13 @@ void JwLayout3D::set3DCanvas() {
      * QOpenGLFunctions created with non-current context
 ASSERT: "QOpenGLFunctions::isInitialized(d_ptr)" in file /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h, line 858
      * */
+
+//    mapSettings3d->settingsChanged();
+    qDebug() << "JwLayout3D::set3DCanvas setMapSettings";
     canvas3d->setMapSettings(mapSettings3d);
-    canvas3d->viewFrustum2DExtent();
-    canvas3d->resetView();
+//    canvas3d->camera();
+//    canvas3d->viewFrustum2DExtent();
+//    canvas3d->resetView();
     //qDebug() << "canvas3d setViewFromTop";
 //    canvas3d->setViewFromTop(extent.center(), dist * 2, 0);
     QgsVector3D lookAtCenterPoint = QgsVector3D(100, 500, 220.0);
@@ -590,6 +594,8 @@ ASSERT: "QOpenGLFunctions::isInitialized(d_ptr)" in file /usr/include/x86_64-lin
 //    } );
 
     //qDebug() << "pending jobs:" << canvas3d->scene()->totalPendingJobsCount();
+//    mapSettings3d->settingsChanged();
+//    canvas3d->setMapSettings(mapSettings3d);
 }
 
 void JwLayout3D::set3DMap(
@@ -616,7 +622,28 @@ void JwLayout3D::set3DMap(
     // qDebug() << "mapItem3d setIsTemporal";
     // mapItem3d->setIsTemporal(true);
     qDebug() << "mapItem3d setMapSettings";
+    QgsVector3D lookAtCenterPoint = QgsVector3D(100, 500, 220.0);
+    QgsPointXY center(lookAtCenterPoint.x(), lookAtCenterPoint.y());
+    const QgsReferencedRectangle projectExtent = project->viewSettings()->fullExtent();
+    const QgsRectangle fullExtent = Qgs3DUtils::tryReprojectExtent2D( projectExtent, projectExtent.crs(), mapSettings3d->crs(), project->transformContext() );
+    QgsRectangle extent = fullExtent;
+    float distance = extent.width() / 1.2; // 根据场景范围调整相机距离
+    float pitch = 38.0;
+    float yaw = 20.0;
+    qDebug() << "distance: " << distance;
+    canvas3d->setViewFromTop(center, distance, 0);
+    canvas3d->cameraController()->setLookingAtPoint(lookAtCenterPoint, distance, pitch , yaw);
+
     mapItem3d->setMapSettings(mapSettings3d);
+
+
+    QgsCameraPose cameraPose;
+    cameraPose.setCenterPoint(lookAtCenterPoint);
+    cameraPose.setDistanceFromCenterPoint(distance);
+    cameraPose.setPitchAngle(pitch);
+    cameraPose.setHeadingAngle(yaw);
+
+    mapItem3d->setCameraPose(cameraPose);
     // 设置地图项大小
     mapWidth = availablePaper.getPaperSize().second - imageSpec["main_left_margin"].toDouble() -
                imageSpec["main_right_margin"].toDouble();
@@ -938,7 +965,7 @@ void JwLayout3D::exportLayoutToPdf(const QString &outputFilePath) {
     settings.dpi = 300; // 设置DPI
     settings.flags |= QgsLayoutRenderContext::FlagAntialiasing; // 启用抗锯齿
 
-    qDebug() << "export to image: " << outputFilePath;
+    qDebug() << "export to pdf: " << outputFilePath;
     // 导出为PNG图片
     QgsLayoutExporter::ExportResult result = exporter.exportToPdf(outputFilePath, settings);
 
