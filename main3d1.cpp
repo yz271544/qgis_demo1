@@ -433,8 +433,8 @@ int main(int argc, char* argv[]) {
 	qDebug() << "constructor 3d JwLayout3D";
 	JwLayout3D* jwLayout3d = new JwLayout3D(project, canvas, canvas3d, "test", imageSpec, save_qgis_project_path);
 
-	QgsOffscreen3DEngine engine;
-	engine.setSize(QSize( 4960, 3507 ));
+//	QgsOffscreen3DEngine engine;
+//	engine.setSize(QSize( 4960, 3507 ));
 //	engine->setFrustumCullingEnabled(true);
 //	engine->setRenderCaptureEnabled(true);
 //	engine->requestCaptureImage();
@@ -448,9 +448,9 @@ int main(int argc, char* argv[]) {
 //	qDebug() << "construct the Qgs3DMapScene";
 //    QVector<QgsPointXY> verticesOfTrapezoid = scene->viewFrustum2DExtent();
 //    CameraUtil::TrapezoidInfo(verticesOfTrapezoid);
-
+//
 //    scene->viewZoomFull();
-
+//
 //    QgsCameraController* canvas3dCameraController = canvas3d->cameraController();
 //
 //    QgsCameraController* cameraController = scene->cameraController();

@@ -582,7 +582,7 @@ ASSERT: "QOpenGLFunctions::isInitialized(d_ptr)" in file /usr/include/x86_64-lin
     float distance = extent.width() / 1.2; // 根据场景范围调整相机距离
     float pitch = 38.0;
     float yaw = 20.0;
-    //canvas3d->setViewFromTop(center, extent.width() / 1.2, 0);
+    canvas3d->setViewFromTop(center, distance, 0);
     canvas3d->cameraController()->setLookingAtPoint(lookAtCenterPoint, distance, pitch , yaw);
 //    QObject::connect( canvas3d->scene(), &Qgs3DMapScene::totalPendingJobsCountChanged, canvas3d, [canvas3d]
 //    {
