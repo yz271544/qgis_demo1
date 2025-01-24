@@ -5,25 +5,32 @@
 #include "QgsUtil.h"
 #include "FileUtil.h"
 
-QgsTextFormat QtFontUtil::create_font(const std::string& font_family, double font_size, const std::string& font_color,
-	bool is_bold, bool is_italic, Qgis::TextOrientation orientation, double spacing) {
-	QgsTextFormat text_format;
-	QFont font(font_family.c_str());
+QgsTextFormat* QtFontUtil::create_font(
+	const QString& font_family,
+	int8_t font_size,
+	const QString& font_color,
+	bool is_bold,
+	bool is_italic,
+	Qgis::TextOrientation orientation,
+	double spacing)
+{
+	QgsTextFormat* text_format = new QgsTextFormat();
+	QFont font(font_family);
 	font.setPointSizeF(font_size);
 	font.setBold(is_bold);
 	font.setItalic(is_italic);
-	text_format.setFont(font);
-	text_format.setSize(font_size);
-	text_format.setColor(QColor(font_color.c_str()));
-	text_format.setOrientation(orientation);
+	text_format->setFont(font);
+	text_format->setSize(font_size);
+	text_format->setColor(QColor(font_color));
+	text_format->setOrientation(orientation);
 	QgsTextBufferSettings buffer_settings;
 	buffer_settings.setEnabled(true);
 	buffer_settings.setSize(spacing);
-	text_format.setBuffer(buffer_settings);
+	text_format->setBuffer(buffer_settings);
 	return text_format;
 }
 
-void QgsUtil::show_layer_label(QgsVectorLayer* layer, const std::string& style) {
+void QgsUtil::show_layer_label(QgsVectorLayer* layer, const QString& style) {
 	layer->setLabelsEnabled(true);
 	layer->setDisplayExpression("name");
 	// Create label settings
@@ -32,11 +39,11 @@ void QgsUtil::show_layer_label(QgsVectorLayer* layer, const std::string& style) 
 	// label_settings.placement = QgsPalLayerSettings::OverPoint;
 
 	// Create text format for the labels
-	QgsTextFormat text_format = QtFontUtil::create_font(style, 12.0, "#000000", false, false,
+	QgsTextFormat* text_format = QtFontUtil::create_font(style, 12, QString("#000000"), false, false,
 		Qgis::TextOrientation::Horizontal, 0.0);
 
 	// Apply text format to label settings
-	label_settings.setFormat(text_format);
+	label_settings.setFormat(*text_format);
 
 	// Apply label settings to the layer
 	QgsVectorLayerSimpleLabeling* labeling = new QgsVectorLayerSimpleLabeling(label_settings);
@@ -44,17 +51,17 @@ void QgsUtil::show_layer_label(QgsVectorLayer* layer, const std::string& style) 
 }
 
 QgsVectorLayerSimpleLabeling*
-QgsUtil::get_layer_label(const std::string& style, const std::string& label_of_field_name) {
+QgsUtil::get_layer_label(const QString& style, const std::string& label_of_field_name) {
 	QgsPalLayerSettings label_settings;
 	label_settings.fieldName = label_of_field_name.c_str();
 	// label_settings.placement = QgsPalLayerSettings::OverPoint;
 
 	// Create text format for the labels
-	QgsTextFormat text_format = QtFontUtil::create_font(style, 12.0, "#000000", false, false,
+	QgsTextFormat* text_format = QtFontUtil::create_font(style, 12, QString("#000000"), false, false,
 		Qgis::TextOrientation::Horizontal, 0.0);
 
 	// Apply text format to label settings
-	label_settings.setFormat(text_format);
+	label_settings.setFormat(*text_format);
 
 	// Apply label settings to the layer
 	return new QgsVectorLayerSimpleLabeling(label_settings);

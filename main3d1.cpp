@@ -9,7 +9,7 @@
 #include <QIODevice>
 
 #include <complex>
-#include <execution>
+// #include <execution>
 #include <QCoreApplication>
 #include <QTextCodec>
 #include <QUrl>
@@ -33,7 +33,14 @@
 #include <qgs3dmapcanvas.h>
 #include <qgswkbtypes.h>
 #include <qgslayoutmanager.h>
+#include <qgsmapviewsmanager.h>
+#include <qgsoffscreen3dengine.h>
+#include <qgs3dutils.h>
 
+#include <yaml-cpp/parser.h>
+#include <yaml-cpp/yaml.h>
+#include <QOffscreenSurface>
+#include <QOpenGLContext>
 
 #include "config.h"
 #include "core/qgis/payload/InputPoint.h"
@@ -42,12 +49,22 @@
 #include "qgspluginlayerregistry.h"
 #include "core/qgis/style/StylePoint.h"
 #include "core/utils/FileUtil.h"
+
+
+#include "core/qgis/layout/JwLayout.h"
+#include "core/qgis/layout/JwLayout3D.h"
+#include "core/utils/NodeToMap.h"
+#include "core/utils/JsonUtil.h"
+#include "core/qgis/d3/ImageCaptureHelper.h"
+#include "core/qgis/d3/CameraUtil.h"
+
 #if defined(_WIN32)
 #include <windows.h>
 #endif
 
 
 int main(int argc, char* argv[]) {
+	qDebug() << "qgis printer server";
 #if defined(_WIN32)
 	// 设置控制台输出为UTF - 8
 	SetConsoleOutputCP(CP_UTF8);
@@ -57,11 +74,37 @@ int main(int argc, char* argv[]) {
 
 	// init QGIS app
 	QgsApplication app(argc, argv, true);
+	qDebug() << "QGIS_PREFIX_PATH: " << QGIS_PREFIX_PATH;
 	QgsApplication::setPrefixPath(QGIS_PREFIX_PATH, true);
 	//QgsApplication::setPrefixPath("/usr", true);
 	QgsApplication::init();
 	QgsApplication::initQgis();
 	Qgs3D::initialize();
+
+    // 设置 OpenGL 表面格式
+    QSurfaceFormat format;
+    format.setVersion(4, 1);  // 设置 OpenGL 版本
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    QSurfaceFormat::setDefaultFormat(format);
+
+    // 创建离屏表面
+    QOffscreenSurface surface;
+    surface.setFormat(format);
+    surface.create();
+
+    // 创建 OpenGL 上下文
+    QOpenGLContext context;
+    context.setFormat(format);
+    if (!context.create()) {
+        qWarning() << "Failed to create OpenGL context";
+        return -1;
+    }
+
+    // 使上下文成为当前上下文
+    if (!context.makeCurrent(&surface)) {
+        qWarning() << "Failed to make OpenGL context current";
+        return -1;
+    }
 
 	qDebug() << "Plugin path: " << QgsApplication::pluginPath();
 	QString save_qgis_project_path = QString(QGIS_PROJECT_PATH);
@@ -75,8 +118,9 @@ int main(int argc, char* argv[]) {
 	project->setCrs(qgscrs);
 
 	// create XYZ base layer
-	QString baseXyzUrl = "type=xyz&url=http://47.94.145.6/map/lx/{z}/{x}/{y}.png&zmax=19&zmin=0";
-	//QString baseXyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
+	 QString baseXyzUrl = "type=xyz&url=http://47.94.145.6/map/lx/{z}/{x}/{y}.png&zmax=19&zmin=0";
+	// QString baseXyzUrl = "type=xyz&url=http://172.31.100.34:38083/map/lx/{z}/{x}/{y}.png&zmax=17&zmin=0";
+    // QString baseXyzUrl = "type=xyz&http://tile.openstreetmap.org/{z}/{x}/{y}.png&zmax=19&zmin=0";
 
 	QgsRasterLayer* baseXyzLayer = new QgsRasterLayer(baseXyzUrl, BASE_TILE_NAME, "wms");
 	if (!baseXyzLayer->isValid()) {
@@ -89,6 +133,7 @@ int main(int argc, char* argv[]) {
 
 	// create MAIN XYZ layer
 	QString urlString = "http://47.94.145.6/map/orthogonal/1847168269595754497-健康谷正射";
+	// QString urlString = "http://172.31.100.34:38083/map/orthogonal/1847168269595754497-健康谷正射";
 	QString encodedOrthogonalXyzUrl = "type=xyz&url=";
 	encodedOrthogonalXyzUrl.append(urlString);
 	encodedOrthogonalXyzUrl.append("/{z}/{x}/{y}");
@@ -103,9 +148,10 @@ int main(int argc, char* argv[]) {
 	qDebug() << "add orthogonal layer to project";
 
 	// 3D Scene
-	QString realistic3d_tile_url =
-		"url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
+	QString realistic3d_tile_url = "url=http://47.94.145.6/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
+	// QString realistic3d_tile_url = "url=http://172.31.100.34:38083/map/realistic3d/1847168269595754497-jkg/tileset.json&http-header:referer=";
 	QgsTiledSceneLayer* tiled_scene_layer = new QgsTiledSceneLayer(realistic3d_tile_url, REAL3D_TILE_NAME, "cesiumtiles");
+	// tiled_scene_layer->setCrs(project->crs());
 	QgsTiledSceneLayer3DRenderer* qgs_tiled_scene_layer_3d_renderer = new QgsTiledSceneLayer3DRenderer();
 	qgs_tiled_scene_layer_3d_renderer->setLayer(tiled_scene_layer);
 	tiled_scene_layer->setRenderer3D(qgs_tiled_scene_layer_3d_renderer);
@@ -303,10 +349,11 @@ int main(int argc, char* argv[]) {
 			extent.combineExtentWith(ext);
 		}
 	}
-	qDebug() << "extent: " << extent << " width: " << extent.width() << " height: " << extent.height()
-		<< " xMinimum:" << extent.xMinimum() << " yMinimum:" << extent.yMinimum() << " xMaximum:" << extent.
-		xMaximum() << " yMaximum:" << extent.yMaximum()
-		<< " area: " << extent.area() << " perimeter: " << extent.perimeter() << " center: " << extent.center()
+	qDebug() << "extent: " << extent << " width: " << QString::number(extent.width(),'f',3) << " height: " << QString::number(extent.height(),'f',3)
+		<< " xMinimum:" << QString::number(extent.xMinimum(),'f',3) << " yMinimum:" << QString::number(extent.yMinimum(),'f',3)
+		<< " xMaximum:" << QString::number(extent.xMaximum(),'f',3) << " yMaximum:" << QString::number(extent.yMaximum(),'f',3)
+		<< " area: " << QString::number(extent.area(),'f',3) << " perimeter: " << QString::number(extent.perimeter(),'f',3)
+		<< " center -> x:" << QString::number(extent.center().x(), 'f', 3) << " y:" << QString::number(extent.center().y(), 'f', 3)
 		<< " isEmpty: " << extent.isEmpty() << " isNull: " << extent.isNull() << " isFinite: " << extent.isFinite();
 	qgs_map_settings.setLayers(b_layers);
 	qgs_map_settings.setExtent(extent, false);
@@ -316,9 +363,204 @@ int main(int argc, char* argv[]) {
 	QgsReferencedRectangle* referenced_rectangle = new QgsReferencedRectangle(extent, project->crs());
 	project->viewSettings()->setDefaultViewExtent(*referenced_rectangle);
 
-	QString projectPath = QString().append(save_qgis_project_path).append(QGIS_PROJECT_FILE_NAME);
+#if defined(_WIN32)
+	YAML::Node config = YAML::LoadFile("D:/iProject/cpath/qgis_demo1/config/settings.yaml");
+#elif defined(__linux__)
+	YAML::Node config = YAML::LoadFile("/lyndon/iProject/cpath/qgis_demo1/config/settings.yaml");
+#endif
+	// QMap<QString, YAML::Node>* specification_map = new QMap<QString, YAML::Node>();
+	// if (config["specification"]) {
+	// 	for (YAML::const_iterator it = config["specification"].begin(); it != config["specification"].end(); ++it) {
+	// 		QString name = QString((*it)["name"].as<std::string>().c_str());
+	// 		specification_map->insert(name, *it);
+	// 	}
+	// }
+	//
+	// // 遍历 specification_map
+	// for (auto it = specification_map->begin(); it != specification_map->end(); ++it) {
+	// 	QString key = it.key();  // 获取当前的 key
+	// 	YAML::Node value = it.value();  // 获取当前的 value
+	//
+	// 	// 检查 value 中是否存在 "local" 节点
+	// 	if (value["local"]) {
+	// 		// 获取 "local" 节点的值并打印
+	// 		QString localValue = QString(value["local"].as<std::string>().c_str());
+	// 		qDebug() << "Key:" << key << ", Local:" << localValue;
+	// 	} else {
+	// 		qDebug() << "Key:" << key << ", Local: (not found)";
+	// 	}
+	// }
+
+	QVariantMap localConfig = NodeToMap::mapToVariantMap(config);
+	qDebug() << "localConfig: " << localConfig;
+	// YAML::Node localConfig = config["specification"]["现场位置图"];
+	QList<QVariant> specVariants = localConfig["specification"].toList();
+	// qDebug() << "specVariants: " << specVariants;
+	QVariantMap imageSpec = specVariants[0].toMap();
+	// qDebug() << "imageSpec:" << imageSpec;
+
+
+	qDebug() << "add 2d layout";
+	JwLayout* jwLayout = new JwLayout(project, canvas, "test", imageSpec, save_qgis_project_path);
+
+	QString layout_type = "现场位置图";
+	QString joined_layout_name = QString(layout_type).append("-").append("A3");
+
+	QString plottingWeb = "{\"selectPath\":true,\"path\":\"健康谷正射\",\"tileIndex\":[[846789,407356],[856152,402089]],\"sceneId\":\"1847168269595754497\",\"sceneName\":\"test\",\"topicCategory\":\"\",\"geojson\":{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[111.45614558807182,40.718542891344214],[111.45614558807182,40.73911269545787],[111.51314153018527,40.73911269545787],[111.51314153018527,40.718542891344214],[111.45614558807182,40.718542891344214]]]},\"properties\":{}},\"savePath\":\"C:/Users/Administrator/Desktop\",\"sceneType\":\"01\",\"layinfo\":{\"title\":{\"text\":\"test郑州二期警务部署图\",\"position\":[],\"borderColor\":\"rgba(0,0,0,1)\",\"fillColor\":\"rgba(255,0,0,1)\",\"fontSize\":28,\"color\":\"rgba(0,0,0,1)\",\"fontBorderColor\":\"\"},\"subTitle\":{\"text\":\"右侧索引标题\",\"color\":\"rgba(0,0,0,1)\",\"fontSize\":16},\"remark\":[{\"text\":\"指挥: 这里填写指挥信息\",\"position\":[0,0,28,10],\"borderColor\":\"\",\"fillColor\":\"rgba(0,151,233,1)\",\"fontSize\":18,\"color\":\"rgba(0,0,0,1)\",\"url\":\"C:/security2.0/ToDWG/tmp/0.png\"},{\"text\":\"备注: 这里填写备注信息\",\"position\":[0,90,28,10],\"borderColor\":\"\",\"fillColor\":\"rgba(0,51,133,1)\",\"fontSize\":18,\"color\":\"rgba(0,0,0,1)\",\"url\":\"C:/security2.0/ToDWG/tmp/0.png\"}],\"north\":{\"position\":[97,0,2,8],\"rotate\":30},\"arrows\":[{\"position\":[80,80,10,2],\"rotate\":30}],\"scaleBar\":true},\"paper\":\"a3\",\"pictureUnit\":\"制图单位：xxx 制\",\"mapType\":{\"map\":true,\"electron\":false}}";
+	QJsonObject plottingWebObj = QJsonDocument::fromJson(plottingWeb.toUtf8()).object();
+	// qDebug() << "plottingWebObj: " << plottingWebObj;
+	QVariantMap plottingWebVariants = JsonUtil::jsonObjectToVariantMap(plottingWebObj);
+	// qDebug() << "plottingWebVariants: " << plottingWebVariants;
+	PaperSpecification availablePaper("A3");
+
+	QVector<QString> removeLayerNames = QVector<QString>();
+	QVector<QString> removeLayerPrefixes = QVector<QString>();
+	removeLayerPrefixes.append(REAL3D_TILE_NAME);
+	jwLayout->addPrintLayout(QString("2d"), joined_layout_name, plottingWebVariants, availablePaper, false, removeLayerNames, removeLayerPrefixes);
+	qDebug() << "add 2d layout done";
+
+
+	qDebug() << "add 3d layout";
+	QString joined_3d_layout_name = QString(layout_type).append("-3D").append("-").append("A3");
+	QVector<QString> remove3DLayerNames = QVector<QString>();
+	remove3DLayerNames.append(BASE_TILE_NAME);
+	QVector<QString> remove3DLayerPrefixes = QVector<QString>();
+	remove3DLayerPrefixes.append(MAIN_TILE_NAME);
+	qDebug() << "constructor 3d canvas";
+    // 初始化 Qgs3DMapCanvas
+	Qgs3DMapCanvas* canvas3d = new Qgs3DMapCanvas();
+    canvas3d->show(); // 即使是无头模式，也需要调用 show() 来初始化 OpenGL 上下文
+	qDebug() << "constructor 3d JwLayout3D";
+	JwLayout3D* jwLayout3d = new JwLayout3D(project, canvas, canvas3d, "test", imageSpec, save_qgis_project_path);
+
+//	QgsOffscreen3DEngine engine;
+//	engine.setSize(QSize( 4960, 3507 ));
+//	engine->setFrustumCullingEnabled(true);
+//	engine->setRenderCaptureEnabled(true);
+//	engine->requestCaptureImage();
+    qDebug() << "construct the QgsOffscreen3DEngine";
+    jwLayout3d->get3DMapSettings(remove3DLayerNames, remove3DLayerPrefixes);
+    jwLayout3d->set3DCanvas();
+//    qDebug() << "construct the Qgs3DMapSettings";
+//    Qgs3DMapScene* scene = new Qgs3DMapScene(*map_settings_3d, &engine);
+//    engine.setRootEntity( scene );
+//	qDebug() << "construct the Qgs3DMapScene";
+//    QVector<QgsPointXY> verticesOfTrapezoid = scene->viewFrustum2DExtent();
+//    CameraUtil::TrapezoidInfo(verticesOfTrapezoid);
+//
+//    scene->viewZoomFull();
+//
+//    QgsCameraController* canvas3dCameraController = canvas3d->cameraController();
+//
+//    QgsCameraController* cameraController = scene->cameraController();
+
+//    qDebug() << "before modify camera controller scene state:" << scene->sceneState();
+//    qDebug() << "before modify camera controller pending jobs:" << scene->totalPendingJobsCount();
+//    qDebug() << "scene CameraController info";
+//    CameraUtil::LookingAtInfo(cameraController);
+//    CameraUtil::PoseInfo(cameraController);
+//    qDebug() << "canvas3d CameraController info";
+//    CameraUtil::LookingAtInfo(canvas3dCameraController);
+//    CameraUtil::PoseInfo(canvas3dCameraController);
+
+    // 设置保存路径
+	QString capture_scene_image_path = QString().append(save_qgis_project_path).append("/").append("capture_scene_image.png");
+	qDebug() << "save image path: " << capture_scene_image_path;
+
+//    canvas3d->saveAsImage(capture_scene_image_path, "png");
+//
+//    // 监听渲染完成信号
+//    QObject::connect(canvas3d, &QgsOffscreen3DEngine::imageCaptured, [=](const QImage& image) {
+//        qDebug() << "Image captured successfully!";
+//        // 可以在这里处理捕获的图像
+//    });
+//
+//    // 使用定时器延迟捕获，确保场景加载完成
+//    QTimer::singleShot(30000,  [=]() {
+//        // 延迟 1 秒后调用 saveAsImage
+//        canvas3d->saveAsImage(capture_scene_image_path, "png");
+//    });
+
+//    Qgs3DUtils::captureSceneImage( engine, scene ); // 保存截图 init
+//	if (scene->sceneState() == Qgs3DMapScene::Ready && scene->totalPendingJobsCount() == 0) {
+//		qDebug() << "Scene is ready, capturing image...";
+//
+//        QgsVector3D lookAtCenterPoint = QgsVector3D(100, 500, 220.0);
+//
+//        float distance = extent.width() / 1.2; // 根据场景范围调整相机距离
+//        //float distance = 1857.9;
+//        qDebug() << "distance: " << distance << " extent.width(): " << extent.width();
+//        cameraController->setLookingAtPoint(lookAtCenterPoint, distance, 38.0, 20.0);
+//
+//        QgsCameraPose cameraPose;
+//        QgsVector3D cameraPostPoint = QgsVector3D(100, 500, 220.0);
+//        cameraPose.setCenterPoint(cameraPostPoint);
+//        cameraPose.setDistanceFromCenterPoint(distance);
+//        cameraPose.setPitchAngle(38.0);
+//        cameraPose.setHeadingAngle(20.0);
+//
+//        cameraController->setCameraPose(cameraPose);
+//        canvas3dCameraController->setLookingAtPoint(lookAtCenterPoint, distance, 38.0, 20.0);
+//        canvas3dCameraController->setCameraPose(cameraPose);
+//
+//        CameraUtil::LookingAtInfo(cameraController);
+//        CameraUtil::PoseInfo(cameraController);
+//        CameraUtil::LookingAtInfo(canvas3dCameraController);
+//        CameraUtil::PoseInfo(canvas3dCameraController);
+//        qDebug() << "extent: ";
+//        CameraUtil::ExtentInfo(extent);
+//
+//		QImage img = Qgs3DUtils::captureSceneImage(engine, scene);
+//		bool capture_image_status = img.save(capture_scene_image_path);
+//		qDebug() << "Save capture_scene_image: " << capture_image_status;
+//	}
+
+//	// 创建辅助对象并捕获图像
+//	ImageCaptureHelper* helper = new ImageCaptureHelper(engine, qgs_3d_map_scene, capture_scene_image_path);
+
+//	QObject::connect(qgs_3d_map_scene, &Qgs3DMapScene::sceneStateChanged, [helper, qgs_3d_map_scene]() {
+//		if (qgs_3d_map_scene->sceneState() == Qgs3DMapScene::Ready) {
+//			qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " start capture image";
+//			helper->captureImage();
+//			qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " capture image done";
+//		}
+//	});
+
+	// qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " start capture image";
+	// helper->captureImage();
+	// qDebug() << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss") << " capture image done";
+
+	// QImage capture_scene_image = Qgs3DUtils::captureSceneImage(*qgs_offscreen_3d_engine, qgs_3d_map_scene);
+	// qDebug() << "capture_scene_image size:" << capture_scene_image.size();
+	// QString capture_scene_image_path = QString().append(save_qgis_project_path).append("/").append("capture_scene_image.png");
+	// qDebug() << "capture_scene_image_path: " << capture_scene_image_path;
+	// bool capture_image_status = capture_scene_image.save(capture_scene_image_path);
+	// qDebug() << "save capture_scene_image: " << capture_image_status;
+
+	qDebug() << "JwLayout3D addPrintLayout";
+	jwLayout3d->addPrintLayout(QString("3d"), joined_3d_layout_name, plottingWebVariants, availablePaper, false);
+	qDebug() << "add 3d layout done";
+//
+    QString d3_scene_png = QString().append(save_qgis_project_path).append("/").append("d3_scene.png");
+    qDebug() << "d3_scene_png: " << d3_scene_png;
+    jwLayout3d->exportLayoutToImage(d3_scene_png);
+
+    QString d3_scene_pdf = QString().append(save_qgis_project_path).append("/").append("d3_scene.pdf");
+    qDebug() << "d3_scene_pdf: " << d3_scene_pdf;
+    jwLayout3d->exportLayoutToPdf(d3_scene_pdf);
+
+	qDebug() << "验证布局是否存在";
+	QgsLayoutManager* layout_manager = project->layoutManager();
+	QList<QgsMasterLayoutInterface*> layouts = layout_manager->layouts();
+	qDebug() << " layouts count: " << layouts.count();
+	for (int i = 0; i < layouts.size(); ++i) {
+		QgsMasterLayoutInterface* layout = layouts.at(i);
+		qDebug() << "layout name:" << layout->name();
+	}
+
 
 	// save to .qgz file
+	QString projectPath = QString().append(save_qgis_project_path).append(QGIS_PROJECT_FILE_NAME);
 	qDebug() << "projectPath:" << projectPath;
 	if (!project->write(projectPath)) {
 		qWarning() << "save projectPath to file " << projectPath << " failed!";
@@ -361,43 +603,52 @@ int main(int argc, char* argv[]) {
 	// }
 
 
-	auto layers = project->mapLayers();
-	qDebug() << "layers count:" << layers.size();
-	for (auto it = layers.constBegin(); it != layers.constEnd(); ++it) {
-		qDebug() << "Layer ID:" << it.key() << " Name:" << it.value()->name();
-		QgsVectorLayer* vectorLayer = dynamic_cast<QgsVectorLayer*>(it.value());
-		if (vectorLayer) {
-			qDebug() << "Checking relations for layer:" << vectorLayer->name();
-			//delete feature_renderer;
-			// for (int i = 0; i < vectorLayer->fields().count(); ++i) {
-			// 	qDebug() << "Field index:" << i << " Name:" << vectorLayer->fields().at(i).name();
-			// 	QList<QgsRelation> relations = vectorLayer->referencingRelations(i);
-			// 	qDebug() << "Field index:" << i << " has referencing relations count:" << relations.size();
-			// 	if (!relations.isEmpty()) {
-			// 		qDebug() << "Field index:" << i << " has referencing relations:";
-			// 		for (const QgsRelation& relation : relations) {
-			// 			qDebug() << "Relation name:" << relation.name();
-			// 			qDebug() << "Referenced layer ID:" << relation.referencedLayerId();
-			// 		}
-			// 	}
-			// }
-		}
-		qDebug() << "removeMapLayer" << it.key();
-		project->removeMapLayer(it.key());
-	}
-	/*qDebug() << "remove all layouts";
-	QgsLayoutManager* layout_manager = project->layoutManager();
-	layout_manager->clear();
-	qDebug() << "removeAllMapLayers";
-	project->removeAllMapLayers();
-	qDebug() << "project -> clear()";
-	project->clear();*/
+	// auto layers = project->mapLayers();
+	// qDebug() << "layers count:" << layers.size();
+	// for (auto it = layers.constBegin(); it != layers.constEnd(); ++it) {
+	// 	qDebug() << "Layer ID:" << it.key() << " Name:" << it.value()->name();
+	// 	QgsVectorLayer* vectorLayer = dynamic_cast<QgsVectorLayer*>(it.value());
+	// 	if (vectorLayer) {
+	// 		qDebug() << "Checking relations for layer:" << vectorLayer->name();
+	// 		//delete feature_renderer;
+	// 		// for (int i = 0; i < vectorLayer->fields().count(); ++i) {
+	// 		// 	qDebug() << "Field index:" << i << " Name:" << vectorLayer->fields().at(i).name();
+	// 		// 	QList<QgsRelation> relations = vectorLayer->referencingRelations(i);
+	// 		// 	qDebug() << "Field index:" << i << " has referencing relations count:" << relations.size();
+	// 		// 	if (!relations.isEmpty()) {
+	// 		// 		qDebug() << "Field index:" << i << " has referencing relations:";
+	// 		// 		for (const QgsRelation& relation : relations) {
+	// 		// 			qDebug() << "Relation name:" << relation.name();
+	// 		// 			qDebug() << "Referenced layer ID:" << relation.referencedLayerId();
+	// 		// 		}
+	// 		// 	}
+	// 		// }
+	// 	}
+	// 	qDebug() << "removeMapLayer" << it.key();
+	// 	project->removeMapLayer(it.key());
+	// }
 
-	QString delete_file_test = "D:/iProject/cpath/qgis_demo1/common/project/民警.geojson";
-	//bool delete_file_status = FileUtil::delete_file_with_status(delete_file_test);
-	QFile file(delete_file_test);
-	bool delete_file_status = file.remove();
-	qDebug() << "delete file: " << delete_file_test << " status:" << delete_file_status;
+//#if !defined(_WIN32)
+//	layout_manager->clear();
+//	qDebug() << "removeAllMapLayers";
+//	project->removeAllMapLayers();
+//	qDebug() << "project -> clear()";
+//	/*project->clear();*/
+//	qDebug() << "remove all layouts";
+//	qDebug() << "delete project";
+//	delete project;
+//	qDebug() << "delete project done";
+//
+//	QString delete_file_test = "D:/iProject/cpath/qgis_demo1/common/project/民警.geojson";
+//	//bool delete_file_status = FileUtil::delete_file_with_status(delete_file_test);
+//	QFile file(delete_file_test);
+//	qDebug() << "ready delete file: " << delete_file_test;
+//	bool delete_file_status = file.remove();
+//	qDebug() << "delete file: " << delete_file_test << " status:" << delete_file_status;
+//#endif
+
+    // 释放上下文
+    context.doneCurrent();
 
 	//return app.exec();
 	return 0;

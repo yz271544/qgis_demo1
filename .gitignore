@@ -3,8 +3,9 @@ cmake-build-release/
 common/
 .idea/
 out/
-doc/
 .vs/
 config.h
+constants.h
+constants.cpp
 .cmake/
 Testing/

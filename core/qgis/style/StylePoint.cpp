@@ -28,7 +28,7 @@ QgsFeatureRenderer* StylePoint::get2d_rule_based_renderer(QJsonObject& font_styl
 	if (font_style.contains("fontColor")) {
 		QString font_color = font_style["fontColor"].toString();
 		qDebug() << "origin font_color:" << font_color;
-		std::pair<QString, float> colorOpacity = ColorTransformUtil::str_rgba_to_hex(font_color);
+		std::pair<QString, float> colorOpacity = ColorTransformUtil::strRgbaToHex(font_color);
 		qDebug() << "insert fontColor:" << colorOpacity.first << " fontOpacity:" << colorOpacity.second;
 		label_style->insert("fontColor", colorOpacity.first);
 		label_style->insert("fontOpacity", colorOpacity.second);
@@ -86,8 +86,10 @@ QgsFeatureRenderer* StylePoint::get2d_rule_based_renderer(QJsonObject& font_styl
 	qDebug() << "point_size:" << point_size << " --> raster_marker_size: " << raster_marker_size;
 	rule_raster_marker->setSize(raster_marker_size);
 	rule_symbol->changeSymbolLayer(0, rule_raster_marker);
-	rule_symbol->appendSymbolLayer(rule_font_marker);
-
+	if (ENABLE_POINT_CLUSTER)
+	{
+		rule_symbol->appendSymbolLayer(rule_font_marker);
+	}
 	QgsRuleBasedRenderer::Rule* root_rule = new QgsRuleBasedRenderer::Rule(nullptr);
 	QgsRuleBasedRenderer::Rule* rule = new QgsRuleBasedRenderer::Rule(rule_symbol);
 	rule->setFilterExpression("ELSE");
@@ -136,7 +138,7 @@ QgsAbstract3DRenderer* StylePoint::get3d_single_symbol_renderer(
 		font_color = "#000000";
 	}
 
-	std::pair<QString, float> colorOpacity = ColorTransformUtil::str_rgba_to_hex(font_color);
+	std::pair<QString, float> colorOpacity = ColorTransformUtil::strRgbaToHex(font_color);
 	QString material_font_color = colorOpacity.first;
 	float material_font_opacity = colorOpacity.second;
 
@@ -162,7 +164,7 @@ QgsAbstract3DRenderer* StylePoint::get3d_single_raster_symbol_renderer(
 
 	if (font_style.contains("fontColor")) {
 		QString font_color = font_style["fontColor"].toString();
-		std::pair<QString, float> colorOpacity = ColorTransformUtil::str_rgba_to_hex(font_color);
+		std::pair<QString, float> colorOpacity = ColorTransformUtil::strRgbaToHex(font_color);
 		label_style->insert("fontColor", colorOpacity.first);
 		label_style->insert("fontOpacity", colorOpacity.second);
 
@@ -223,7 +225,7 @@ QgsRuleBased3DRenderer* StylePoint::get3d_rule_renderer(
 
 	if (font_style.contains("fontColor")) {
 		QString font_color = font_style["fontColor"].toString();
-		std::pair<QString, float> colorOpacity = ColorTransformUtil::str_rgba_to_hex(font_color);
+		std::pair<QString, float> colorOpacity = ColorTransformUtil::strRgbaToHex(font_color);
 		label_style.insert("fontColor", colorOpacity.first);
 		label_style.insert("fontOpacity", colorOpacity.second);
 

@@ -1,7 +1,7 @@
 ﻿
 #include "ColorTransformUtil.h"
 
-std::tuple<int, int, int, float> ColorTransformUtil::str_rgba_to_tuple_int(const QString& rgba) {
+std::tuple<int, int, int, float> ColorTransformUtil::strRgbaToTupleInt(const QString& rgba) {
 	if (rgba.isEmpty()) {
 		qCritical() << "Input string is empty";
 		return std::make_tuple(0, 0, 0, 0.0f);
@@ -57,22 +57,22 @@ std::tuple<int, int, int, float> ColorTransformUtil::str_rgba_to_tuple_int(const
 }
 
 // 将 RGB 元组转换为十六进制字符串
-QString ColorTransformUtil::rgb_to_hex(const std::tuple<int, int, int>& rgb) {
+QString ColorTransformUtil::rgbToHex(const std::tuple<int, int, int>& rgb) {
 	return QString("#%1%2%3")
 		.arg(std::get<0>(rgb), 2, 16, QLatin1Char('0'))
 		.arg(std::get<1>(rgb), 2, 16, QLatin1Char('0'))
 		.arg(std::get<2>(rgb), 2, 16, QLatin1Char('0'));
 }
 
-std::pair<QString, float> ColorTransformUtil::str_rgba_to_hex(const QString& rgba) {
-	auto rgb = str_rgba_to_tuple_int(rgba);
+std::pair<QString, float> ColorTransformUtil::strRgbaToHex(const QString& rgba) {
+	auto rgb = strRgbaToTupleInt(rgba);
 	float capacity = std::get<3>(rgb);
-	QString hex = rgb_to_hex(std::make_tuple(std::get<0>(rgb), std::get<1>(rgb), std::get<2>(rgb)));
+	QString hex = rgbToHex(std::make_tuple(std::get<0>(rgb), std::get<1>(rgb), std::get<2>(rgb)));
 	return std::make_pair(hex, capacity);
 }
 
 // 将十六进制字符串转换为 RGB 元组
-std::tuple<int, int, int> ColorTransformUtil::hex_to_rgb(const QString& hex_str) {
+std::tuple<int, int, int> ColorTransformUtil::hexToRgb(const QString& hex_str) {
 	std::string str = hex_str.toStdString();
 	int r = std::stoi(str.substr(1, 2), nullptr, 16);
 	int g = std::stoi(str.substr(3, 2), nullptr, 16);
@@ -81,7 +81,7 @@ std::tuple<int, int, int> ColorTransformUtil::hex_to_rgb(const QString& hex_str)
 }
 
 // 比较两种颜色
-bool ColorTransformUtil::compare_color(const QVector<QString>& color1, const QVector<QString>& color2) {
+bool ColorTransformUtil::compareColor(const QVector<QString>& color1, const QVector<QString>& color2) {
 	if (color1.size() < 3 || color2.size() < 3) {
 		return false;
 	}
@@ -89,7 +89,7 @@ bool ColorTransformUtil::compare_color(const QVector<QString>& color1, const QVe
 }
 
 // 合并颜色
-QString ColorTransformUtil::merge_color(const QVector<QString>& color) {
+QString ColorTransformUtil::mergeColor(const QVector<QString>& color) {
 	QString result;
 	for (int i = 0; i < color.size(); ++i) {
 		result += color[i];
@@ -101,7 +101,7 @@ QString ColorTransformUtil::merge_color(const QVector<QString>& color) {
 }
 
 // 拆分颜色
-QVector<QString> ColorTransformUtil::split_color(const QString& merged_color) {
+QVector<QString> ColorTransformUtil::splitColor(const QString& merged_color) {
 	QVector<QString> result;
 	int start = 0;
 	int pos = 0;
@@ -115,10 +115,10 @@ QVector<QString> ColorTransformUtil::split_color(const QString& merged_color) {
 
 
 // 对颜色进行分组统计
-QHash<QString, int> ColorTransformUtil::multi_color_group(const QVector<QVector<QString>>& style_colors) {
+QHash<QString, int> ColorTransformUtil::multiColorGroup(const QVector<QVector<QString>>& style_colors) {
 	QHash<QString, int> color_dict;
 	for (const auto& style_color : style_colors) {
-		QString style_color_merged = merge_color(style_color);
+		QString style_color_merged = mergeColor(style_color);
 		if (color_dict.contains(style_color_merged)) {
 			color_dict[style_color_merged]++;
 		}
