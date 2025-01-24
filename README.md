@@ -33,3 +33,10 @@ save qgz file: "/lyndon/iProject/cpath/qgis_demo1/common/project/project.qgz"
 ```
 
 ![](doc/images/d3_scene.png)
+
+#### need fix the qgis bug
+bug:
+[60256](https://github.com/qgis/QGIS/issues/60256)
+
+fix pending PR merge:
+[60258](https://github.com/qgis/QGIS/issues/60258)
