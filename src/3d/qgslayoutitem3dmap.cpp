@@ -24,6 +24,7 @@
 #include "qgslayoutitemregistry.h"
 #include "qgsoffscreen3dengine.h"
 #include "qgslayoutrendercontext.h"
+#include "qlogging.h"
 
 QgsLayoutItem3DMap::QgsLayoutItem3DMap( QgsLayout *layout )
   : QgsLayoutItem( layout )
@@ -96,12 +97,15 @@ void QgsLayoutItem3DMap::updateToolTip()
 
 void QgsLayoutItem3DMap::draw( QgsLayoutItemRenderContext &context )
 {
+  qWarning() << "QgsLayoutItem3DMap warning: QgsLayoutItem3DMap draw";
+  qDebug() << "QgsLayoutItem3DMap debug: QgsLayoutItem3DMap draw";
   QgsRenderContext &ctx = context.renderContext();
   QPainter *painter = ctx.painter();
 
   int w = static_cast<int>( std::ceil( rect().width() * ctx.scaleFactor() ) );
   int h = static_cast<int>( std::ceil( rect().height() * ctx.scaleFactor() ) );
   QRect r( 0, 0, w, h );
+  qDebug() << "QgsLayoutItem3DMap draw w: " << w << " h:" << h;
 
   painter->save();
 
@@ -109,11 +113,13 @@ void QgsLayoutItem3DMap::draw( QgsLayoutItemRenderContext &context )
   {
     painter->drawText( r, Qt::AlignCenter, tr( "Scene not set" ) );
     painter->restore();
+    qDebug() << "QgsLayoutItem3DMap not scene";
     return;
   }
 
   if ( mSettings->backgroundColor() != backgroundColor() )
   {
+    qDebug() << "QgsLayoutItem3DMap set background color";
     mSettings->setBackgroundColor( backgroundColor() );
     mCapturedImage = QImage();
   }
@@ -122,6 +128,7 @@ void QgsLayoutItem3DMap::draw( QgsLayoutItemRenderContext &context )
   {
     painter->drawImage( r, mCapturedImage );
     painter->restore();
+    qDebug() << "QgsLayoutItem3DMap draw image return";
     return;
   }
 
@@ -129,6 +136,7 @@ void QgsLayoutItem3DMap::draw( QgsLayoutItemRenderContext &context )
 
   if ( mLayout->renderContext().isPreviewRender() )
   {
+    qDebug() << "QgsLayoutItem3DMap preview render draw text";
     painter->drawText( r, Qt::AlignCenter, tr( "Loading" ) );
     painter->restore();
     if ( mSettings->rendererUsage() != Qgis::RendererUsage::View )
@@ -141,20 +149,21 @@ void QgsLayoutItem3DMap::draw( QgsLayoutItemRenderContext &context )
   {
     if ( mSettings->rendererUsage() != Qgis::RendererUsage::Export )
     {
+      qDebug() << "QgsLayoutItem3DMap render usage: " << mSettings->rendererUsage();
       mSettings->setRendererUsage( Qgis::RendererUsage::Export );
       mEngine.reset(); //we need to rebuild the scene to force the render again
     }
   }
 
   QSizeF sizePixels = mLayout->renderContext().measurementConverter().convert( sizeWithUnits(), Qgis::LayoutUnit::Pixels ).toQSizeF();
-  QSize sizePixelsInt = QSize( static_cast<int>( std::ceil( sizePixels.width() ) ),
-                               static_cast<int>( std::ceil( sizePixels.height() ) ) );
+  QSize sizePixelsInt = QSize( static_cast<int>( std::ceil( sizePixels.width() ) ), static_cast<int>( std::ceil( sizePixels.height() ) ) );
 
   if ( isTemporal() )
     mSettings->setTemporalRange( temporalRange() );
 
   if ( !mEngine )
   {
+    qDebug() << "QgsLayoutItem3DMap mEngine is nullptr, reset it";
     mEngine.reset( new QgsOffscreen3DEngine );
     connect( mEngine.get(), &QgsAbstract3DEngine::imageCaptured, this, &QgsLayoutItem3DMap::onImageCaptured );
 
@@ -163,7 +172,6 @@ void QgsLayoutItem3DMap::draw( QgsLayoutItemRenderContext &context )
     connect( mScene, &Qgs3DMapScene::sceneStateChanged, this, &QgsLayoutItem3DMap::onSceneStateChanged );
 
     mEngine->setRootEntity( mScene );
-
   }
 
   if ( mEngine->size() != sizePixelsInt )
@@ -173,27 +181,88 @@ void QgsLayoutItem3DMap::draw( QgsLayoutItemRenderContext &context )
 
   if ( mLayout->renderContext().isPreviewRender() )
   {
+    qDebug() << "QgsLayoutItem3DMap preview render on scene state changed";
     onSceneStateChanged();
   }
   else
   {
     // we can't just request a capture and hope it will arrive at some point later.
     // this is not a preview, we need the rendered scene now!
+    qDebug() << "QgsLayoutItem3DMap mDrawing: " << mDrawing;
     if ( mDrawing )
       return;
     mDrawing = true;
     disconnect( mEngine.get(), &QgsAbstract3DEngine::imageCaptured, this, &QgsLayoutItem3DMap::onImageCaptured );
     disconnect( mScene, &Qgs3DMapScene::sceneStateChanged, this, &QgsLayoutItem3DMap::onSceneStateChanged );
-
+    qDebug() << "QgsLayoutItem3DMap init capture scene image";
     Qgs3DUtils::captureSceneImage( *mEngine.get(), mScene );
+
+
+    QgsVector3D lookAtCenterPoint = QgsVector3D(100, 500, 220.0);
+    float distance = 4424.83;
+    float pitchAngle = 38.0;
+    float headingAngle = 20.0;
+    QgsCameraPose newCameraPose;
+    newCameraPose.setCenterPoint(lookAtCenterPoint);
+    newCameraPose.setDistanceFromCenterPoint(distance);
+    newCameraPose.setPitchAngle(pitchAngle);
+    newCameraPose.setHeadingAngle(headingAngle);
+
+    qDebug() << "QgsLayoutItem3DMap capture scene image";
+    QgsCameraController* cameraController = mScene->cameraController();
+    cameraController->setCameraPose(newCameraPose);
+    cameraController->setLookingAtPoint(lookAtCenterPoint, distance, pitchAngle, headingAngle);
+
+    qDebug() << "before modify camera controller scene state:" << mScene->sceneState();
+    qDebug() << "before modify camera controller pending jobs:" << mScene->totalPendingJobsCount();
+    QgsVector3D sceneLookingAtPoint3d = cameraController->lookingAtPoint();
+    qDebug() << "scene camera lookingAtPoint: x:" << QString::number(sceneLookingAtPoint3d.x(), 'f', 10)
+         << " y:" << QString::number(sceneLookingAtPoint3d.y(), 'f', 10)
+         << " z:" << QString::number(sceneLookingAtPoint3d.z(), 'f', 10);
+    QgsCameraPose cameraPose = cameraController->cameraPose();
+    qDebug() << "scene camera cameraPose: x:" << QString::number(cameraPose.centerPoint().x() , 'f', 10)
+             << " y:" << QString::number(cameraPose.centerPoint().y() , 'f', 10)
+             << " z:" << QString::number(cameraPose.centerPoint().z(), 'f', 10)
+             << " pitchAngle:" << cameraPose.pitchAngle()
+             << " headingAngle:" << cameraPose.headingAngle()
+             << " distanceFromCenterPoint:" << cameraPose.distanceFromCenterPoint();
+
+
+
     QImage img = Qgs3DUtils::captureSceneImage( *mEngine.get(), mScene );
+    qDebug() << "after modify camera controller scene state:" << mScene->sceneState();
+    qDebug() << "after modify camera controller pending jobs:" << mScene->totalPendingJobsCount();
     painter->drawImage( r, img );
     painter->restore();
+    qDebug() << "QgsLayoutItem3DMap saved image";
 
     connect( mEngine.get(), &QgsAbstract3DEngine::imageCaptured, this, &QgsLayoutItem3DMap::onImageCaptured );
     connect( mScene, &Qgs3DMapScene::sceneStateChanged, this, &QgsLayoutItem3DMap::onSceneStateChanged );
     mDrawing = false;
+    qDebug() << "QgsLayoutItem3DMap drawing success";
   }
+}
+
+
+void QgsLayoutItem3DMap::initCameraPose(QgsVector3D lookAtCenterPoint, float distance, float pitchAngle, float headingAngle) {
+    mCameraPose.setCenterPoint(lookAtCenterPoint);
+    mCameraPose.setDistanceFromCenterPoint(distance);
+    mCameraPose.setPitchAngle(pitchAngle);
+    mCameraPose.setHeadingAngle(headingAngle);
+    mCapturedImage = QImage();
+    update();
+}
+
+void QgsLayoutItem3DMap::moveCamera(QgsVector3D lookAtCenterPoint, float distance, float pitchAngle, float headingAngle)
+{
+  QgsCameraPose newCameraPose;
+  newCameraPose.setCenterPoint(lookAtCenterPoint);
+  newCameraPose.setDistanceFromCenterPoint(distance);
+  newCameraPose.setPitchAngle(pitchAngle);
+  newCameraPose.setHeadingAngle(headingAngle);
+  QgsCameraController* cameraController = mScene->cameraController();
+  cameraController->setCameraPose(newCameraPose);
+  cameraController->setLookingAtPoint(lookAtCenterPoint, distance, pitchAngle, headingAngle);
 }
 
 void QgsLayoutItem3DMap::onImageCaptured( const QImage &img )

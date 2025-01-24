@@ -107,6 +107,9 @@ class _3D_EXPORT QgsLayoutItem3DMap : public QgsLayoutItem, public QgsTemporalRa
 
     void finalizeRestoreFromXml() override;
 
+    void initCameraPose(QgsVector3D lookAtCenterPoint, float distance, float pitchAngle, float headingAngle);
+    void moveCamera(QgsVector3D lookAtCenterPoint, float distance, float pitchAngle, float headingAngle);
+
   public slots:
     void refresh() override;
 
@@ -131,6 +134,11 @@ class _3D_EXPORT QgsLayoutItem3DMap : public QgsLayoutItem, public QgsTemporalRa
     QImage mCapturedImage;
     QgsCameraPose mCameraPose;
     bool mDrawing = false;
+    bool mCamereMove = false;
+    QgsVector3D mLookAtCenterPoint;
+    float mDistance;
+    float mPitchAngle;
+    float mHeadingAngle;
 
     //! Unique identifier
     int mMapId = 1;

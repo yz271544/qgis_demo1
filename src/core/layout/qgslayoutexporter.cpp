@@ -198,6 +198,7 @@ void QgsLayoutExporter::renderPage( QPainter *painter, int page ) const
 
 QImage QgsLayoutExporter::renderPageToImage( int page, QSize imageSize, double dpi ) const
 {
+  qDebug() << "QgsLayoutExporter renderPageToImage";
   if ( !mLayout )
     return QImage();
 
@@ -1365,6 +1366,7 @@ void QgsLayoutExporter::preparePrint( QgsLayout *layout, QPagedPaintDevice *devi
 
 QgsLayoutExporter::ExportResult QgsLayoutExporter::print( QPagedPaintDevice *device )
 {
+  qDebug() << "QgsLayoutExporter print";
   if ( mLayout->pageCollection()->pageCount() == 0 )
     return PrintError;
 
@@ -1383,6 +1385,7 @@ QgsLayoutExporter::ExportResult QgsLayoutExporter::print( QPagedPaintDevice *dev
 
 QgsLayoutExporter::ExportResult QgsLayoutExporter::printPrivate( QPagedPaintDevice *device, QPainter &painter, bool startNewPage, double dpi, bool rasterize )
 {
+  qDebug() << "QgsLayoutExporter printPrivate" << " rasterize: " << rasterize;
   // layout starts page numbering at 0
   int fromPage = 0;
   int toPage = mLayout->pageCollection()->pageCount() - 1;
