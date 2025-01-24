@@ -25,3 +25,11 @@ Error adding XYZ layer
 save qgs file: "/lyndon/iProject/cpath/qgis_demo1/common/project/temp_project.qgs"
 save qgz file: "/lyndon/iProject/cpath/qgis_demo1/common/project/project.qgz"
 ```
+
+### export 3d layout to image
+```console
+/lyndon/iProject/cpath/qgis_demo1/cmake-build-debug/qgis_demo3d1
+...
+```
+
+![](doc/images/d3_scene.png)
